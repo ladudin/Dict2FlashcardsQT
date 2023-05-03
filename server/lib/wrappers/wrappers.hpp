@@ -1,10 +1,12 @@
-#pragma once
+#ifndef WRAPPERS_H
+#define WRAPPERS_H
 
 #include <string>
 #include <vector>
 
 using JSON = int;  // Временная заглушка
-#error "Нужно поменять заглушку типа JSON на настоящий"
+
+// #error "Нужно поменять заглушку типа JSON на настоящий"
 
 template <class T>
 class IPluginWrapper {
@@ -39,7 +41,7 @@ struct Card {
     JSON                     other;
 };
 
-#error "Нужно раснести оболочки по разным файлам"
+// #error "Нужно раснести оболочки по разным файлам"
 
 class DefinitionsProviderWrapper : public IPluginWrapper<std::vector<Card>> {
     auto get_dictionary_scheme() -> JSON;
@@ -56,3 +58,5 @@ class AudiosProviderWrapper : public IPluginWrapper<std::vector<std::string>> {
 
 class FormatProcessorWrapper : public IPluginWrapper<std::vector<std::string>> {
 };
+
+#endif  // WRAPPERS_H

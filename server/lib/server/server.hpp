@@ -50,11 +50,11 @@ class User {
     auto set_format_processors_config(JSON new_config) -> JSON;
 
  private:
-    DefinitionsProviderWrapper definitions_provider_;
-    SentencesProviderWrapper   sentences_provider_;
-    ImagesProviderWrapper      images_provider_;
-    AudiosProviderWrapper      audios_provider_;
-    FormatProcessorWrapper     format_processor_;
+    // DefinitionsProviderWrapper definitions_provider_;
+    // SentencesProviderWrapper   sentences_provider_;
+    // ImagesProviderWrapper      images_provider_;
+    // AudiosProviderWrapper      audios_provider_;
+    // FormatProcessorWrapper     format_processor_;
 };
 
 class TCPSession : public std::enable_shared_from_this<TCPSession> {
@@ -65,19 +65,16 @@ class TCPSession : public std::enable_shared_from_this<TCPSession> {
 
  private:
     boost::asio::ip::tcp::socket socket_;
+    boost::asio::streambuf       request_buffer;
 
     void                         do_read();
 
     void                         do_write(std::size_t length);
-
-    enum { max_length = 1024 };
-
-    char data_[max_length];
 };
 
 class PluginServer {
  public:
-    explicit PluginServer(boost::asio::io_context &context);
+    explicit PluginServer(boost::asio::io_context &context, uint16_t port);
 
     ~PluginServer()                                        = default;
     PluginServer(const PluginServer &)                     = delete;
