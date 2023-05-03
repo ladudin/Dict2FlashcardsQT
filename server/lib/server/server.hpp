@@ -66,6 +66,7 @@ class TCPSession : public std::enable_shared_from_this<TCPSession> {
  private:
     boost::asio::ip::tcp::socket socket_;
     boost::asio::streambuf       request_buffer;
+    char                         data_[1024];
 
     void                         do_read();
 

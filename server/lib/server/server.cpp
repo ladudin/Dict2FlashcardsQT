@@ -30,11 +30,13 @@ void TCPSession::do_read() {
         request_buffer,
         ' ',  // https://stackoverflow.com/questions/3058589/boostasioasync-read-until-reads-all-data-instead-of-just-some
         [this, self](boost::system::error_code ec, std::size_t length) {
-            std::cout << "reading" << std::endl;
+            std::cout << "reading " << length << std::endl;
             std::cout << make_string(request_buffer) << std::endl;
+
+            request_buffer.consume(length);
+
             std::fflush(stdout);
             if (!ec) {
-                // request_buffer.
                 do_read();
                 return;
             }
