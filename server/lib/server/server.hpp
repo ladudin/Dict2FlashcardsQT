@@ -2,12 +2,16 @@
 #define SERVER_H
 
 #include "wrappers.hpp"
+#include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <cstdint>
+#include <memory>
+#include <nlohmann/json_fwd.hpp>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -15,7 +19,7 @@
 
 using UserID = uint16_t;
 
-class User {
+class PluginsBundle {
  public:
     // clang-format off
     auto get_definitions(std::string word)
@@ -50,27 +54,52 @@ class User {
     auto set_format_processors_config(JSON new_config) -> JSON;
 
  private:
-    // DefinitionsProviderWrapper definitions_provider_;
-    // SentencesProviderWrapper   sentences_provider_;
-    // ImagesProviderWrapper      images_provider_;
-    // AudiosProviderWrapper      audios_provider_;
-    // FormatProcessorWrapper     format_processor_;
+    // std::optional<DefinitionsProviderWrapper> definitions_provider_ =
+    //     std::nullopt;
+    // std::optional<SentencesProviderWrapper> sentences_provider_ =
+    // std::nullopt; std::optional<ImagesProviderWrapper>    images_provider_ =
+    // std::nullopt; std::optional<AudiosProviderWrapper>    audios_provider_ =
+    // std::nullopt; std::optional<FormatProcessorWrapper>   format_processor_
+    // = std::nullopt;
 };
 
-class TCPSession : public std::enable_shared_from_this<TCPSession> {
+class IResponceGenerator {
  public:
-    explicit TCPSession(boost::asio::ip::tcp::socket socket);
+    explicit IResponceGenerator(nlohmann::json request);
+
+    virtual ~IResponceGenerator() = default;
+
+    virtual auto handle() -> nlohmann::json;
+
+    IResponceGenerator(const IResponceGenerator &)            = default;
+    IResponceGenerator(IResponceGenerator &&)                 = default;
+    IResponceGenerator &operator=(const IResponceGenerator &) = default;
+    IResponceGenerator &operator=(IResponceGenerator &&)      = default;
+};
+
+class ResponceGenerator : public IResponceGenerator {
+ public:
+    explicit ResponceGenerator(nlohmann::json request);
+
+    auto handle() -> nlohmann::json override;
+};
+
+class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
+ public:
+    explicit TCPConnection(
+        boost::asio::ip::tcp::socket        socket,
+        std::unique_ptr<IResponceGenerator> response_generator);
 
     void start();
 
  private:
-    boost::asio::ip::tcp::socket socket_;
-    boost::asio::streambuf       request_buffer;
-    char                         data_[1024];
+    boost::asio::ip::tcp::socket        socket_;
+    boost::asio::streambuf              request_buffer;
+    std::unique_ptr<IResponceGenerator> response_generator_;
 
-    void                         do_read();
-
-    void                         do_write(std::size_t length);
+    void                                do_read();
+    void                                do_write(std::size_t length);
+    void                                handle_request(std::string);
 };
 
 class PluginServer {
@@ -84,14 +113,13 @@ class PluginServer {
     auto operator=(PluginServer &&) -> PluginServer      & = delete;
 
  private:
-    boost::asio::io_context         &io_context_;
-    boost::asio::ip::tcp::acceptor   acceptor_;
-    std::unordered_map<UserID, User> users;
+    boost::asio::io_context       &io_context_;
+    boost::asio::ip::tcp::acceptor acceptor_;
 
-    void                             start_accept();
+    void                           start_accept();
 
-    void                             handle_accept(
-                                    // TCPConnection::pointer          new_connection,
+    void                           handle_accept(
+                                  // TCPConnection::pointer          new_connection,
         const boost::system::error_code &error);
     // clang-format on
 };

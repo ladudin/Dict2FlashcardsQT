@@ -3,54 +3,64 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/bind.hpp>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 
 using boost::asio::ip::tcp;
+using nlohmann::json;
 
-TCPSession::TCPSession(tcp::socket socket) : socket_(std::move(socket)) {
+TCPConnection::TCPConnection(
+    boost::asio::ip::tcp::socket        socket,
+    std::unique_ptr<IResponceGenerator> response_generator)
+    : socket_(std::move(socket)) {
+    response_generator_.reset(std::move(response_generator));
 }
 
-void TCPSession::start() {
+void TCPConnection::start() {
     do_read();
 }
 
-auto make_string(boost::asio::streambuf &streambuf) -> std::string {
-    return {buffers_begin(streambuf.data()), buffers_end(streambuf.data())};
-}
-
-void TCPSession::do_read() {
+void TCPConnection::do_read() {
     auto self = shared_from_this();
 
+    // https://stackoverflow.com/questions/3058589/boostasioasync-read-until-reads-all-data-instead-of-just-some
     boost::asio::async_read_until(
         socket_,
         request_buffer,
-        ' ',  // https://stackoverflow.com/questions/3058589/boostasioasync-read-until-reads-all-data-instead-of-just-some
-        [this, self](boost::system::error_code ec, std::size_t length) {
-            std::cout << "reading " << length << std::endl;
-            std::cout << make_string(request_buffer) << std::endl;
-
-            request_buffer.consume(length);
-
-            std::fflush(stdout);
-            if (!ec) {
-                do_read();
+        "\n\r",
+        [this, self](boost::system::error_code error_code, std::size_t length) {
+            if (error_code) {
+                std::cerr << "TCPSesssion error: " << error_code << std::endl;
                 return;
             }
-            std::cout << ec << std::endl;
-            std::fflush(stdout);
+            request_buffer.commit(length);
+            std::istream istrm(&request_buffer);
+            std::string  result;
+            istrm >> result;
+
+            json parsed_request = json::parse(result);
+            assert(parsed_request.is_object());
+            assert(parsed_request.contains("query_type"));
+
+            json query_type = parsed_request["query_type"];
+            assert(query_type.is_string());
+
+            parsed_request["query_type"];
         });
 }
 
-void TCPSession::do_write(std::size_t length) {
+void TCPConnection::do_write(std::size_t length) {
     // auto self(shared_from_this());
     // boost::asio::async_write(
     //     socket_,
     //     boost::asio::buffer(data_, length),
-    //     [this, self](boost::system::error_code ec, std::size_t /*length*/)
+    //     [this, self](boost::system::error_code ec, std::size_t /*length*/) //
     //     {});
 }
 
@@ -64,7 +74,7 @@ void PluginServer::start_accept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
             if (!ec) {
-                std::make_shared<TCPSession>(std::move(socket))->start();
+                std::make_shared<TCPConnection>(std::move(socket))->start();
             }
             start_accept();
         });
