@@ -5,9 +5,7 @@
 
 using nlohmann::json;
 
-ResponceGenerator::ResponceGenerator(std::shared_ptr<PluginsBundle> bundle)
-    : bundle_(std::move(bundle)) {
-}
+ResponceGenerator::ResponceGenerator() = default;
 
 static auto return_error(const std::string &message) -> json {
     json dst;

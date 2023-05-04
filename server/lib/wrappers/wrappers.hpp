@@ -1,12 +1,14 @@
 #ifndef WRAPPERS_H
 #define WRAPPERS_H
 
+#include <nlohmann/json.hpp>
 #include <string>
+#include <utility>
 #include <vector>
 
-using JSON = int;  // Временная заглушка
 
-// #error "Нужно поменять заглушку типа JSON на настоящий"
+
+
 
 template <class T>
 class IPluginWrapper {
@@ -15,9 +17,9 @@ class IPluginWrapper {
 
     virtual void load();
     virtual auto get(std::string word) -> T;
-    virtual auto get_config_description() -> JSON;
-    virtual auto get_default_config() -> JSON;
-    virtual auto set_config(JSON new_config) -> JSON;
+    virtual auto get_config_description() -> nlohmann::json;
+    virtual auto get_default_config() -> nlohmann::json;
+    virtual auto set_config(nlohmann::json new_config) -> nlohmann::json;
     virtual void unload();
 
     virtual ~IPluginWrapper()                                  = default;
@@ -27,7 +29,7 @@ class IPluginWrapper {
     auto operator=(IPluginWrapper &&) -> IPluginWrapper      & = delete;
 
  private:
-    JSON config;
+    nlohmann::json config;
 };
 
 struct Card {
@@ -37,26 +39,31 @@ struct Card {
     std::vector<std::string> examples;
     std::vector<std::string> image_links;
     std::vector<std::string> audio_links;
-    JSON                     tags;
-    JSON                     other;
+    nlohmann::json           tags;
+    nlohmann::json           other;
 };
 
-// #error "Нужно раснести оболочки по разным файлам"
+#error "Нужно раснести оболочки по разным файлам"
 
-class DefinitionsProviderWrapper : public IPluginWrapper<std::vector<Card>> {
-    auto get_dictionary_scheme() -> JSON;
+class DefinitionsProviderWrapper
+    : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
+    auto get_dictionary_scheme() -> nlohmann::json;
 };
 
 class SentencesProviderWrapper
-    : public IPluginWrapper<std::vector<std::string>> {};
-
-class ImagesProviderWrapper : public IPluginWrapper<std::vector<std::string>> {
+    : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
 };
 
-class AudiosProviderWrapper : public IPluginWrapper<std::vector<std::string>> {
+class ImagesProviderWrapper
+    : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
 };
 
-class FormatProcessorWrapper : public IPluginWrapper<std::vector<std::string>> {
+class AudiosProviderWrapper
+    : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
+};
+
+class FormatProcessorWrapper
+    : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
 };
 
 #endif  // WRAPPERS_H

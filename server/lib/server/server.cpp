@@ -1,5 +1,6 @@
 #include "server.hpp"
-#include "connection.hpp"
+#include "response_generators.hpp"
+#include "session.hpp"
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/read_until.hpp>
@@ -26,7 +27,8 @@ void PluginServer::start_accept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
             if (!ec) {
-                std::make_shared<TCPConnection>(std::move(socket))->start();
+                std::make_shared<Session<ResponceGenerator>>(std::move(socket))
+                    ->start();
             }
             start_accept();
         });

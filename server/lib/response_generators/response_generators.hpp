@@ -24,12 +24,13 @@ class IResponceGenerator {
 
 class ResponceGenerator : public IResponceGenerator {
  public:
-    explicit ResponceGenerator(std::shared_ptr<PluginsBundle> bundle);
+    ResponceGenerator();
 
     auto handle(const std::string &request) -> nlohmann::json override;
 
  private:
     std::shared_ptr<PluginsBundle> bundle_;
+    std::shared_ptr<>              plugins_provider_;
 };
 
 #endif  // !RESPONSE_GENERATORS_H

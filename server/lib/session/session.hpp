@@ -1,15 +1,19 @@
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#ifndef SESSION_H
+#define SESSION_H
 
 #include "response_generators.hpp"
 #include <boost/asio.hpp>
+#include <concepts>
+#include <iostream>
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
+#include <utility>
 
-class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
+class Session : public std::enable_shared_from_this<Session> {
  public:
-    explicit TCPConnection(
-        boost::asio::ip::tcp::socket        socket,
-        std::unique_ptr<IResponceGenerator> response_generator);
+    explicit Session(boost::asio::ip::tcp::socket        socket,
+                     std::unique_ptr<IResponceGenerator> response_generator);
 
     void start();
 
@@ -22,4 +26,4 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
     void                                do_write(std::string response);
 };
 
-#endif  // !CONNECTION_H
+#endif  // SESSION_H
