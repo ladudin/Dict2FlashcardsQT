@@ -1,7 +1,7 @@
 #ifndef DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_PLUGIN_WRAPPER_INTERFACES_IFORMATPROCESSORPLUGINWRAPPER_H
 #define DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_PLUGIN_WRAPPER_INTERFACES_IFORMATPROCESSORPLUGINWRAPPER_H
 
-#include "../plugin_wrapper_interfaces/IBasicPluginWrapper.h"
+#include "plugin_wrappers/plugin_wrapper_interfaces/IBasicPluginWrapper.h"
 
 #include <string>
 
@@ -11,6 +11,5 @@ class IFormatProcessorPluginWrapper : virtual public IBasicPluginWrapper {
                       const std::string &links_path,
                       const std::string &media_path) = 0;
 };
-
 
 #endif  // DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_PLUGIN_WRAPPER_INTERFACES_IFORMATPROCESSORPLUGINWRAPPER_H
