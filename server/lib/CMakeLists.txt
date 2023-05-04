@@ -1,2 +1,5 @@
 add_subdirectory(wrappers)
+add_subdirectory(plugins_bundle)
+add_subdirectory(response_generators)
+add_subdirectory(connection)
 add_subdirectory(server)
