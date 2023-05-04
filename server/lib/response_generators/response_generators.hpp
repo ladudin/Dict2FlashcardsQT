@@ -1,29 +1,35 @@
 #ifndef RESPONSE_GENERATORS_H
 #define RESPONSE_GENERATORS_H
 
+#include "plugins_bundle.hpp"
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
 
 class IResponceGenerator {
  public:
-    explicit IResponceGenerator();
-
     virtual ~IResponceGenerator() = default;
+    virtual auto handle(const std::string &request) -> nlohmann::json;
 
-    virtual auto handle(std::string request) -> nlohmann::json;
-
-    IResponceGenerator(const IResponceGenerator &) = default;
-    IResponceGenerator(IResponceGenerator &&)      = default;
-    auto operator=(const IResponceGenerator &)
-        -> IResponceGenerator                                   & = default;
-    auto operator=(IResponceGenerator &&) -> IResponceGenerator & = default;
+ protected:
+    virtual auto handle_init(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get_default_config(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get_config_scheme(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_set_config(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_list_plugins(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_load_new_plugins(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get_dict_scheme(nlohmann::json &) -> nlohmann::json;
 };
 
 class ResponceGenerator : public IResponceGenerator {
  public:
-    ResponceGenerator();
+    explicit ResponceGenerator(std::shared_ptr<PluginsBundle> bundle);
 
-    auto handle(std::string request) -> nlohmann::json override;
+    auto handle(const std::string &request) -> nlohmann::json override;
+
+ private:
+    std::shared_ptr<PluginsBundle> bundle_;
 };
 
 #endif  // !RESPONSE_GENERATORS_H
