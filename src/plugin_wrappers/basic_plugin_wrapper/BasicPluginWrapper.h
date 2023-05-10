@@ -21,7 +21,7 @@ class BasicPluginWrapper : virtual public IBasicPluginWrapper {
     LoadResult list_plugins() override;
     LoadResult load_new_plugins() override;
 
- private:
+ protected:
     std::shared_ptr<IRequestable> connection_;
     std::string                   plugin_type_;
 };

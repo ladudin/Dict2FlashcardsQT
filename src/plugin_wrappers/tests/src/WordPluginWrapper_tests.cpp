@@ -1,29 +1,36 @@
-#include "plugin_wrappers/tests/src/mock_classes.h"
-#include "plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.h"
-
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
+
+#include "containers/Card.h"
+#include "plugin_wrappers/tests/src/mock_classes.h"
+#include "plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.h"
 
 #include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
+
+using namespace nlohmann;
 
 TEST(WordPWOutputTest, GetDictScheme) {
     auto              memorizer = std::make_shared<Memorizer>();
     WordPluginWrapper wrapper(memorizer);
-    wrapper.get_dict_scheme();
+    EXPECT_THROW(wrapper.get_dict_scheme(), std::runtime_error);
 
-    std::string actual   = memorizer->received_message;
-    std::string expected = R"({ "query_type" : "get_dict_scheme" })";
+    json actual   = json::parse(memorizer->received_message);
+    json expected = json::parse(
+        R"({ "query_type" : "get_dict_scheme" , "plugin_type" : "word" })");
     EXPECT_EQ(expected, actual);
 }
 
 TEST(WordPWOutputTest, Get) {
     auto              memorizer = std::make_shared<Memorizer>();
     WordPluginWrapper wrapper(memorizer);
-    wrapper.get();
+    EXPECT_THROW(wrapper.get("go"), std::runtime_error);
 
-    std::string actual   = memorizer->received_message;
-    std::string expected = R"({ "query_type" : "get", "plugin_type" : "word", "query" : { "word" : "go" } })";
+    json actual   = json::parse(memorizer->received_message);
+    json expected = json::parse(
+        R"({ "query_type" : "get", "plugin_type" : "word", "query" : "go" })");
     EXPECT_EQ(expected, actual);
 }
 
@@ -33,9 +40,9 @@ TEST(WordPWInputTest, GetDefaultConfigSuccess) {
     auto              fixed_answer = std::make_shared<FixedAnswer>(answer);
     WordPluginWrapper wrapper(fixed_answer);
 
-    std::string       actual = wrapper.get_dict_scheme();
-    std::string       expected =
-        R"({ "field_1" : "value_1", "field_2" : "value_2" })";
+    json              actual = json::parse(wrapper.get_dict_scheme());
+    json              expected =
+        json::parse(R"({ "field_1" : "value_1", "field_2" : "value_2" })");
     EXPECT_EQ(expected, actual);
 }
 
@@ -49,12 +56,21 @@ TEST(WordPWInputTest, GetDefaultConfigFailure) {
 
 TEST(WordPWInputTest, GetSuccess) {
     std::string answer =
-        R"({ "status" : 0, "result" : [ { card_fields }, { card_2_fields } ]})";
+        R"({"status":0,"result":[{"word":"go","special":["something special"],"definition":"move","examples":["go somewhere"],"image_links":[],"audio_links":[],"tags":{"tag":"tag"},"other":{"other":"other"}}]})";
     auto              fixed_answer = std::make_shared<FixedAnswer>(answer);
     WordPluginWrapper wrapper(fixed_answer);
 
-    std::vector<Card>       actual = wrapper.get();
-    std::vector<Card>       expected = { Card(card_fields), Card(card_2_fileds)};
+    std::vector<Card> actual   = wrapper.get("go");
+    std::vector<Card> expected = {
+        Card{
+             "go", {"something special"},
+             "move", {"go somewhere"},
+             std::vector<std::string>(),
+             std::vector<std::string>(),
+             json({{"tag", "tag"}}),
+             json({{"other", "other"}}),
+             }
+    };
     EXPECT_EQ(expected, actual);
 }
 
@@ -63,5 +79,5 @@ TEST(WordPWInputTest, GetFailure) {
     auto              fixed_answer = std::make_shared<FixedAnswer>(answer);
     WordPluginWrapper wrapper(fixed_answer);
 
-    EXPECT_THROW(wrapper.get(), std::runtime_error);
+    EXPECT_THROW(wrapper.get("go"), std::runtime_error);
 }

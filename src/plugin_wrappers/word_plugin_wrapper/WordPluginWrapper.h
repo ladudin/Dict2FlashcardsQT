@@ -5,8 +5,9 @@
 #include <vector>
 #include <memory>
 
-#include "../basic_plugin_wrapper/BasicPluginWrapper.h"
-#include "../plugin_wrapper_interfaces/IWordPluginWrapper.h"
+#include "plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.h"
+#include "plugin_wrappers/plugin_wrapper_interfaces/IWordPluginWrapper.h"
+#include "containers/Card.h"
 
 class WordPluginWrapper : public BasicPluginWrapper, virtual public IWordPluginWrapper {
  public:

@@ -1,9 +1,10 @@
 #ifndef DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_PLUGIN_WRAPPER_INTERFACES_IWORDPLUGINWRAPPER_H
 #define DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_PLUGIN_WRAPPER_INTERFACES_IWORDPLUGINWRAPPER_H
 
-#include "plugin_wrappers/plugin_wrapper_interfaces/IBasicPluginWrapper.h"
-
 #include <string>
+
+#include "plugin_wrappers/plugin_wrapper_interfaces/IBasicPluginWrapper.h"
+#include "containers/Card.h"
 
 class IWordPluginWrapper : virtual public IBasicPluginWrapper {
  public:

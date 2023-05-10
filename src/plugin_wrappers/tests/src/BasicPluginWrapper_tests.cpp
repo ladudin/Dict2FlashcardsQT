@@ -53,7 +53,7 @@ TEST(BasicPWOutputTest, SetConfig) {
 
     json actual   = json::parse(memorizer->received_message);
     json expected = json::parse(
-        R"({ "query_type" : "set_config", "plugin_type" : "test", "config" : { "language" : "english", "level" : "C2" } })");
+        R"({ "query_type" : "set_config", "plugin_type" : "test", "query" : { "language" : "english", "level" : "C2" } })");
     EXPECT_EQ(expected, actual);
 }
 

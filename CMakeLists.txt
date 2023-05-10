@@ -15,19 +15,18 @@ find_package(GTest REQUIRED)
 #enable_testing()
 
 set(TEST_FILES src/plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.cpp
-        src/plugin_wrappers/tests/src/BasicPluginWrapper_tests.cpp)
+        src/plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.cpp
+        src/plugin_wrappers/tests/src/BasicPluginWrapper_tests.cpp
+        src/plugin_wrappers/tests/src/WordPluginWrapper_tests.cpp)
 add_executable(tests ${TEST_FILES})
 target_link_libraries(tests GTest::gtest_main)
-
-add_test(tests tests)
+#
+#add_test(tests tests)
 
 set(SOURCE_FILES src/main.cpp
-        src/data_providers/irequestable/IRequestable.h
-        src/data_providers/server_connection/ServerConnection.h
         src/data_providers/server_connection/ServerConnection.cpp
-        src/plugin_wrappers/plugin_wrapper_interfaces/IBasicPluginWrapper.h
         src/plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.cpp
-        src/plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.h)
+        src/plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.cpp)
 
 add_executable(Dict2FlashcardsQT ${SOURCE_FILES})
 

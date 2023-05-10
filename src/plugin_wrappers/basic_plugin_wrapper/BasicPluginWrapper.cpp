@@ -76,7 +76,7 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
     json request = {
         {"query_type",  "set_config"},
         {"plugin_type", plugin_type_},
-        {"config",      config      }
+        {"query",       config      }
     };
     std::string message = connection_->request(request.dump());
     try {
