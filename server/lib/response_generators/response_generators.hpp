@@ -23,6 +23,8 @@ class IResponceGenerator {
     virtual auto handle_get_dict_scheme(nlohmann::json &) -> nlohmann::json;
 };
 
+// Где-то хранить state между сообщениями. Энивей многошаговый запрос
+// разрешается через handle()
 class ResponceGenerator : public IResponceGenerator {
  public:
     ResponceGenerator();
