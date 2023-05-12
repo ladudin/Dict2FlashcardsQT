@@ -6,10 +6,6 @@
 #include <utility>
 #include <vector>
 
-
-
-
-
 template <class T>
 class IPluginWrapper {
  public:
