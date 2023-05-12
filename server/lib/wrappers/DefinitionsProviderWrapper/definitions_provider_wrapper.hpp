@@ -1,3 +1,6 @@
+#ifndef DEFINITIONS_PROVIDER_WRAPPER_H
+#define DEFINITIONS_PROVIDER_WRAPPER_H
+
 #include "IPluginWrapper.hpp"
 
 #include <string>
@@ -19,3 +22,5 @@ class DefinitionsProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
     auto get_dictionary_scheme() -> nlohmann::json;
 };
+
+#endif  // !DEFINITIONS_PROVIDER_WRAPPER_H

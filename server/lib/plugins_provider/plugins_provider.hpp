@@ -1,7 +1,11 @@
 #ifndef PLUGINS_PROVIDER_H
 #define PLUGINS_PROVIDER_H
 
-#include "wrappers.hpp"
+#include "audios_provider_wrapper.hpp"
+#include "definitions_provider_wrapper.hpp"
+#include "format_processor_wrapper.hpp"
+#include "images_provider_wrapper.hpp"
+#include "sentences_provider_wrapper.hpp"
 #include <optional>
 #include <string>
 

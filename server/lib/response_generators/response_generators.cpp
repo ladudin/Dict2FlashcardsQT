@@ -16,7 +16,7 @@ static auto return_error(const std::string &message) -> json {
 
 auto ResponceGenerator::handle(const std::string &request) -> json {
     using std::string_literals::operator""s;
-    json                        parsed_request;
+    json parsed_request;
     try {
         parsed_request = json::parse(request);
     } catch (json::exception &e) {

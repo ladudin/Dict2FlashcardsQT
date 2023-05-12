@@ -2,6 +2,7 @@
 #define RESPONSE_GENERATORS_H
 
 #include "plugins_bundle.hpp"
+#include "plugins_provider.hpp"
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -29,8 +30,8 @@ class ResponceGenerator : public IResponceGenerator {
     auto handle(const std::string &request) -> nlohmann::json override;
 
  private:
-    std::shared_ptr<PluginsBundle> bundle_;
-    std::shared_ptr<>              plugins_provider_;
+    PluginsBundle                          bundle_;
+    const std::shared_ptr<PluginsProvider> plugins_provider_;
 };
 
 #endif  // !RESPONSE_GENERATORS_H
