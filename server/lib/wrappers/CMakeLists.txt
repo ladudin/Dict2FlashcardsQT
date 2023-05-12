@@ -1,6 +1,4 @@
 add_subdirectory(PluginWrapperInterface)
-
-set(serverside_plugin_wrappers "")
 add_subdirectory(AudiosProviderWrapper)
 add_subdirectory(DefinitionsProviderWrapper)
 add_subdirectory(FormatProcessorWrapper)
