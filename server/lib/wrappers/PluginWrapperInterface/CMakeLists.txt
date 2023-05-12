@@ -1,0 +1,2 @@
+add_library(plugin_wrapper_interface INTERFACE)
+target_include_directories(plugin_wrapper_interface INTERFACE .)

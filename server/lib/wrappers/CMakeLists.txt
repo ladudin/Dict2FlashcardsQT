@@ -1,3 +1,8 @@
-add_library(serverside_plugin_wrappers wrappers.cpp)
-target_include_directories(serverside_plugin_wrappers PUBLIC ./)
+add_subdirectory(PluginWrapperInterface)
 
+set(serverside_plugin_wrappers "")
+add_subdirectory(AudiosProviderWrapper)
+add_subdirectory(DefinitionsProviderWrapper)
+add_subdirectory(FormatProcessorWrapper)
+add_subdirectory(ImagesProviderWrapper)
+add_subdirectory(SentencesProviderWrapper)

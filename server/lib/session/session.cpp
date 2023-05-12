@@ -15,8 +15,8 @@ void Session::start() {
 }
 
 void Session::do_read() {
-    auto self = shared_from_this();
     // https://stackoverflow.com/questions/3058589/boostasioasync-read-until-reads-all-data-instead-of-just-some
+    auto self = shared_from_this();
     boost::asio::async_read_until(
         socket_,
         request_buffer,

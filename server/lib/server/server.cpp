@@ -20,33 +20,24 @@
 using boost::asio::ip::tcp;
 using nlohmann::json;
 
+#error "Переставить путь к плагинам"
+
 PluginServer::PluginServer(boost::asio::io_context &context, uint16_t port)
     : io_context_(context),
       acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)) {
     Py_Initialize();
     try {
+        // Так мы указываем пайтону откуда можно импортировать модули
         const auto           *plug_dir = "/home/blackdeer/projects/cpp/"
                                          "technopark_project/python_tests/plugins/";
-        // Так мы указываем пайтону откуда можно импортировать модули
         boost::python::object sys      = boost::python::import("sys");
         sys.attr("path").attr("append")(plug_dir);
 
-        boost::python::object cambridge_plug =
-            boost::python::import("cambridge");
-        boost::python::object wordset_plug = boost::python::import("wordset");
-
-        // boost::python::object response =
-        //     http.attr("urlopen")("http://www.google.com");
-        // boost::python::object read = response.attr("read")();
-        // std::string strResponse    =
-        // boost::python::extract<std::string>(read); std::cout << strResponse
-        // << std::endl;
+        start_accept();
     } catch (...) {
         PyErr_Print();
         PyErr_Clear();
     }
-
-    start_accept();
 }
 
 void PluginServer::start_accept() {
