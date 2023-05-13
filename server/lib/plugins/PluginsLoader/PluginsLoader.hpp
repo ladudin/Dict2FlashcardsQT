@@ -18,9 +18,14 @@
 #include <utility>
 #include <variant>
 
+// https://stackoverflow.com/a/71921982
+template <class Dependent>
+concept is_plugin =
+    requires(Dependent c) { []<typename X>(IPluginWrapper<X> &) {}(c); };
+
 template <typename Wrapper>
     requires std::derived_from<IPluginWrapper<std::any>, Wrapper> &&
-             std::constructible_from<Wrapper, Container>
+             std::constructible_from<Wrapper, Container &&>
 class IPluginsLoader {
  public:
     virtual ~IPluginsLoader() = default;
@@ -30,7 +35,7 @@ class IPluginsLoader {
 
 template <typename Wrapper>
     requires std::derived_from<IPluginWrapper<std::any>, Wrapper> &&
-             std::constructible_from<Wrapper, Container>
+             std::constructible_from<Wrapper, Container &&>
 class PluginsLoader : public IPluginsLoader<Wrapper> {
  public:
     explicit PluginsLoader(std::filesystem::path &&plugins_dir) noexcept(

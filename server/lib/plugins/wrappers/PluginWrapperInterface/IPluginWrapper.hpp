@@ -16,14 +16,7 @@ class IPluginWrapper {
     virtual auto set_config(nlohmann::json new_config) -> nlohmann::json;
     virtual void unload();
 
-    virtual ~IPluginWrapper()                                  = default;
-    IPluginWrapper(const IPluginWrapper &)                     = delete;
-    IPluginWrapper(IPluginWrapper &&) noexcept                 = default;
-    auto operator=(const IPluginWrapper &) -> IPluginWrapper & = delete;
-    auto operator=(IPluginWrapper &&) -> IPluginWrapper      & = delete;
-
- private:
-    nlohmann::json config;
+    virtual ~IPluginWrapper() = default;
 };
 
 #endif  // !PLUGIN_WRAPPER_INTERFACE_H

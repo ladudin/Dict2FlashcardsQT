@@ -1,6 +1,7 @@
 #ifndef DEFINITIONS_PROVIDER_WRAPPER_H
 #define DEFINITIONS_PROVIDER_WRAPPER_H
 
+#include "Container.hpp"
 #include "IPluginWrapper.hpp"
 
 #include <string>
@@ -8,6 +9,12 @@
 #include <vector>
 
 struct Card {
+    Card(const Card &)                     = default;
+    Card(Card &&)                          = default;
+    auto operator=(const Card &) -> Card & = default;
+    auto operator=(Card &&) -> Card      & = default;
+
+ public:
     std::string              word;
     std::vector<std::string> special;
     std::string              definition;
@@ -20,7 +27,26 @@ struct Card {
 
 class DefinitionsProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
+ public:
+    explicit DefinitionsProviderWrapper(Container &&container);
+
     auto get_dictionary_scheme() -> nlohmann::json;
+    void load() override;
+    auto get(std::string word) -> provided_type override;
+    auto get_config_description() -> nlohmann::json override;
+    auto get_default_config() -> nlohmann::json override;
+    auto set_config(nlohmann::json new_config) -> nlohmann::json override;
+    void unload() override;
+
+    DefinitionsProviderWrapper(const DefinitionsProviderWrapper &) = delete;
+    DefinitionsProviderWrapper(DefinitionsProviderWrapper &&)      = default;
+    auto operator=(const DefinitionsProviderWrapper &)
+        -> DefinitionsProviderWrapper & = delete;
+    auto operator=(DefinitionsProviderWrapper &&)
+        -> DefinitionsProviderWrapper & = delete;
+
+ private:
+    nlohmann::json config;
 };
 
 #endif  // !DEFINITIONS_PROVIDER_WRAPPER_H
