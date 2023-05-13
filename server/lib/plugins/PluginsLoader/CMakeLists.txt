@@ -1,13 +1,13 @@
-add_library(plugins_loader PluginsLoader.cpp)
-target_include_directories(plugins_loader PUBLIC
+add_library(plugins_loader INTERFACE)
+target_include_directories(plugins_loader INTERFACE 
     ./
     ${Boost_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
 )
 
 target_link_libraries(plugins_loader
+    INTERFACE
     containers
-    serverside_plugin_wrappers
     definitions_provider_wrapper
     images_provider_wrapper
     sentences_provider_wrapper

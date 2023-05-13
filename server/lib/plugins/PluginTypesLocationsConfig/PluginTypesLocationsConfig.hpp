@@ -3,13 +3,14 @@
 
 #include <filesystem>
 
-class PluginsDestinations {
+class PluginTypesLocationsConfig {
  public:
-    PluginsDestinations(std::filesystem::path &&definitions_providers_dir,
-                        std::filesystem::path &&sentences_providers_dir,
-                        std::filesystem::path &&images_providers_dir,
-                        std::filesystem::path &&audios_providers_dir,
-                        std::filesystem::path &&format_processors_dir);
+    PluginTypesLocationsConfig(
+        std::filesystem::path &&definitions_providers_dir,
+        std::filesystem::path &&sentences_providers_dir,
+        std::filesystem::path &&images_providers_dir,
+        std::filesystem::path &&audios_providers_dir,
+        std::filesystem::path &&format_processors_dir);
 
     [[nodiscard]] auto definitions_providers_dir() const
         -> std::filesystem::path;

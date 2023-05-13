@@ -5,5 +5,5 @@ target_include_directories(plugins_provider PUBLIC
 
 target_link_libraries(plugins_provider
     plugins_loader
-    plugins_destinations
+    plugin_types_locations_config
 )

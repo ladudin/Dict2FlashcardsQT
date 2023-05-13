@@ -19,6 +19,8 @@ auto Container::build(boost::python::object &&module)
     return plugin_container;
 }
 
+Container::Container() = default;
+
 auto Container::load() const -> const boost::python::object & {
     return load_;
 }

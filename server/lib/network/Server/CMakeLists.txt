@@ -1,5 +1,5 @@
 
-add_library(plugin_server server.cpp)
+add_library(plugin_server Server.cpp)
 target_link_libraries(plugin_server
     session
     ${Boost_LIBRARIES}

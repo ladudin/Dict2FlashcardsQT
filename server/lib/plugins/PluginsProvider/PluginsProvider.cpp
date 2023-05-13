@@ -1,6 +1,6 @@
 #include "PluginsProvider.hpp"
 
-PluginsProvider::PluginsProvider(PluginsDestinations &&confg)
+PluginsProvider::PluginsProvider(PluginTypesLocationsConfig &&confg)
     : definitions_providers_(std::move(confg.definitions_providers_dir())),
       sentences_providers_(std::move(confg.sentences_providers_dir())),
       images_providers_(std::move(confg.images_providers_dir())),

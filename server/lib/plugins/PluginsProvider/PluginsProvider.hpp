@@ -5,6 +5,7 @@
 #include "DefinitionsProviderWrapper.hpp"
 #include "FormatProcessorWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
+#include "PluginTypesLocationsConfig.hpp"
 #include "PluginsLoader.hpp"
 #include "SentencesProviderWrapper.hpp"
 #include <filesystem>
@@ -37,7 +38,7 @@ class IPluginsProvider {
 
 class PluginsProvider : public IPluginsProvider {
  public:
-    explicit PluginsProvider(PluginsDestinations &&config);
+    explicit PluginsProvider(PluginTypesLocationsConfig &&config);
 
     auto get_definitions_provider(const std::string &name)
         -> std::optional<DefinitionsProviderWrapper> override;

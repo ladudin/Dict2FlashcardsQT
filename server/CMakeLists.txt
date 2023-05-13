@@ -13,4 +13,6 @@ add_subdirectory(lib)
 add_executable(server_main main.cpp)
 target_link_libraries(server_main
     plugin_server
+    plugins_provider
+    plugin_types_locations_config
 )

@@ -1,6 +1,6 @@
-#include "PluginsDestinations.hpp"
+#include "PluginTypesLocationsConfig.hpp"
 
-PluginsDestinations::PluginsDestinations(
+PluginTypesLocationsConfig::PluginTypesLocationsConfig(
     std::filesystem::path &&definitions_providers_dir,
     std::filesystem::path &&sentences_providers_dir,
     std::filesystem::path &&images_providers_dir,

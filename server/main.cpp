@@ -1,15 +1,11 @@
-#include "plugins_provider.hpp"
-#include "server.hpp"
+#include "PluginTypesLocationsConfig.hpp"
+#include "PluginsProvider.hpp"
+#include "Server.hpp"
 #include <boost/asio.hpp>
 #include <memory>
 
 auto main(int argc, char *argv[]) -> int {
-    auto plugins_dirs = PluginsDirs{
-        .definitions_providers_dir = "",
-        .audios_providers_dir = "",
-        
-
-    };
+    auto plugins_dirs = PluginTypesLocationsConfig("", "", "", "", "");
 
     boost::asio::io_context io_context;
     auto                    plugins_provider =
