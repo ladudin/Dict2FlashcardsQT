@@ -8,8 +8,10 @@
 #include "plugins_loader.hpp"
 #include "sentences_provider_wrapper.hpp"
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 
 class IPluginsProvider {
  public:
@@ -33,17 +35,9 @@ class IPluginsProvider {
     virtual auto reload_plugins() -> void;
 };
 
-struct PluginsDirs {
-    std::filesystem::path definitions_providers_dir;
-    std::filesystem::path sentences_providers_dir;
-    std::filesystem::path images_providers_dir;
-    std::filesystem::path audios_providers_dir;
-    std::filesystem::path format_processors_dir;
-};
-
 class PluginsProvider : public IPluginsProvider {
  public:
-    explicit PluginsProvider(PluginsDirs &&config);
+    explicit PluginsProvider(PluginsDestinations &&config);
 
     auto get_definitions_provider(const std::string &name)
         -> std::optional<DefinitionsProviderWrapper> override;

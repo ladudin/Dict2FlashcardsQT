@@ -6,12 +6,12 @@
 #include "plugins_loader.hpp"
 #include "sentences_provider_wrapper.hpp"
 
-PluginsProvider::PluginsProvider(PluginsDirs &&confg)
-    : definitions_providers_(std::move(confg.definitions_providers_dir)),
-      sentences_providers_(std::move(confg.sentences_providers_dir)),
-      images_providers_(std::move(confg.images_providers_dir)),
-      audios_providers_(std::move(confg.audios_providers_dir)),
-      format_processors_(std::move(confg.format_processors_dir)) {
+PluginsProvider::PluginsProvider(PluginsDestinations &&confg)
+    : definitions_providers_(std::move(confg.definitions_providers_dir())),
+      sentences_providers_(std::move(confg.sentences_providers_dir())),
+      images_providers_(std::move(confg.images_providers_dir())),
+      audios_providers_(std::move(confg.audios_providers_dir())),
+      format_processors_(std::move(confg.format_processors_dir())) {
 }
 
 auto PluginsProvider::get_definitions_provider(const std::string &name)

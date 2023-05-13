@@ -1,0 +1,7 @@
+add_subdirectory(PyExceptionInfo)
+add_subdirectory(Container)
+add_subdirectory(wrappers)
+add_subdirectory(PluginsBundle)
+add_subdirectory(PluginTypesLocations)
+add_subdirectory(PluginsLoader)
+add_subdirectory(PluginsProvider)

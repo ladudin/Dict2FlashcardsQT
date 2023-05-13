@@ -31,7 +31,8 @@ class IResponceGenerator {
 // разрешается через handle()
 class ResponceGenerator : public IResponceGenerator {
  public:
-    ResponceGenerator();
+    explicit ResponceGenerator(
+        std::shared_ptr<PluginsProvider> plugins_provider);
 
     auto handle(const std::string &request) -> nlohmann::json override;
 

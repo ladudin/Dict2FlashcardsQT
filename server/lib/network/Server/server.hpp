@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "plugins_provider.hpp"
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
@@ -18,7 +19,9 @@
 
 class PluginServer {
  public:
-    explicit PluginServer(boost::asio::io_context &context, uint16_t port);
+    explicit PluginServer(std::shared_ptr<PluginsProvider> &&provider,
+                          boost::asio::io_context           &context,
+                          uint16_t                           port);
 
     ~PluginServer()                                        = default;
     PluginServer(const PluginServer &)                     = delete;
@@ -27,10 +30,11 @@ class PluginServer {
     auto operator=(PluginServer &&) -> PluginServer      & = delete;
 
  private:
-    boost::asio::io_context       &io_context_;
-    boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::io_context         &io_context_;
+    boost::asio::ip::tcp::acceptor   acceptor_;
+    std::shared_ptr<PluginsProvider> plugins_provider_;
 
-    void                           start_accept();
+    void                             start_accept();
 
     void handle_accept(const boost::system::error_code &error);
 };

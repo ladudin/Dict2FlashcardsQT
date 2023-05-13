@@ -42,24 +42,25 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
                 auto loaded_module = boost::python::import(module_name.c_str());
                 auto plugin_container =
                     Container::build(std::move(loaded_module));
-                std::visit(
-                    [this, module_name](ExceptionInfo &&exception_info) {
-                        failed_plugins_[module_name] = exception_info;
-                    },
-                    [this, module_name](Container &&container) {
-                        plugins_[module_name] = Wrapper(container);
-                    },
-                    plugin_container);
+                // std::visit(
+                //     [this, module_name](
+                //         std::optional<PyExceptionInfo> &&exception_info) {
+                //         failed_plugins_[module_name] = exception_info;
+                //     },
+                //     [this, module_name](Container &&container) {
+                //         plugins_[module_name] = Wrapper(container);
+                //     },
+                //     plugin_container);
             });
     }
 
-    auto get(const std::string &plugin_name)
-        -> std::optional<Wrapper> override {
-    }
+    // auto get(const std::string &plugin_name)
+    //     -> std::optional<Wrapper> override {
+    // }
 
  private:
-    std::unordered_map<std::string, Wrapper>       plugins_;
-    std::unordered_map<std::string, ExceptionInfo> failed_plugins_;
+    std::unordered_map<std::string, Wrapper>         plugins_;
+    std::unordered_map<std::string, PyExceptionInfo> failed_plugins_;
 };
 
 #endif

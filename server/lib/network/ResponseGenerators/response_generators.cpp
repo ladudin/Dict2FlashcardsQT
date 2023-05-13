@@ -5,7 +5,10 @@
 
 using nlohmann::json;
 
-ResponceGenerator::ResponceGenerator() = default;
+ResponceGenerator::ResponceGenerator(
+    std::shared_ptr<PluginsProvider> plugins_provider)
+    : plugins_provider_(std::move(plugins_provider)) {
+}
 
 static auto return_error(const std::string &message) -> json {
     json dst;
