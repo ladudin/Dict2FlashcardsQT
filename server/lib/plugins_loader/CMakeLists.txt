@@ -1,7 +1,6 @@
 add_library(plugins_loader plugins_loader.cpp)
 target_include_directories(plugins_loader PUBLIC
     ./
-    PRIVATE
     ${Boost_INCLUDE_DIRS}
     ${PYTHON_INCLUDE_DIRS}
 )
