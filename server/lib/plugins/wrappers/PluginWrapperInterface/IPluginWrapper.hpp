@@ -18,7 +18,7 @@ class IPluginWrapper {
 
     virtual ~IPluginWrapper()                                  = default;
     IPluginWrapper(const IPluginWrapper &)                     = delete;
-    IPluginWrapper(IPluginWrapper &&)                          = delete;
+    IPluginWrapper(IPluginWrapper &&) noexcept                 = default;
     auto operator=(const IPluginWrapper &) -> IPluginWrapper & = delete;
     auto operator=(IPluginWrapper &&) -> IPluginWrapper      & = delete;
 
