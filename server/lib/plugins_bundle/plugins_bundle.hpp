@@ -13,19 +13,19 @@
 class PluginsBundle {
  public:
     PluginsBundle();
-    auto get_definitions(std::string word)
+    auto get_definitions(const std::string &word)
         -> std::optional<DefinitionsProviderWrapper::provided_type>;
 
-    auto get_sentences(std::string word)
+    auto get_sentences(const std::string &word)
         -> std::optional<SentencesProviderWrapper::provided_type>;
 
-    auto get_images(std::string word)
+    auto get_images(const std::string &word)
         -> std::optional<ImagesProviderWrapper::provided_type>;
 
-    auto get_audios(std::string word)
+    auto get_audios(const std::string &word)
         -> std::optional<AudiosProviderWrapper::provided_type>;
 
-    auto save_results(std::string word)
+    auto save_results(const std::string &word)
         -> std::optional<FormatProcessorWrapper::provided_type>;
 
     auto set_definitions_provider(DefinitionsProviderWrapper &&) -> void;
