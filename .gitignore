@@ -1,6 +1,8 @@
 *
 !*/
 !.gitignore
+!.gitignore
+!/spdlog/*
 !CMakeLists.txt
 !README.md
 !/img/**
