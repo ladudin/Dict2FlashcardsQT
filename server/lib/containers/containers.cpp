@@ -1,9 +1,8 @@
 #include "containers.hpp"
-#include "pyerrors.h"
 
 // https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text
 auto Container::build(boost::python::object &&module)
-    -> std::variant<Container, ExceptionInfo> {
+    -> std::variant<Container, std::optional<PyExceptionInfo>> {
     auto plugin_container = Container();
     try {
         plugin_container.load_ = module.attr("load");
@@ -15,18 +14,7 @@ auto Container::build(boost::python::object &&module)
             module.attr("get_default_config");
         plugin_container.unload_ = module.attr("unload");
     } catch (...) {
-        PyErr_Clear();
-        auto py_err         = boost::python::eval("str(sys.last_value)");
-        auto py_stack_trace = boost::python::eval(
-            "'\\n'.join(traceback.format_exception(sys.last_type, "
-            "sys.last_value, sys.last_traceback))");
-
-        ExceptionInfo exception_info;
-        exception_info.stack_trace =
-            boost::python::extract<std::string>(py_stack_trace);
-        exception_info.error_summary =
-            boost::python::extract<std::string>(py_err);
-        return exception_info;
+        return PyExceptionInfo::build();
     }
     return plugin_container;
 }

@@ -1,3 +1,4 @@
+add_subdirectory(PyExceptionInfo)
 add_subdirectory(wrappers)
 add_subdirectory(containers)
 add_subdirectory(plugins_loader)

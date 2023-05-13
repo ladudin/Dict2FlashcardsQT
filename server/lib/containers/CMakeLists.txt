@@ -9,6 +9,7 @@ target_include_directories(containers
 
 target_link_libraries(
     containers
+    py_exception_info
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
 )

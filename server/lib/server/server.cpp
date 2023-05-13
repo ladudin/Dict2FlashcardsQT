@@ -26,27 +26,17 @@ PluginServer::PluginServer(boost::asio::io_context &context, uint16_t port)
     : io_context_(context),
       acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)) {
     Py_Initialize();
-    try {
-        // Так мы указываем пайтону откуда можно импортировать модули
-        const auto           *plug_dir = "/home/blackdeer/projects/cpp/"
-                                         "technopark_project/python_tests/plugins/";
-        boost::python::object sys      = boost::python::import("sys");
-        sys.attr("path").attr("append")(plug_dir);
-
-        start_accept();
-    } catch (...) {
-        PyErr_Print();
-        PyErr_Clear();
-    }
+    start_accept();
 }
 
 void PluginServer::start_accept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
-            if (!ec) {
-                std::make_shared<Session<ResponceGenerator>>(std::move(socket))
-                    ->start();
-            }
-            start_accept();
+            // if (!ec) {
+            //     auto test = std::make_unique<ResponceGenerator>();
+            //     std::make_shared<Session>(std::move(socket), std::move(test))
+            //         ->start();
+            // }
+            // start_accept();
         });
 }

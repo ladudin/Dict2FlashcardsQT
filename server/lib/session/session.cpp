@@ -1,4 +1,6 @@
 #include "session.hpp"
+#include "spdlog/common.h"
+#include "spdlog/spdlog.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -23,8 +25,7 @@ void Session::do_read() {
         "\n\r",
         [this, self](boost::system::error_code error_code, std::size_t length) {
             if (error_code) {
-                // Заменим на логер
-                std::cerr << "Couldn't read from user" << std::endl;
+                spdlog::error("Couldn't read from user");
                 return;
             }
             request_buffer.commit(length);
@@ -44,7 +45,7 @@ void Session::do_write(std::string response) {
         boost::asio::buffer(response, response.length()),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
-                std::cerr << "Couldn't respond to user" << std::endl;
+                spdlog::error("Couldn't respond to user");
             }
             do_read();
         });

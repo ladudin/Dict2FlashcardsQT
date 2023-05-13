@@ -13,14 +13,18 @@ class IResponceGenerator {
     virtual auto handle(const std::string &request) -> nlohmann::json;
 
  protected:
-    virtual auto handle_init(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_get_default_config(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_get_config_scheme(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_set_config(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_list_plugins(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_load_new_plugins(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_get(nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_get_dict_scheme(nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_init(const nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get_default_config(const nlohmann::json &)
+        -> nlohmann::json;
+    virtual auto handle_get_config_scheme(const nlohmann::json &)
+        -> nlohmann::json;
+    virtual auto handle_set_config(const nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_list_plugins(const nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_load_new_plugins(const nlohmann::json &)
+        -> nlohmann::json;
+    virtual auto handle_get(const nlohmann::json &) -> nlohmann::json;
+    virtual auto handle_get_dict_scheme(const nlohmann::json &)
+        -> nlohmann::json;
 };
 
 // Где-то хранить state между сообщениями. Энивей многошаговый запрос
@@ -30,6 +34,22 @@ class ResponceGenerator : public IResponceGenerator {
     ResponceGenerator();
 
     auto handle(const std::string &request) -> nlohmann::json override;
+
+ protected:
+    auto handle_init(const nlohmann::json &request) -> nlohmann::json override;
+    auto handle_get_default_config(const nlohmann::json &request)
+        -> nlohmann::json override;
+    auto handle_get_config_scheme(const nlohmann::json &request)
+        -> nlohmann::json override;
+    auto handle_set_config(const nlohmann::json &request)
+        -> nlohmann::json override;
+    auto handle_list_plugins(const nlohmann::json &request)
+        -> nlohmann::json override;
+    auto handle_load_new_plugins(const nlohmann::json &request)
+        -> nlohmann::json override;
+    auto handle_get(const nlohmann::json &request) -> nlohmann::json override;
+    auto handle_get_dict_scheme(const nlohmann::json &request)
+        -> nlohmann::json override;
 
  private:
     PluginsBundle                          bundle_;

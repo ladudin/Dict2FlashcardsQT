@@ -1,21 +1,17 @@
 #ifndef CONTAINERS_H
 #define CONTAINERS_H
 
+#include "PyExceptionInfo.hpp"
 #include <boost/python.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
 #include <string>
 #include <variant>
 
-struct ExceptionInfo {
-    std::string stack_trace;
-    std::string error_summary;
-};
-
 class Container {
  public:
     static auto build(boost::python::object &&module)
-        -> std::variant<Container, ExceptionInfo>;
+        -> std::variant<Container, std::optional<PyExceptionInfo>>;
 
     [[nodiscard]] auto load() const -> const boost::python::object &;
     [[nodiscard]] auto get() const -> const boost::python::object &;
