@@ -1,6 +1,6 @@
-#include "server.hpp"
-#include "response_generators.hpp"
-#include "session.hpp"
+#include "Server.hpp"
+#include "ResponseGenerators.hpp"
+#include "Session.hpp"
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/read_until.hpp>

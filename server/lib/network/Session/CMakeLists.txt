@@ -1,4 +1,4 @@
-add_library(session session.cpp)
+add_library(session Session.cpp)
 target_include_directories(session PUBLIC
     ./
 )

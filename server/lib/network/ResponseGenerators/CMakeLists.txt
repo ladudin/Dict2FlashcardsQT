@@ -1,4 +1,4 @@
-add_library(response_generators response_generators.cpp)
+add_library(response_generators ResponseGenerators.cpp)
 target_include_directories(response_generators
     PUBLIC
     ./

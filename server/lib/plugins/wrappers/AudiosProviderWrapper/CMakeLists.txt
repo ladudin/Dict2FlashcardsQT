@@ -1,3 +1,3 @@
-add_library(audios_provider_wrapper audios_provider_wrapper.cpp)
+add_library(audios_provider_wrapper AudiosProviderWrapper.cpp)
 target_include_directories(audios_provider_wrapper PUBLIC ./)
 target_link_libraries(audios_provider_wrapper plugin_wrapper_interface)

@@ -1,10 +1,4 @@
-#include "plugins_provider.hpp"
-#include "audios_provider_wrapper.hpp"
-#include "definitions_provider_wrapper.hpp"
-#include "format_processor_wrapper.hpp"
-#include "images_provider_wrapper.hpp"
-#include "plugins_loader.hpp"
-#include "sentences_provider_wrapper.hpp"
+#include "PluginsProvider.hpp"
 
 PluginsProvider::PluginsProvider(PluginsDestinations &&confg)
     : definitions_providers_(std::move(confg.definitions_providers_dir())),

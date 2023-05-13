@@ -1,4 +1,4 @@
-add_library(plugins_provider plugins_provider.cpp)
+add_library(plugins_provider PluginsProvider.cpp)
 target_include_directories(plugins_provider PUBLIC
     ./
 )

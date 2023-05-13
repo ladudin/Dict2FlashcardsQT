@@ -1,4 +1,4 @@
-add_library(plugins_bundle plugins_bundle.cpp)
+add_library(plugins_bundle PluginsBundle.cpp)
 target_link_libraries(plugins_bundle
     definitions_provider_wrapper
     images_provider_wrapper

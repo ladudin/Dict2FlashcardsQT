@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "plugins_provider.hpp"
+#include "PluginsProvider.hpp"
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>

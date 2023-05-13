@@ -1,11 +1,11 @@
 #ifndef PLUGINS_BUNDLE_H
 #define PLUGINS_BUNDLE_H
 
-#include "audios_provider_wrapper.hpp"
-#include "definitions_provider_wrapper.hpp"
-#include "format_processor_wrapper.hpp"
-#include "images_provider_wrapper.hpp"
-#include "sentences_provider_wrapper.hpp"
+#include "AudiosProviderWrapper.hpp"
+#include "DefinitionsProviderWrapper.hpp"
+#include "FormatProcessorWrapper.hpp"
+#include "ImagesProviderWrapper.hpp"
+#include "SentencesProviderWrapper.hpp"
 #include <optional>
 #include <string>
 #include <vector>

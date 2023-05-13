@@ -1,4 +1,4 @@
-add_library(containers containers.cpp)
+add_library(containers Container.cpp)
 target_include_directories(containers
     PUBLIC
     ./

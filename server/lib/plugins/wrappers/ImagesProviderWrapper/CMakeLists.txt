@@ -1,4 +1,4 @@
-add_library(images_provider_wrapper images_provider_wrapper.cpp)
+add_library(images_provider_wrapper ImagesProviderWrapper.cpp)
 target_include_directories(images_provider_wrapper PUBLIC ./)
 target_link_libraries(images_provider_wrapper plugin_wrapper_interface)
 #

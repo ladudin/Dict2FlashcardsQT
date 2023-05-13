@@ -1,4 +1,4 @@
-add_library(definitions_provider_wrapper definitions_provider_wrapper.cpp)
+add_library(definitions_provider_wrapper DefinitionsProviderWrapper.cpp)
 target_include_directories(definitions_provider_wrapper PUBLIC ./)
 target_link_libraries(definitions_provider_wrapper plugin_wrapper_interface)
 

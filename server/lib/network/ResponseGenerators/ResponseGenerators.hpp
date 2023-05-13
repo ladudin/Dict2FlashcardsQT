@@ -1,8 +1,8 @@
 #ifndef RESPONSE_GENERATORS_H
 #define RESPONSE_GENERATORS_H
 
-#include "plugins_bundle.hpp"
-#include "plugins_provider.hpp"
+#include "PluginsBundle.hpp"
+#include "PluginsProvider.hpp"
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
