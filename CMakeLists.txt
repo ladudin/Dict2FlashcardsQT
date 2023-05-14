@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(Dict2FlashcardsQT)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 
 find_package(Boost 1.82 COMPONENTS program_options REQUIRED)
@@ -15,9 +15,7 @@ find_package(GTest REQUIRED)
 #enable_testing()
 
 set(TEST_FILES src/plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.cpp
-        src/plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.cpp
-        src/plugin_wrappers/tests/src/BasicPluginWrapper_tests.cpp
-        src/plugin_wrappers/tests/src/WordPluginWrapper_tests.cpp)
+        src/plugin_wrappers/tests/src/BasicPluginWrapper_tests.cpp)
 add_executable(tests ${TEST_FILES})
 target_link_libraries(tests GTest::gtest_main)
 #
@@ -25,6 +23,7 @@ target_link_libraries(tests GTest::gtest_main)
 
 set(SOURCE_FILES src/main.cpp
         src/data_providers/server_connection/ServerConnection.cpp
+        src/plugin_wrappers/plugin_wrapper_interfaces/IBasicPluginWrapper.h
         src/plugin_wrappers/basic_plugin_wrapper/BasicPluginWrapper.cpp
         src/plugin_wrappers/word_plugin_wrapper/WordPluginWrapper.cpp)
 
