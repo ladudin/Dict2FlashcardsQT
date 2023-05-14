@@ -20,18 +20,21 @@
 #include <variant>
 
 template <typename Wrapper>
-    requires implements_wrapper<Wrapper>
+    requires is_plugin_wrapper<Wrapper>
 class IPluginsLoader {
  public:
     virtual ~IPluginsLoader() = default;
 
-    virtual auto get(const std::string &plugin_name) -> std::optional<Wrapper>;
+    virtual auto get(const std::string &plugin_name)
+        -> std::optional<Wrapper>           = 0;
+
+    virtual auto load_new_plugins() -> void = 0;
 };
 
-using Wrapper = DefinitionsProviderWrapper;
+// using Wrapper = DefinitionsProviderWrapper;
 
 template <typename Wrapper>
-    requires implements_wrapper<Wrapper>
+    requires is_plugin_wrapper<Wrapper>
 class PluginsLoader : public IPluginsLoader<Wrapper> {
  public:
     explicit PluginsLoader(std::filesystem::path &&plugins_dir) noexcept(
@@ -79,6 +82,10 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         return Wrapper(res->second);
+    }
+
+    auto load_new_plugins() -> void override {
+        throw std::runtime_error("load_new_plugins() is not implemented");
     }
 
  private:

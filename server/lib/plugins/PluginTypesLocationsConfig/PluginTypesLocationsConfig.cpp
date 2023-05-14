@@ -12,3 +12,28 @@ PluginTypesLocationsConfig::PluginTypesLocationsConfig(
       audios_providers_dir_(std::move(audios_providers_dir)),
       format_processors_dir_(std::move(format_processors_dir)) {
 }
+
+auto PluginTypesLocationsConfig::definitions_providers_dir() const
+    -> std::filesystem::path {
+    return definitions_providers_dir_;
+}
+
+auto PluginTypesLocationsConfig::sentences_providers_dir() const
+    -> std::filesystem::path {
+    return sentences_providers_dir_;
+}
+
+auto PluginTypesLocationsConfig::images_providers_dir() const
+    -> std::filesystem::path {
+    return images_providers_dir_;
+}
+
+auto PluginTypesLocationsConfig::audios_providers_dir() const
+    -> std::filesystem::path {
+    return audios_providers_dir_;
+}
+
+auto PluginTypesLocationsConfig::format_processors_dir() const
+    -> std::filesystem::path {
+    return format_processors_dir_;
+}

@@ -3,21 +3,21 @@
 
 #include "IPluginWrapper.hpp"
 
+#include <filesystem>
 #include <string>
 #include <utility>
 #include <vector>
 
-class FormatProcessorWrapper
-    : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
+class FormatProcessorWrapper : public IPluginWrapper<std::string> {
  public:
     explicit FormatProcessorWrapper(Container container);
 
-    void load() override;
-    auto get(std::string word) -> provided_type override;
+    auto get(ResultFilesPaths &&paths) -> FormatProcessorWrapper::type;
+    auto load() -> void override;
     auto get_config_description() -> nlohmann::json override;
     auto get_default_config() -> nlohmann::json override;
-    auto set_config(nlohmann::json new_config) -> nlohmann::json override;
-    void unload() override;
+    auto set_config(nlohmann::json &&new_config) -> nlohmann::json override;
+    auto unload() -> void override;
 
     FormatProcessorWrapper(const FormatProcessorWrapper &) = default;
     FormatProcessorWrapper(FormatProcessorWrapper &&)      = default;

@@ -5,7 +5,7 @@
 
 using nlohmann::json;
 
-ResponceGenerator::ResponceGenerator(
+ResponseGenerator::ResponseGenerator(
     std::shared_ptr<PluginsProvider> plugins_provider)
     : plugins_provider_(std::move(plugins_provider)) {
 }
@@ -17,7 +17,7 @@ static auto return_error(const std::string &message) -> json {
     return dst;
 }
 
-auto ResponceGenerator::handle(const std::string &request) -> json {
+auto ResponseGenerator::handle(const std::string &request) -> json {
     using std::string_literals::operator""s;
     json parsed_request;
     try {
@@ -62,4 +62,44 @@ auto ResponceGenerator::handle(const std::string &request) -> json {
         return handle_get_dict_scheme(parsed_request);
     }
     return return_error("Unknown query type: "s + query_type);
+}
+
+auto ResponseGenerator::handle_init(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_get_default_config(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_get_config_scheme(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_set_config(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_list_plugins(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_load_new_plugins(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_get(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
+}
+
+auto ResponseGenerator::handle_get_dict_scheme(const nlohmann::json &request)
+    -> nlohmann::json {
+    return {};
 }

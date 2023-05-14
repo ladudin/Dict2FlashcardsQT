@@ -19,21 +19,21 @@ class IPluginsProvider {
     virtual ~IPluginsProvider() = default;
 
     virtual auto get_definitions_provider(const std::string &name)
-        -> std::optional<DefinitionsProviderWrapper>;
+        -> std::optional<DefinitionsProviderWrapper> = 0;
 
     virtual auto get_sentences_provider(const std::string &name)
-        -> std::optional<SentencesProviderWrapper>;
+        -> std::optional<SentencesProviderWrapper> = 0;
 
     virtual auto get_images_provider(const std::string &name)
-        -> std::optional<ImagesProviderWrapper>;
+        -> std::optional<ImagesProviderWrapper> = 0;
 
     virtual auto get_audios_provider(const std::string &name)
-        -> std::optional<AudiosProviderWrapper>;
+        -> std::optional<AudiosProviderWrapper> = 0;
 
     virtual auto get_format_processor(const std::string &name)
-        -> std::optional<FormatProcessorWrapper>;
+        -> std::optional<FormatProcessorWrapper> = 0;
 
-    virtual auto reload_plugins() -> void;
+    virtual auto load_new_plugins() -> void      = 0;
 };
 
 class PluginsProvider : public IPluginsProvider {
@@ -55,7 +55,7 @@ class PluginsProvider : public IPluginsProvider {
     auto get_format_processor(const std::string &name)
         -> std::optional<FormatProcessorWrapper> override;
 
-    auto reload_plugins() -> void override;
+    auto load_new_plugins() -> void override;
 
  private:
     PluginsLoader<DefinitionsProviderWrapper> definitions_providers_;

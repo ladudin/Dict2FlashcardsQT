@@ -4,6 +4,8 @@
 #include "Container.hpp"
 #include "IPluginWrapper.hpp"
 
+#include <cstdint>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -31,12 +33,13 @@ class DefinitionsProviderWrapper
     explicit DefinitionsProviderWrapper(Container container);
 
     auto get_dictionary_scheme() -> nlohmann::json;
-    void load() override;
-    auto get(std::string word) -> provided_type override;
+    auto get(const std::string &word, uint64_t batch_size)
+        -> DefinitionsProviderWrapper::type;
+    auto load() -> void override;
     auto get_config_description() -> nlohmann::json override;
     auto get_default_config() -> nlohmann::json override;
-    auto set_config(nlohmann::json new_config) -> nlohmann::json override;
-    void unload() override;
+    auto set_config(nlohmann::json &&new_config) -> nlohmann::json override;
+    auto unload() -> void override;
 
     DefinitionsProviderWrapper(const DefinitionsProviderWrapper &) = default;
     DefinitionsProviderWrapper(DefinitionsProviderWrapper &&)      = default;

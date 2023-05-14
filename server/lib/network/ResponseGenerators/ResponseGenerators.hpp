@@ -9,34 +9,36 @@
 
 class IResponceGenerator {
  public:
-    virtual ~IResponceGenerator() = default;
-    virtual auto handle(const std::string &request) -> nlohmann::json;
+    virtual ~IResponceGenerator()                                     = default;
+    virtual auto handle(const std::string &request) -> nlohmann::json = 0;
 
- protected:
-    virtual auto handle_init(const nlohmann::json &) -> nlohmann::json;
+ private:
+    virtual auto handle_init(const nlohmann::json &) -> nlohmann::json = 0;
     virtual auto handle_get_default_config(const nlohmann::json &)
-        -> nlohmann::json;
+        -> nlohmann::json = 0;
     virtual auto handle_get_config_scheme(const nlohmann::json &)
-        -> nlohmann::json;
-    virtual auto handle_set_config(const nlohmann::json &) -> nlohmann::json;
-    virtual auto handle_list_plugins(const nlohmann::json &) -> nlohmann::json;
+        -> nlohmann::json = 0;
+    virtual auto handle_set_config(const nlohmann::json &)
+        -> nlohmann::json = 0;
+    virtual auto handle_list_plugins(const nlohmann::json &)
+        -> nlohmann::json = 0;
     virtual auto handle_load_new_plugins(const nlohmann::json &)
-        -> nlohmann::json;
-    virtual auto handle_get(const nlohmann::json &) -> nlohmann::json;
+        -> nlohmann::json                                             = 0;
+    virtual auto handle_get(const nlohmann::json &) -> nlohmann::json = 0;
     virtual auto handle_get_dict_scheme(const nlohmann::json &)
-        -> nlohmann::json;
+        -> nlohmann::json = 0;
 };
 
 // Где-то хранить state между сообщениями. Энивей многошаговый запрос
 // разрешается через handle()
-class ResponceGenerator : public IResponceGenerator {
+class ResponseGenerator : public IResponceGenerator {
  public:
-    explicit ResponceGenerator(
+    explicit ResponseGenerator(
         std::shared_ptr<PluginsProvider> plugins_provider);
 
     auto handle(const std::string &request) -> nlohmann::json override;
 
- protected:
+ private:
     auto handle_init(const nlohmann::json &request) -> nlohmann::json override;
     auto handle_get_default_config(const nlohmann::json &request)
         -> nlohmann::json override;

@@ -34,7 +34,7 @@ void PluginServer::start_accept() {
     acceptor_.async_accept([this](boost::system::error_code ec,
                                   tcp::socket               socket) {
         if (!ec) {
-            auto test = std::make_unique<ResponceGenerator>(plugins_provider_);
+            auto test = std::make_unique<ResponseGenerator>(plugins_provider_);
             std::make_shared<Session>(std::move(socket), std::move(test))
                 ->start();
         }

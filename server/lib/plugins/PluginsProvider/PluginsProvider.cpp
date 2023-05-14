@@ -32,3 +32,7 @@ auto PluginsProvider::get_format_processor(const std::string &name)
     -> std::optional<FormatProcessorWrapper> {
     return format_processors_.get(name);
 }
+
+auto PluginsProvider::load_new_plugins() -> void {
+    return;
+}
