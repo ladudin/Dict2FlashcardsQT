@@ -1,29 +1,37 @@
 #include "AudiosProviderWrapper.hpp"
+#include "Container.hpp"
+#include "PyExceptionInfo.hpp"
 #include <cstdint>
+#include <optional>
+#include <utility>
+#include <variant>
 
-AudiosProviderWrapper::AudiosProviderWrapper(Container container) {
+AudiosProviderWrapper::AudiosProviderWrapper(Container &&container)
+    : container_(container) {
 }
 
-auto AudiosProviderWrapper::load() -> void {
+auto AudiosProviderWrapper::build(Container containter)
+    -> std::variant<AudiosProviderWrapper, PyExceptionInfo> {
 }
 
 auto AudiosProviderWrapper::get(const std::string &word, uint64_t batch_size)
-    -> AudiosProviderWrapper::type {
-    return {};
+    -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo> {
 }
 
-auto AudiosProviderWrapper::get_config_description() -> nlohmann::json {
-    return {};
+auto AudiosProviderWrapper::load() -> std::optional<PyExceptionInfo> {
 }
 
-auto AudiosProviderWrapper::get_default_config() -> nlohmann::json {
-    return {};
+auto AudiosProviderWrapper::unload() -> std::optional<PyExceptionInfo> {
+}
+
+auto AudiosProviderWrapper::get_config_description()
+    -> std::variant<PyExceptionInfo, nlohmann::json> {
+}
+
+auto AudiosProviderWrapper::get_default_config()
+    -> std::variant<PyExceptionInfo, nlohmann::json> {
 }
 
 auto AudiosProviderWrapper::set_config(nlohmann::json &&new_config)
-    -> nlohmann::json {
-    return {};
-}
-
-auto AudiosProviderWrapper::unload() -> void {
+    -> std::variant<PyExceptionInfo, nlohmann::json> {
 }

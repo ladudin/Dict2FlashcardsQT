@@ -6,8 +6,10 @@
 #include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 #include "spdlog/common.h"
+#include "spdlog/spdlog.h"
 #include <bits/ranges_algo.h>
 #include <boost/python/import.hpp>
+#include <complex>
 #include <concepts>
 #include <filesystem>
 #include <memory>
@@ -26,9 +28,9 @@ class IPluginsLoader {
     virtual ~IPluginsLoader() = default;
 
     virtual auto get(const std::string &plugin_name)
-        -> std::optional<Wrapper>           = 0;
+        -> std::optional<std::variant<Wrapper, PyExceptionInfo>> = 0;
 
-    virtual auto load_new_plugins() -> void = 0;
+    virtual auto load_new_plugins() -> void                      = 0;
 };
 
 // using Wrapper = DefinitionsProviderWrapper;
@@ -49,6 +51,9 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
         std::ranges::for_each(
             std::filesystem::directory_iterator(plugins_dir),
             [this](const std::filesystem::path &dir_entry) {
+                using std::string_literals::operator""s;
+
+                spdlog::info("Loading plugin from "s + dir_entry.string());
                 if (!std::filesystem::is_directory(dir_entry)) {
                     return;
                 }
@@ -61,11 +66,15 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
                         plugin_container)) {
                     auto info = std::get<std::optional<PyExceptionInfo>>(
                         plugin_container);
+                    spdlog::info("Failed to load plugin from "s +
+                                 dir_entry.string());
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(info));
                 } else if (std::holds_alternative<Container>(
                                plugin_container)) {
                     auto container = std::get<Container>(plugin_container);
+                    spdlog::info("Successfully loaded plugin from "s +
+                                 dir_entry.string());
                     loaded_containers_.emplace(std::move(module_name),
                                                std::move(container));
                 } else {
@@ -76,12 +85,17 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
     }
 
     auto get(const std::string &plugin_name)
-        -> std::optional<Wrapper> override {
+        -> std::optional<std::variant<Wrapper, PyExceptionInfo>> override {
+        using std::string_literals::operator""s;
+        spdlog::info(plugin_name + " was requested");
+
         auto res = loaded_containers_.find(plugin_name);
         if (res == loaded_containers_.end()) {
+            spdlog::info(plugin_name + " not found");
             return std::nullopt;
         }
-        return Wrapper(res->second);
+        spdlog::info(plugin_name + " was found");
+        return Wrapper::build(res->second);
     }
 
     auto load_new_plugins() -> void override {

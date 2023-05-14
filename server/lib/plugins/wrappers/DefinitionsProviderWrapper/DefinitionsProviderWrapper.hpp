@@ -1,14 +1,15 @@
 #ifndef DEFINITIONS_PROVIDER_WRAPPER_H
 #define DEFINITIONS_PROVIDER_WRAPPER_H
 
-#include "Container.hpp"
-#include "IPluginWrapper.hpp"
-
 #include <cstdint>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "Container.hpp"
+#include "IPluginWrapper.hpp"
+#include "PyExceptionInfo.hpp"
 
 struct Card {
     Card(const Card &)                     = default;
@@ -30,26 +31,29 @@ struct Card {
 class DefinitionsProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
  public:
-    explicit DefinitionsProviderWrapper(Container container);
+    static auto build(Container container)
+        -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
-    auto get_dictionary_scheme() -> nlohmann::json;
+    auto get_dictionary_scheme()
+        -> std::variant<nlohmann::json, PyExceptionInfo>;
     auto get(const std::string &word, uint64_t batch_size)
-        -> DefinitionsProviderWrapper::type;
-    auto load() -> void override;
-    auto get_config_description() -> nlohmann::json override;
-    auto get_default_config() -> nlohmann::json override;
-    auto set_config(nlohmann::json &&new_config) -> nlohmann::json override;
-    auto unload() -> void override;
-
-    DefinitionsProviderWrapper(const DefinitionsProviderWrapper &) = default;
-    DefinitionsProviderWrapper(DefinitionsProviderWrapper &&)      = default;
-    auto operator=(const DefinitionsProviderWrapper &)
-        -> DefinitionsProviderWrapper & = default;
-    auto operator=(DefinitionsProviderWrapper &&)
-        -> DefinitionsProviderWrapper & = default;
+        -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
+    auto load() -> std::optional<PyExceptionInfo> override;
+    auto unload() -> std::optional<PyExceptionInfo> override;
+    auto get_config_description()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto get_default_config()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto set_config(nlohmann::json &&new_config)
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  private:
-    nlohmann::json config;
+    explicit DefinitionsProviderWrapper(Container &&container);
+
+    Container      container_;
+    nlohmann::json config_;
 };
+
+static_assert(is_plugin_wrapper<DefinitionsProviderWrapper>);
 
 #endif  // !DEFINITIONS_PROVIDER_WRAPPER_H

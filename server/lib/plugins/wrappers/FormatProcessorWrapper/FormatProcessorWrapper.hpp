@@ -1,30 +1,39 @@
 #ifndef FORMAT_PROCESSOR_WRAPPER_H
 #define FORMAT_PROCESSOR_WRAPPER_H
 
-#include "IPluginWrapper.hpp"
-
 #include <filesystem>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "Container.hpp"
+#include "IPluginWrapper.hpp"
+#include "PyExceptionInfo.hpp"
+
 class FormatProcessorWrapper : public IPluginWrapper<std::string> {
  public:
-    explicit FormatProcessorWrapper(Container container);
+    static auto build(Container container)
+        -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
-    auto get(ResultFilesPaths &&paths) -> FormatProcessorWrapper::type;
-    auto load() -> void override;
-    auto get_config_description() -> nlohmann::json override;
-    auto get_default_config() -> nlohmann::json override;
-    auto set_config(nlohmann::json &&new_config) -> nlohmann::json override;
-    auto unload() -> void override;
+    auto get(ResultFilesPaths &&paths)
+        -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
+    auto load() -> std::optional<PyExceptionInfo> override;
+    auto unload() -> std::optional<PyExceptionInfo> override;
+    auto get_config_description()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto get_default_config()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto set_config(nlohmann::json &&new_config)
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
-    FormatProcessorWrapper(const FormatProcessorWrapper &) = default;
-    FormatProcessorWrapper(FormatProcessorWrapper &&)      = default;
-    auto operator=(const FormatProcessorWrapper &)
-        -> FormatProcessorWrapper & = default;
-    auto operator=(FormatProcessorWrapper &&)
-        -> FormatProcessorWrapper & = default;
+ private:
+    explicit FormatProcessorWrapper(Container &&container);
+
+    Container      container_;
+    nlohmann::json config_;
 };
+
+static_assert(is_plugin_wrapper<FormatProcessorWrapper>);
 
 #endif

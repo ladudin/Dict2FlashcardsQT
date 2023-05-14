@@ -2,6 +2,7 @@
 #define PLUGIN_WRAPPER_INTERFACE_H
 
 #include "Container.hpp"
+#include "PyExceptionInfo.hpp"
 #include <concepts>
 #include <cstdint>
 #include <filesystem>
@@ -12,14 +13,17 @@
 template <class T>
 class IPluginWrapper {
  public:
-    using type                                              = T;
-    virtual ~IPluginWrapper()                               = default;
+    using type                                            = T;
+    virtual ~IPluginWrapper()                             = default;
 
-    virtual void load()                                     = 0;
-    virtual auto get_config_description() -> nlohmann::json = 0;
-    virtual auto get_default_config() -> nlohmann::json     = 0;
-    virtual auto set_config(nlohmann::json &&new_config) -> nlohmann::json = 0;
-    virtual void unload()                                                  = 0;
+    virtual auto load() -> std::optional<PyExceptionInfo> = 0;
+    virtual auto get_config_description()
+        -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
+    virtual auto get_default_config()
+        -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
+    virtual auto set_config(nlohmann::json &&new_config)
+        -> std::variant<PyExceptionInfo, nlohmann::json>    = 0;
+    virtual auto unload() -> std::optional<PyExceptionInfo> = 0;
 };
 
 struct ResultFilesPaths {
@@ -29,7 +33,12 @@ struct ResultFilesPaths {
 };
 
 template <class T>
-concept container_constructible = std::constructible_from<T, Container>;
+concept container_constructible =
+    requires(T instance, Container container) {
+        {
+            T::build(container)
+        } -> std::same_as<std::variant<T, PyExceptionInfo>>;
+    };
 
 template <class T>
 concept implements_wrapper_interface =
@@ -45,13 +54,13 @@ concept implements_wrapper_get = (
              uint64_t           batch_size) {
         {
             dependent_instance.get(word, batch_size)
-        } -> std::same_as<typename T::type>;
+        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
     } ||
     // FormatProcessor
     requires(T dependent_instance, ResultFilesPaths paths) {
         {
             dependent_instance.get(std::move(paths))
-        } -> std::same_as<typename T::type>;
+        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
     });
 
 template <class T>

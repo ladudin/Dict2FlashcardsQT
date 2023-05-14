@@ -29,8 +29,6 @@ class IResponceGenerator {
         -> nlohmann::json = 0;
 };
 
-// Где-то хранить state между сообщениями. Энивей многошаговый запрос
-// разрешается через handle()
 class ResponseGenerator : public IResponceGenerator {
  public:
     explicit ResponseGenerator(

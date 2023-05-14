@@ -1,31 +1,40 @@
 #ifndef IMAGES_PROVIDER_WRAPPER_H
 #define IMAGES_PROVIDER_WRAPPER_H
 
-#include "IPluginWrapper.hpp"
-
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
+
+#include "Container.hpp"
+#include "IPluginWrapper.hpp"
+#include "PyExceptionInfo.hpp"
 
 class ImagesProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
  public:
-    explicit ImagesProviderWrapper(Container container);
+    static auto build(Container container)
+        -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
-        -> ImagesProviderWrapper::type;
-    auto load() -> void override;
-    auto get_config_description() -> nlohmann::json override;
-    auto get_default_config() -> nlohmann::json override;
-    auto set_config(nlohmann::json &&new_config) -> nlohmann::json override;
-    auto unload() -> void override;
+        -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
+    auto load() -> std::optional<PyExceptionInfo> override;
+    auto unload() -> std::optional<PyExceptionInfo> override;
+    auto get_config_description()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto get_default_config()
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
+    auto set_config(nlohmann::json &&new_config)
+        -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
-    ImagesProviderWrapper(const ImagesProviderWrapper &) = default;
-    ImagesProviderWrapper(ImagesProviderWrapper &&)      = default;
-    auto operator=(const ImagesProviderWrapper &)
-        -> ImagesProviderWrapper & = default;
-    auto operator=(ImagesProviderWrapper &&)
-        -> ImagesProviderWrapper & = default;
+ private:
+    explicit ImagesProviderWrapper(Container &&container);
+
+    Container      container_;
+    nlohmann::json config_;
 };
+
+static_assert(is_plugin_wrapper<ImagesProviderWrapper>);
 
 #endif
