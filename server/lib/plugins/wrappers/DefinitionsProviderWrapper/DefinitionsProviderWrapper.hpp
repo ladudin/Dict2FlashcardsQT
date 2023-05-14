@@ -28,7 +28,7 @@ struct Card {
 class DefinitionsProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
  public:
-    explicit DefinitionsProviderWrapper(Container &&container);
+    explicit DefinitionsProviderWrapper(Container container);
 
     auto get_dictionary_scheme() -> nlohmann::json;
     void load() override;
@@ -38,12 +38,12 @@ class DefinitionsProviderWrapper
     auto set_config(nlohmann::json new_config) -> nlohmann::json override;
     void unload() override;
 
-    DefinitionsProviderWrapper(const DefinitionsProviderWrapper &) = delete;
+    DefinitionsProviderWrapper(const DefinitionsProviderWrapper &) = default;
     DefinitionsProviderWrapper(DefinitionsProviderWrapper &&)      = default;
     auto operator=(const DefinitionsProviderWrapper &)
-        -> DefinitionsProviderWrapper & = delete;
+        -> DefinitionsProviderWrapper & = default;
     auto operator=(DefinitionsProviderWrapper &&)
-        -> DefinitionsProviderWrapper & = delete;
+        -> DefinitionsProviderWrapper & = default;
 
  private:
     nlohmann::json config;

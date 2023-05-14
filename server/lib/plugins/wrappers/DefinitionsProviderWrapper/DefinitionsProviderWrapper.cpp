@@ -1,6 +1,6 @@
 #include "DefinitionsProviderWrapper.hpp"
 
-DefinitionsProviderWrapper::DefinitionsProviderWrapper(Container &&container) {
+DefinitionsProviderWrapper::DefinitionsProviderWrapper(Container container) {
 }
 
 auto DefinitionsProviderWrapper::get_dictionary_scheme() -> nlohmann::json {

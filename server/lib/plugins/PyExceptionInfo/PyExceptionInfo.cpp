@@ -1,4 +1,8 @@
 #include "PyExceptionInfo.hpp"
+#include "spdlog/common.h"
+#include "spdlog/spdlog.h"
+#include <boost/python/exec.hpp>
+#include <boost/python/extract.hpp>
 
 auto PyExceptionInfo::build() -> std::optional<PyExceptionInfo> {
     PyExceptionInfo info;

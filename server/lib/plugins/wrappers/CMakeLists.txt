@@ -1,3 +1,5 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_subdirectory(PluginWrapperInterface)
 add_subdirectory(AudiosProviderWrapper)
 add_subdirectory(DefinitionsProviderWrapper)

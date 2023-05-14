@@ -1,3 +1,4 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(plugin_server Server.cpp)
 target_link_libraries(plugin_server

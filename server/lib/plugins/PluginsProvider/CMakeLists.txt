@@ -1,3 +1,5 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(plugins_provider PluginsProvider.cpp)
 target_include_directories(plugins_provider PUBLIC
     ./

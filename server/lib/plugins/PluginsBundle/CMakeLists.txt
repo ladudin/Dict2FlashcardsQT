@@ -1,3 +1,5 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(plugins_bundle PluginsBundle.cpp)
 target_link_libraries(plugins_bundle
     definitions_provider_wrapper

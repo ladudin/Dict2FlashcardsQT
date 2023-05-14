@@ -1,6 +1,9 @@
 #ifndef PLUGIN_WRAPPER_INTERFACE_H
 #define PLUGIN_WRAPPER_INTERFACE_H
 
+#include "Container.hpp"
+#include <concepts>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -18,5 +21,13 @@ class IPluginWrapper {
 
     virtual ~IPluginWrapper() = default;
 };
+
+template <class Dependent>
+concept implements_wrapper =
+    requires(Dependent c) { []<typename X>(IPluginWrapper<X> &) {}(c); } &&
+    std::constructible_from<Dependent, Container> &&
+    std::copy_constructible<Dependent>;
+
+// constexpr bool test = ;
 
 #endif  // !PLUGIN_WRAPPER_INTERFACE_H

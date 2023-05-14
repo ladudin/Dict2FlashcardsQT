@@ -13,6 +13,11 @@ class Container {
     static auto build(boost::python::object &&module)
         -> std::variant<Container, std::optional<PyExceptionInfo>>;
 
+    Container(const Container &)                    = default;
+    Container(Container &&)                         = default;
+    Container         &operator=(const Container &) = default;
+    Container         &operator=(Container &&)      = default;
+
     [[nodiscard]] auto load() const -> const boost::python::object &;
     [[nodiscard]] auto get() const -> const boost::python::object &;
     [[nodiscard]] auto get_config_description() const

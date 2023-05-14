@@ -1,3 +1,5 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(containers Container.cpp)
 target_include_directories(containers
     PUBLIC
@@ -6,8 +8,7 @@ target_include_directories(containers
     ${PYTHON_INCLUDE_DIRS}
 )
 
-target_link_libraries(
-    containers
+target_link_libraries(containers
     py_exception_info
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}

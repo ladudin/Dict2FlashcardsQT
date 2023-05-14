@@ -1,3 +1,5 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(py_exception_info PyExceptionInfo.cpp)
 target_include_directories(py_exception_info
     PUBLIC

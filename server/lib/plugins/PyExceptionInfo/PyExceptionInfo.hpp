@@ -1,10 +1,6 @@
 #ifndef PY_EXCEPTION_INFO_H
 #define PY_EXCEPTION_INFO_H
 
-#include "spdlog/common.h"
-#include "spdlog/spdlog.h"
-#include <boost/python/exec.hpp>
-#include <boost/python/extract.hpp>
 #include <optional>
 #include <string>
 #include <utility>
