@@ -1,7 +1,7 @@
 #include "ServerConnection.h"
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include <boost/asio.hpp>
 
@@ -18,9 +18,7 @@ ServerConnection::~ServerConnection() {
 
 std::string ServerConnection::request(const std::string &request) {
     boost::asio::write(socket_, boost::asio::buffer(request));
-    //    buffer_.consume(buffer_.size())
     size_t       bytes = boost::asio::read_until(socket_, buffer_, '\n');
-
     std::string  response;
     std::istream is(&buffer_);
     std::getline(is, response);

@@ -14,8 +14,8 @@ class ServerConnection : public IRequestable {
     ServerConnection(unsigned short     port,
                      const std::string &host = "127.0.0.1");
     ~ServerConnection() override;
-    std::pair<std::string, std::string>
-    request(const std::string &request) override;
+    bool        is_connected();
+    std::string request(const std::string &request) override;
 
  private:
     boost::asio::io_context io_context_;
