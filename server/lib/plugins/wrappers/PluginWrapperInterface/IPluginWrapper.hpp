@@ -40,22 +40,17 @@ concept implements_wrapper_interface =
 template <class T>
 concept implements_wrapper_get = (
     // DefinitionsProvider, SentencesProvider, AudiosProvider, ImagesProvider
-    requires(T dependent_instance) {
+    requires(T                  dependent_instance,
+             const std::string &word,
+             uint64_t           batch_size) {
         {
-            [](T dependent_instance) {
-                const std::string &word = "";
-                uint64_t           batch_size;
-                return dependent_instance.get(word, batch_size);
-            }(dependent_instance)
+            dependent_instance.get(word, batch_size)
         } -> std::same_as<typename T::type>;
     } ||
     // FormatProcessor
-    requires(T dependent_instance) {
+    requires(T dependent_instance, ResultFilesPaths paths) {
         {
-            [](T dependent_instance) {
-                ResultFilesPaths paths{};
-                return dependent_instance.get(std::move(paths));
-            }(dependent_instance)
+            dependent_instance.get(std::move(paths))
         } -> std::same_as<typename T::type>;
     });
 

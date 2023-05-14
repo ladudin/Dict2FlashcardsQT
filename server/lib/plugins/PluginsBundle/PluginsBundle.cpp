@@ -10,7 +10,7 @@ auto PluginsBundle::get_definitions(const std::string &word,
     if (!definitions_provider_.has_value()) {
         return std::nullopt;
     }
-    return definitions_provider_->get(word);
+    return definitions_provider_->get(word, batch_size);
 }
 
 auto PluginsBundle::get_sentences(const std::string &word, uint64_t batch_size)
