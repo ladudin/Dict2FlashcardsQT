@@ -1,1 +1,1 @@
-#include "../include/wrappers/SentencePluginWrapper.h"
+#include "wrappers/SentencePluginWrapper.h"

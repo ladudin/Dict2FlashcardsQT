@@ -1,1 +1,1 @@
-#include "../include/wrappers/AudioPluginWrapper.h"
+#include "wrappers/AudioPluginWrapper.h"
