@@ -9,18 +9,37 @@ ServerConnection::ServerConnection(unsigned short port, const std::string &host)
     : io_context_(), socket_(io_context_) {
     boost::asio::ip::tcp::endpoint endpoint(
         boost::asio::ip::address::from_string(host), port);
+    boost::system::error_code error;
     socket_.connect(endpoint);
+    is_connected = !error;
 }
 
 ServerConnection::~ServerConnection() {
     socket_.close();
 }
 
-std::string ServerConnection::request(const std::string &request) {
-    boost::asio::write(socket_, boost::asio::buffer(request));
-    size_t       bytes = boost::asio::read_until(socket_, buffer_, '\n');
+ServerConnection::is_connected() {
+    return is_connected_;
+}
+
+std::pair<bool, std::string>
+ServerConnection::request(const std::string &request) {
+    boost::system::error_code error;
+
+    boost::asio::write(socket_, boost::asio::buffer(request), error);
+    if (error) {
+        return std::make_pair(false, error.message());
+        is_connected = false;
+    }
+
+    size_t bytes = boost::asio::read_until(socket_, buffer_, '\n', error);
+    if (error) {
+        return std::make_pair(false, error.message());
+        is_connected = false;
+    }
+
     std::string  response;
     std::istream is(&buffer_);
     std::getline(is, response);
-    return response;
+    return std::make_pair(true, response);
 }

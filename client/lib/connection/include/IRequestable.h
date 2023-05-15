@@ -5,8 +5,9 @@
 
 class IRequestable {
  public:
-    virtual ~IRequestable()                                 = default;
-    virtual std::string request(const std::string &message) = 0;
+    virtual ~IRequestable() = default;
+    virtual std::pair<bool, std::string>
+    request(const std::string &message) = 0;
 };
 
 #endif  // IREQUESTABLE_H
