@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "IRequestable.h"
+#include "LoadResult.h"
 #include "interfaces/IBasicPluginWrapper.h"
 
 class BasicPluginWrapper : virtual public IBasicPluginWrapper {
@@ -17,8 +18,8 @@ class BasicPluginWrapper : virtual public IBasicPluginWrapper {
     std::pair<std::string, std::string> get_default_scheme() override;
     std::pair<std::string, std::string>
     set_config(const std::string &new_config) override;
-    virtual std::pair<LoadResult, std::string> list_plugins() override;
-    virtual std::pair<LoadResult, std::string> load_new_plugins() override;
+    std::pair<LoadResult, std::string> list_plugins() override;
+    std::pair<LoadResult, std::string> load_new_plugins() override;
 
  protected:
     std::shared_ptr<IRequestable> connection_;

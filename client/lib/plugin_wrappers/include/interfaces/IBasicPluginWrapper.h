@@ -1,18 +1,10 @@
 #ifndef IBASICPLUGINWRAPPER_H
 #define IBASICPLUGINWRAPPER_H
 
-#include <map>
 #include <string>
 #include <vector>
 
-struct LoadResult {
-    std::vector<std::string> success;
-    std::vector<std::string> fail;
-};
-
-inline bool operator==(const LoadResult &lhs, const LoadResult &rhs) {
-    return lhs.success == rhs.success && lhs.fail == rhs.fail;
-}
+#include "LoadResult.h"
 
 struct IBasicPluginWrapper {
     virtual ~IBasicPluginWrapper()                                   = default;
