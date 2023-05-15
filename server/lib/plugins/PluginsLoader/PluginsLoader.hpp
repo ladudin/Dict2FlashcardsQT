@@ -1,14 +1,9 @@
 #ifndef PLUGINS_LOADER_H
 #define PLUGINS_LOADER_H
 
-#include "Container.hpp"
-#include "DefinitionsProviderWrapper.hpp"
-#include "IPluginWrapper.hpp"
-#include "PyExceptionInfo.hpp"
+#include "BasePluginWrapper.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
-#include <bits/ranges_algo.h>
-#include <boost/python/import.hpp>
 #include <complex>
 #include <concepts>
 #include <filesystem>
@@ -21,6 +16,8 @@
 #include <utility>
 #include <variant>
 
+#include "PyExceptionInfo.hpp"
+
 template <typename Wrapper>
     requires is_plugin_wrapper<Wrapper>
 class IPluginsLoader {
@@ -32,6 +29,7 @@ class IPluginsLoader {
     virtual auto load_new_plugins() -> void                      = 0;
 };
 
+// #include "DefinitionsProviderWrapper.hpp"
 // using Wrapper = DefinitionsProviderWrapper;
 
 template <typename Wrapper>
@@ -94,7 +92,14 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         spdlog::info(plugin_name + " was found");
-        return Wrapper::build(plugin_name, res->second);
+        auto wrapper_or_error = Wrapper::build(plugin_name, res->second);
+        if (std::holds_alternative<BasePluginWrapper<typename Wrapper::type>>(
+                wrapper_or_error)) {
+            return *dynamic_cast<Wrapper *>(
+                &std::get<BasePluginWrapper<typename Wrapper::type>>(
+                    wrapper_or_error));
+        }
+        return std::nullopt;
     }
 
     auto load_new_plugins() -> void override {

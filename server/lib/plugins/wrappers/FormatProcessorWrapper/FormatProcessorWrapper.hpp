@@ -7,33 +7,13 @@
 #include <utility>
 #include <vector>
 
-#include "Container.hpp"
-#include "IPluginWrapper.hpp"
+#include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class FormatProcessorWrapper : public IPluginWrapper<std::string> {
+class FormatProcessorWrapper : public BasePluginWrapper<std::string> {
  public:
-    static auto build(std::string name, Container container)
-        -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
-
-    [[nodiscard]] auto name() const -> const std::string & override;
-    auto               get(ResultFilesPaths &&paths)
+    auto get(ResultFilesPaths &&paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
-    auto load() -> std::optional<PyExceptionInfo> override;
-    auto unload() -> std::optional<PyExceptionInfo> override;
-    auto get_config_description()
-        -> std::variant<PyExceptionInfo, nlohmann::json> override;
-    auto get_default_config()
-        -> std::variant<PyExceptionInfo, nlohmann::json> override;
-    auto set_config(nlohmann::json &&new_config)
-        -> std::variant<PyExceptionInfo, nlohmann::json> override;
-
- private:
-    explicit FormatProcessorWrapper(std::string &&name, Container &&container);
-
-    std::string    name_;
-    Container      container_;
-    nlohmann::json config_;
 };
 
 static_assert(is_plugin_wrapper<FormatProcessorWrapper>);
