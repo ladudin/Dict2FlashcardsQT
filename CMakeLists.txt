@@ -10,6 +10,6 @@ project(spdlog_examples CXX)
 # Logger
 add_subdirectory(spdlog)
 link_libraries(spdlog::spdlog_header_only)
-add_subdirectory(server)
 
+add_subdirectory(server)
 # add_subdirectory(python_tests)
