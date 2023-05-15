@@ -95,9 +95,11 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
         auto wrapper_or_error = Wrapper::build(plugin_name, res->second);
         if (std::holds_alternative<BasePluginWrapper<typename Wrapper::type>>(
                 wrapper_or_error)) {
-            return *dynamic_cast<Wrapper *>(
-                &std::get<BasePluginWrapper<typename Wrapper::type>>(
-                    wrapper_or_error));
+            auto base_wrapper =
+                std::get<BasePluginWrapper<typename Wrapper::type>>(
+                    wrapper_or_error);
+            auto after_cast = *static_cast<Wrapper *>(&base_wrapper);
+            return after_cast;
         }
         return std::nullopt;
     }

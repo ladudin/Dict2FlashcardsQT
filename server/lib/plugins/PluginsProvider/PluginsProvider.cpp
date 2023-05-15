@@ -1,4 +1,5 @@
 #include "PluginsProvider.hpp"
+#include "pylifecycle.h"
 #include "spdlog/common.h"
 
 PluginsProvider::PluginsProvider(PluginTypesLocationsConfig &&confg)

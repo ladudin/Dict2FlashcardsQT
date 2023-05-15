@@ -5,3 +5,8 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
     -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo> {
     return {};
 }
+
+auto DefinitionsProviderWrapper::get_dictionary_scheme()
+    -> std::variant<nlohmann::json, PyExceptionInfo> {
+    return {};
+}
