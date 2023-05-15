@@ -5,9 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "IBasicPluginWrapper.h"
 #include "IRequestable.h"
-#include "LoadResult.h"
-#include "interfaces/IBasicPluginWrapper.h"
 
 class BasicPluginWrapper : virtual public IBasicPluginWrapper {
  public:

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/IBasicPluginWrapper.h"
+#include "../basic/IBasicPluginWrapper.h"
 
 struct ISentencePluginWrapper : virtual public IBasicPluginWrapper {
     virtual std::pair<std::vector<std::string>, std::string>

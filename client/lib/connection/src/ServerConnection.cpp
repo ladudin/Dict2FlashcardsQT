@@ -5,12 +5,14 @@
 
 #include <boost/asio.hpp>
 
+#include <iostream>
+
 ServerConnection::ServerConnection(unsigned short port, const std::string &host)
     : io_context_(), socket_(io_context_), is_connected_(true) {
     boost::asio::ip::tcp::endpoint endpoint(
         boost::asio::ip::address::from_string(host), port);
     boost::system::error_code error;
-    socket_.connect(endpoint);
+    socket_.connect(endpoint, error);
     is_connected_ = !error;
 }
 

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/IImagePluginWrapper.h"
+#include "IImagePluginWrapper.h"
 #include "wrappers/BasicPluginWrapper.h"
 
 class ImagePluginWrapper : public BasicPluginWrapper,

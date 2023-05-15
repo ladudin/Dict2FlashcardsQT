@@ -3,8 +3,8 @@
 
 #include <string>
 
+#include "../basic/IBasicPluginWrapper.h"
 #include "Card.h"
-#include "interfaces/IBasicPluginWrapper.h"
 
 class IWordPluginWrapper : virtual public IBasicPluginWrapper {
  public:

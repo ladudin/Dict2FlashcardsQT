@@ -4,8 +4,8 @@
 #include <memory>
 #include <string>
 
-#include "interfaces/IFormatProcessorPluginWrapper.h"
-#include "wrappers/BasicPluginWrapper.h"
+#include "../basic/BasicPluginWrapper.h"
+#include "IFormatProcessorPluginWrapper.h"
 
 class FormatProcessorPluginWrapper
     : public BasicPluginWrapper,

@@ -1,4 +1,4 @@
-#include "wrappers/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 
 #include <memory>
 #include <string>
@@ -6,9 +6,6 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
-
-#include "IRequestable.h"
-#include "LoadResult.h"
 
 using namespace nlohmann;
 

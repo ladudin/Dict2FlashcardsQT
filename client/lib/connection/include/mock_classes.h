@@ -1,5 +1,5 @@
-#ifndef DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_TESTS_SRC_MOCK_CLASSES_H
-#define DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_TESTS_SRC_MOCK_CLASSES_H
+#ifndef MOCK_CLASSES_H
+#define MOCK_CLASSES_H
 
 #include "IRequestable.h"
 
@@ -26,4 +26,4 @@ struct FixedAnswer : public IRequestable {
     std::string answer;
 };
 
-#endif  // DICT2FLASHCARDSQT_SRC_PLUGIN_WRAPPERS_TESTS_SRC_MOCK_CLASSES_H
+#endif  // MOCK_CLASSES_H

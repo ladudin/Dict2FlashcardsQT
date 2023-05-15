@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/IAudioPluginWrapper.h"
-#include "wrappers/BasicPluginWrapper.h"
+#include "../basic/BasicPluginWrapper.h"
+#include "IAudioPluginWrapper.h"
 
 class AudioPluginWrapper : public BasicPluginWrapper,
                            virtual public IAudioPluginWrapper {

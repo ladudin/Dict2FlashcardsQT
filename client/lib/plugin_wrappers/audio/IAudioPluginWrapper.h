@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/IBasicPluginWrapper.h"
+#include "../basic/IBasicPluginWrapper.h"
 
 struct IAudioPluginWrapper : virtual public IBasicPluginWrapper {
     virtual std::pair<std::vector<std::pair<std::string, std::string>>,

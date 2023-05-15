@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/ISentencePluginWrapper.h"
+#include "ISentencePluginWrapper.h"
 #include "wrappers/BasicPluginWrapper.h"
 
 class SentencePluginWrapper : public BasicPluginWrapper,

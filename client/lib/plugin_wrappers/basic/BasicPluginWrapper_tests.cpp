@@ -1,4 +1,4 @@
-#include "wrappers/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 #include "mock_classes.h"
 
 #include <memory>

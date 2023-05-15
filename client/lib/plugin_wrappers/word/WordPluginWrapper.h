@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "BasicPluginWrapper.h"
+#include "../basic/BasicPluginWrapper.h"
 #include "Card.h"
 #include "IRequestable.h"
-#include "interfaces/IWordPluginWrapper.h"
+#include "IWordPluginWrapper.h"
 
 class WordPluginWrapper : public BasicPluginWrapper,
                           virtual public IWordPluginWrapper {

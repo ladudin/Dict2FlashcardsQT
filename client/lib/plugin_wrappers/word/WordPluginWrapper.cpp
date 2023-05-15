@@ -1,4 +1,4 @@
-#include "wrappers/WordPluginWrapper.h"
+#include "WordPluginWrapper.h"
 
 #include <vector>
 
