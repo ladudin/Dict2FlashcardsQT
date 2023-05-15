@@ -1,4 +1,4 @@
-#include "../../include/wrappers/BasicPluginWrapper.h"
+#include "wrappers/BasicPluginWrapper.h"
 #include "mock_classes.h"
 
 #include <memory>
@@ -10,15 +10,56 @@
 
 using namespace nlohmann;
 
-TEST(BasicPWOutputTest, Init) {
+TEST(BasicPWInitTest, Output) {
     auto               memorizer = std::make_shared<Memorizer>();
     BasicPluginWrapper wrapper(memorizer, "tests");
-    EXPECT_THROW(wrapper.init("test_name"), std::runtime_error);
+    wrapper.init("test_name");
 
     json actual   = json::parse(memorizer->received_message);
     json expected = json::parse(
         R"({ "query_type" : "init", "plugin_type" : "tests", "plugin_name" : "test_name" })");
     EXPECT_EQ(expected, actual);
+}
+
+TEST(BasicPWInitTest, Success) {
+    std::string        answer       = R"({ "status" : 0, "error" : "null"})";
+    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
+    BasicPluginWrapper wrapper(fixed_answer, "tests");
+
+    EXPECT_TRUE(wrapper.init("exiting_plugin").empty());
+}
+
+TEST(BasicPWInitTest, Error) {
+    std::string        answer       = R"({ "status" : 1, "error" : "something" })";
+    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
+    BasicPluginWrapper wrapper(fixed_answer, "tests");
+
+    std::string actual = wrapper.init("nonexiten_plugin");
+    std::string expected = "something";
+
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BasicPWInitTest, WrongResponseFormat) {
+    std::string        answer       = R"({ "status" : "ok", "error" : "something" })";
+    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
+    BasicPluginWrapper wrapper(fixed_answer, "tests");
+
+    std::string actual = wrapper.init("nonexiten_plugin");
+    std::string expected = "Wrong response format";
+
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BasicPWInitTest, Disconnect) {
+    std::string        answer       = R"({ "status" : "0", "error" : "something" })";
+    auto               fixed_answer = std::make_shared<FixedAnswer>(answer, false);
+    BasicPluginWrapper wrapper(fixed_answer, "tests");
+
+    std::string actual = wrapper.init("nonexiten_plugin");
+    std::string expected = "Server disconnected";
+
+    EXPECT_EQ(actual, expected);
 }
 
 //TEST(BasicPWOutputTest, GetDefaultConfig) {
@@ -78,22 +119,6 @@ TEST(BasicPWOutputTest, Init) {
 //        R"({ "query_type" : "load_new_plugins", "plugin_type" : "tests" })");
 //    EXPECT_EQ(expected, actual);
 //}
-
-TEST(BasicPWInputTest, InitSuccess) {
-    std::string        answer       = R"({ "status" : 0, "result" : "null" })";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    EXPECT_NO_THROW(wrapper.init("exiting_plugin"));
-}
-
-TEST(BasicPWInputTest, InitFailure) {
-    std::string        answer       = R"({ "status" : 1, "result" : "null" })";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    EXPECT_THROW(wrapper.init("nonexiten_plugin"), std::runtime_error);
-}
 
 //TEST(BasicPWInputTest, GetDefaultConfigSuccess) {
 //    std::string answer =

@@ -6,6 +6,10 @@ set(TEST_FILES src/BasicPluginWrapper_tests.cpp
         src/FormatProcessorPluginWrapper_tests.cpp)
 
 add_executable(plugin_wrappers_test ${TEST_FILES})
-target_link_libraries(plugin_wrappers_test GTest::gtest_main)
+
+target_include_directories(plugin_wrappers_test PRIVATE include)
+
+target_link_libraries(plugin_wrappers_test client_plugin_wrappers
+        GTest::gtest_main)
 
 add_test(plugin_wrappers_test plugin_wrappers_test)

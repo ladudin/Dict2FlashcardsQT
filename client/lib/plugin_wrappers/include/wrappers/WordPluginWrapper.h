@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "../Card.h"
-#include "../interfaces/IWordPluginWrapper.h"
 #include "BasicPluginWrapper.h"
+#include "Card.h"
+#include "IRequestable.h"
+#include "interfaces/IWordPluginWrapper.h"
 
 class WordPluginWrapper : public BasicPluginWrapper,
                           virtual public IWordPluginWrapper {
@@ -15,8 +16,9 @@ class WordPluginWrapper : public BasicPluginWrapper,
     WordPluginWrapper(std::shared_ptr<IRequestable> connection);
     std::pair<std::vector<Card>, std::string>
                                         get(const std::string &word,
-                                            const std::string &query,
-                                            size_t             batch_size) override;
+                                            const std::string &query_language,
+                                            size_t             batch_size,
+                                            bool               reload) override;
     std::pair<std::string, std::string> get_dict_scheme() override;
 };
 

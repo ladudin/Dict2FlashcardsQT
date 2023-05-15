@@ -7,8 +7,6 @@
 
 #include "IRequestable.h"
 
-using boost::asio::ip::tcp;
-
 class ServerConnection : public IRequestable {
  public:
     ServerConnection(unsigned short     port,
@@ -19,7 +17,7 @@ class ServerConnection : public IRequestable {
 
  private:
     boost::asio::io_context io_context_;
-    tcp::socket             socket_;
+    boost::asio::ip::tcp::socket             socket_;
     boost::asio::streambuf  buffer_;
     bool is_connected_;
 };

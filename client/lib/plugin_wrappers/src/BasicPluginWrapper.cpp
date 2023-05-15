@@ -26,28 +26,28 @@ std::string BasicPluginWrapper::init(const std::string &plugin_name) {
     std::pair<bool, std::string> response(
         std::move(connection_->request(request_message.dump())));
     if (!response.first)
-        return response.second;
+        return "Server disconnected";
     try {
         json response_message = json::parse(response.second);
-        if (response_message.at("status") != 0)
-            return response_message.at("error").dump();
+        if (response_message.at("status").get<int>() != 0)
+            return response_message.at("error").get<std::string>();
         return {};
     } catch (...) {
         return "Wrong response format";
     }
 }
 
-std::pair<std::string, std::string> get_default_config() {
+std::pair<std::string, std::string> BasicPluginWrapper::get_default_config() {
 }
 
-std::pair<std::string, std::string> get_default_scheme() {
+std::pair<std::string, std::string> BasicPluginWrapper::get_default_scheme() {
 }
 
-std::pair<std::string, std::string> set_config(const std::string &new_config) {
+std::pair<std::string, std::string> BasicPluginWrapper::set_config(const std::string &new_config) {
 }
 
-std::pair<LoadResult, std::string> list_plugins() {
+std::pair<LoadResult, std::string> BasicPluginWrapper::list_plugins() {
 }
 
-std::pair<LoadResult, std::string> load_new_plugins() {
+std::pair<LoadResult, std::string> BasicPluginWrapper::load_new_plugins() {
 }

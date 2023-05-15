@@ -13,3 +13,5 @@ target_include_directories(client_plugin_wrappers PRIVATE
 target_include_directories(client_plugin_wrappers PUBLIC include)
 
 target_link_libraries(client_plugin_wrappers PUBLIC connection)
+
+add_subdirectory(tests)
