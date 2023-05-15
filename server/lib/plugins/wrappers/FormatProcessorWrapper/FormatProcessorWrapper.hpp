@@ -13,10 +13,11 @@
 
 class FormatProcessorWrapper : public IPluginWrapper<std::string> {
  public:
-    static auto build(Container container)
+    static auto build(std::string name, Container container)
         -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
-    auto get(ResultFilesPaths &&paths)
+    [[nodiscard]] auto name() const -> const std::string & override;
+    auto               get(ResultFilesPaths &&paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
     auto load() -> std::optional<PyExceptionInfo> override;
     auto unload() -> std::optional<PyExceptionInfo> override;
@@ -28,8 +29,9 @@ class FormatProcessorWrapper : public IPluginWrapper<std::string> {
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  private:
-    explicit FormatProcessorWrapper(Container &&container);
+    explicit FormatProcessorWrapper(std::string &&name, Container &&container);
 
+    std::string    name_;
     Container      container_;
     nlohmann::json config_;
 };

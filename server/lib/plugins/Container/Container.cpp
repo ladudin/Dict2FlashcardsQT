@@ -15,7 +15,7 @@ auto Container::build(boost::python::object &&module)
         plugin_container.get_default_config_ =
             module.attr("get_default_config");
         plugin_container.unload_ = module.attr("unload");
-    } catch (...) {
+    } catch (const boost::python::error_already_set &) {
         return PyExceptionInfo::build();
     }
     return plugin_container;

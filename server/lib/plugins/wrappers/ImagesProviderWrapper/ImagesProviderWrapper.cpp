@@ -1,11 +1,25 @@
 #include "ImagesProviderWrapper.hpp"
 
-ImagesProviderWrapper::ImagesProviderWrapper(Container &&container)
-    : container_(container) {
+ImagesProviderWrapper::ImagesProviderWrapper(std::string &&name,
+                                             Container   &&container)
+    : name_(name), container_(container) {
 }
 
-auto ImagesProviderWrapper::build(Container containter)
+auto ImagesProviderWrapper::build(std::string name, Container containter)
     -> std::variant<ImagesProviderWrapper, PyExceptionInfo> {
+    // auto wrapper = ImagesProviderWrapper(std::move(containter));
+    // try {
+    //
+    // } catch (const boost::python::error_already_set &) {
+    //     auto info = PyExceptionInfo::build();
+    //     return info;
+    // }
+    //
+    // return wrapper;
+}
+
+auto ImagesProviderWrapper::name() const -> const std::string & {
+    return name_;
 }
 
 auto ImagesProviderWrapper::get(const std::string &word, uint64_t batch_size)

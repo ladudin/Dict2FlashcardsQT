@@ -14,10 +14,11 @@
 class ImagesProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
  public:
-    static auto build(Container container)
+    static auto build(std::string name, Container container)
         -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
-    auto get(const std::string &word, uint64_t batch_size)
+    [[nodiscard]] auto name() const -> const std::string & override;
+    auto               get(const std::string &word, uint64_t batch_size)
         -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
     auto load() -> std::optional<PyExceptionInfo> override;
     auto unload() -> std::optional<PyExceptionInfo> override;
@@ -29,8 +30,9 @@ class ImagesProviderWrapper
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  private:
-    explicit ImagesProviderWrapper(Container &&container);
+    explicit ImagesProviderWrapper(std::string &&name, Container &&container);
 
+    std::string    name_;
     Container      container_;
     nlohmann::json config_;
 };

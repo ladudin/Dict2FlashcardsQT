@@ -9,15 +9,17 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <utility>
 
 template <class T>
 class IPluginWrapper {
  public:
-    using type                                            = T;
-    virtual ~IPluginWrapper()                             = default;
+    using type                                                     = T;
+    virtual ~IPluginWrapper()                                      = default;
 
-    virtual auto load() -> std::optional<PyExceptionInfo> = 0;
-    virtual auto get_config_description()
+    [[nodiscard]] virtual auto name() const -> const std::string & = 0;
+    virtual auto               load() -> std::optional<PyExceptionInfo> = 0;
+    virtual auto               get_config_description()
         -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
     virtual auto get_default_config()
         -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
@@ -34,9 +36,9 @@ struct ResultFilesPaths {
 
 template <class T>
 concept container_constructible =
-    requires(T instance, Container container) {
+    requires(T instance, std::string name, Container container) {
         {
-            T::build(container)
+            T::build(name, container)
         } -> std::same_as<std::variant<T, PyExceptionInfo>>;
     };
 

@@ -1,4 +1,5 @@
 add_library(format_processor_wrapper FormatProcessorWrapper.cpp)
+
 target_include_directories(format_processor_wrapper PUBLIC ./)
 target_link_libraries(format_processor_wrapper plugin_wrapper_interface containers)
 

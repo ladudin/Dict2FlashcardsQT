@@ -16,7 +16,7 @@ auto PyExceptionInfo::build() -> std::optional<PyExceptionInfo> {
             std::move(boost::python::extract<std::string>(py_stack_trace));
         info.error_summary_ =
             std::move(boost::python::extract<std::string>(py_err));
-    } catch (...) {
+    } catch (const boost::python::error_already_set &) {
         spdlog::error("Couldn't extract python exception info");
         return std::nullopt;
     }

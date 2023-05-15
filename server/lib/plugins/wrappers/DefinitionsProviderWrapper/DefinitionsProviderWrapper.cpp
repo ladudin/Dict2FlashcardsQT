@@ -1,11 +1,16 @@
 #include "DefinitionsProviderWrapper.hpp"
 
-DefinitionsProviderWrapper::DefinitionsProviderWrapper(Container &&container)
-    : container_(container) {
+DefinitionsProviderWrapper::DefinitionsProviderWrapper(std::string &&name,
+                                                       Container   &&container)
+    : name_(name), container_(container) {
 }
 
-auto DefinitionsProviderWrapper::build(Container containter)
+auto DefinitionsProviderWrapper::build(std::string name, Container containter)
     -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo> {
+}
+
+auto DefinitionsProviderWrapper::name() const -> const std::string & {
+    return name_;
 }
 
 auto DefinitionsProviderWrapper::get(const std::string &word,

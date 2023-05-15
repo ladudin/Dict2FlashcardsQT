@@ -13,10 +13,11 @@
 class AudiosProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<std::string>, std::string>> {
  public:
-    static auto build(Container container)
+    static auto build(std::string name, Container container)
         -> std::variant<AudiosProviderWrapper, PyExceptionInfo>;
 
-    auto get(const std::string &word, uint64_t batch_size)
+    [[nodiscard]] auto name() const -> const std::string & override;
+    auto               get(const std::string &word, uint64_t batch_size)
         -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo>;
     auto load() -> std::optional<PyExceptionInfo> override;
     auto unload() -> std::optional<PyExceptionInfo> override;
@@ -28,8 +29,9 @@ class AudiosProviderWrapper
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  private:
-    explicit AudiosProviderWrapper(Container &&container);
+    explicit AudiosProviderWrapper(std::string &&name, Container &&container);
 
+    std::string    name_;
     Container      container_;
     nlohmann::json config_;
 };

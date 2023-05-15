@@ -29,7 +29,6 @@ class IPluginsLoader {
 
     virtual auto get(const std::string &plugin_name)
         -> std::optional<std::variant<Wrapper, PyExceptionInfo>> = 0;
-
     virtual auto load_new_plugins() -> void                      = 0;
 };
 
@@ -44,7 +43,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
         try {
             boost::python::object sys = boost::python::import("sys");
             sys.attr("path").attr("append")(plugins_dir.c_str());
-        } catch (...) {
+        } catch (const boost::python::error_already_set &) {
             spdlog::throw_spdlog_ex("Couldn't import sys module");
         }
 
@@ -95,7 +94,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         spdlog::info(plugin_name + " was found");
-        return Wrapper::build(res->second);
+        return Wrapper::build(plugin_name, res->second);
     }
 
     auto load_new_plugins() -> void override {

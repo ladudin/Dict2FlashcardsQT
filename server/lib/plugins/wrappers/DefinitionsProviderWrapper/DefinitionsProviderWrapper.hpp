@@ -31,16 +31,17 @@ struct Card {
 class DefinitionsProviderWrapper
     : public IPluginWrapper<std::pair<std::vector<Card>, std::string>> {
  public:
-    static auto build(Container container)
+    static auto build(std::string name, Container container)
         -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
     auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo>;
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
-    auto load() -> std::optional<PyExceptionInfo> override;
-    auto unload() -> std::optional<PyExceptionInfo> override;
-    auto get_config_description()
+    [[nodiscard]] auto name() const -> const std::string & override;
+    auto               load() -> std::optional<PyExceptionInfo> override;
+    auto               unload() -> std::optional<PyExceptionInfo> override;
+    auto               get_config_description()
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
     auto get_default_config()
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
@@ -48,8 +49,10 @@ class DefinitionsProviderWrapper
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  private:
-    explicit DefinitionsProviderWrapper(Container &&container);
+    explicit DefinitionsProviderWrapper(std::string &&name,
+                                        Container   &&container);
 
+    std::string    name_;
     Container      container_;
     nlohmann::json config_;
 };

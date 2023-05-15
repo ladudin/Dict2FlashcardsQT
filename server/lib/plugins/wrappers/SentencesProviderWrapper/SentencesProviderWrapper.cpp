@@ -1,12 +1,17 @@
 #include "SentencesProviderWrapper.hpp"
 #include "Container.hpp"
 
-SentencesProviderWrapper::SentencesProviderWrapper(Container &&container)
-    : container_(container) {
+SentencesProviderWrapper::SentencesProviderWrapper(std::string &&name,
+                                                   Container   &&container)
+    : name_(name), container_(container) {
 }
 
-auto SentencesProviderWrapper::build(Container containter)
+auto SentencesProviderWrapper::build(std::string name, Container containter)
     -> std::variant<SentencesProviderWrapper, PyExceptionInfo> {
+}
+
+auto SentencesProviderWrapper::name() const -> const std::string & {
+    return name_;
 }
 
 auto SentencesProviderWrapper::get(const std::string &word, uint64_t batch_size)
