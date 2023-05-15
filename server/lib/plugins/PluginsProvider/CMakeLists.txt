@@ -7,7 +7,6 @@ target_include_directories(plugins_provider PUBLIC
 
 target_link_libraries(plugins_provider
     plugins_loader
-    plugin_types_locations_config
     definitions_provider_wrapper
     images_provider_wrapper
     sentences_provider_wrapper

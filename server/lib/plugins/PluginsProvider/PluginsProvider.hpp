@@ -5,7 +5,6 @@
 #include "DefinitionsProviderWrapper.hpp"
 #include "FormatProcessorWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
-#include "PluginTypesLocationsConfig.hpp"
 #include "PluginsLoader.hpp"
 #include "SentencesProviderWrapper.hpp"
 #include <filesystem>
@@ -36,6 +35,14 @@ class IPluginsProvider {
         std::variant<FormatProcessorWrapper, PyExceptionInfo>> = 0;
 
     virtual auto load_new_plugins() -> void                    = 0;
+};
+
+struct PluginTypesLocationsConfig {
+    std::filesystem::path definitions_providers_dir;
+    std::filesystem::path sentences_providers_dir;
+    std::filesystem::path images_providers_dir;
+    std::filesystem::path audios_providers_dir;
+    std::filesystem::path format_processors_dir;
 };
 
 class PluginsProvider : public IPluginsProvider {
