@@ -7,62 +7,38 @@
 #include "IPluginWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
 #include "SentencesProviderWrapper.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 class PluginsBundle {
  public:
     PluginsBundle();
-    auto get_definitions(const std::string &word, uint64_t batch_size)
-        -> std::optional<
-            std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>>;
 
-    auto get_sentences(const std::string &word, uint64_t batch_size)
-        -> std::optional<
-            std::variant<SentencesProviderWrapper::type, PyExceptionInfo>>;
+    auto set_definitions_provider(DefinitionsProviderWrapper &&new_provider)
+        -> void;
 
-    auto get_images(const std::string &word, uint64_t batch_size)
-        -> std::optional<
-            std::variant<ImagesProviderWrapper::type, PyExceptionInfo>>;
+    auto set_sentences_provider(SentencesProviderWrapper &&new_provider)
+        -> void;
 
-    auto get_audios(const std::string &word, uint64_t batch_size)
-        -> std::optional<
-            std::variant<AudiosProviderWrapper::type, PyExceptionInfo>>;
+    auto set_images_provider(ImagesProviderWrapper &&new_provider) -> void;
 
-    auto save_results(ResultFilesPaths &&paths) -> std::optional<
-        std::variant<FormatProcessorWrapper::type, PyExceptionInfo>>;
+    auto set_audios_provider(AudiosProviderWrapper &&new_provider) -> void;
 
-    auto set_definitions_provider(DefinitionsProviderWrapper &&) -> void;
-    auto get_definitions_providers_config()
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
-    auto set_definitions_providers_config(nlohmann::json &&new_config)
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
+    auto set_format_processor(FormatProcessorWrapper &&new_provider) -> void;
 
-    auto set_sentences_provider(SentencesProviderWrapper &&) -> void;
-    auto get_sentences_providers_config()
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
-    auto set_sentences_providers_config(nlohmann::json &&new_config)
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
+    auto definitions_provider() -> std::optional<DefinitionsProviderWrapper> &;
 
-    auto set_images_provider(ImagesProviderWrapper &&) -> void;
-    auto get_images_providers_config()
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
-    auto set_images_providers_config(nlohmann::json &&new_config)
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
+    auto sentences_provider() -> std::optional<SentencesProviderWrapper> &;
 
-    auto set_audios_provider(AudiosProviderWrapper &&) -> void;
-    auto get_audios_providers_config()
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
-    auto set_audios_providers_config(nlohmann::json &&new_config)
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
+    auto images_provider() -> std::optional<ImagesProviderWrapper> &;
 
-    auto set_format_processor(FormatProcessorWrapper &&) -> void;
-    auto get_format_processors_config()
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
-    auto set_format_processors_config(nlohmann::json &&new_config)
-        -> std::optional<std::variant<PyExceptionInfo, nlohmann::json>>;
+    auto audios_provider() -> std::optional<AudiosProviderWrapper> &;
+
+    auto format_processor() -> std::optional<FormatProcessorWrapper> &;
 
  private:
     std::optional<DefinitionsProviderWrapper> definitions_provider_ =
