@@ -25,11 +25,11 @@ bool ServerConnection::is_connected() {
 }
 
 std::pair<bool, std::string>
-ServerConnection::request(std::string request) {
-    request += "\r\n";
+ServerConnection::request(const std::string &message) {
+    std::string request_message = message + "\r\n";
     boost::system::error_code error;
 
-    boost::asio::write(socket_, boost::asio::buffer(request), error);
+    boost::asio::write(socket_, boost::asio::buffer(request_message), error);
     if (error) {
         return std::make_pair(false, error.message());
         is_connected_ = false;
