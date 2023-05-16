@@ -25,7 +25,8 @@ bool ServerConnection::is_connected() {
 }
 
 std::pair<bool, std::string>
-ServerConnection::request(const std::string &request) {
+ServerConnection::request(std::string request) {
+    request += "\r\n";
     boost::system::error_code error;
 
     boost::asio::write(socket_, boost::asio::buffer(request), error);
@@ -34,7 +35,7 @@ ServerConnection::request(const std::string &request) {
         is_connected_ = false;
     }
 
-    size_t bytes = boost::asio::read_until(socket_, buffer_, '\n', error);
+    size_t bytes = boost::asio::read_until(socket_, buffer_, "\r\n", error);
     if (error) {
         return std::make_pair(false, error.message());
         is_connected_ = false;

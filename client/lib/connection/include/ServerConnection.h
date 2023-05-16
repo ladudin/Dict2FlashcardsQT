@@ -13,7 +13,7 @@ class ServerConnection : public IRequestable {
                      const std::string &host = "127.0.0.1");
     ~ServerConnection() override;
     bool        is_connected();
-    std::pair<bool, std::string> request(const std::string &request) override;
+    std::pair<bool, std::string> request(std::string request) override;
 
  private:
     boost::asio::io_context io_context_;
