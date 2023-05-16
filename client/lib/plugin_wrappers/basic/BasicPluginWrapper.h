@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "IBasicPluginWrapper.h"
 #include "IRequestable.h"
@@ -15,7 +16,7 @@ class BasicPluginWrapper : virtual public IBasicPluginWrapper {
     std::string init(const std::string &plugin_name) override;
     std::pair<std::string, std::string> get_default_config() override;
     std::pair<std::string, std::string> get_default_scheme() override;
-    std::pair<std::string, std::string>
+    std::pair<std::map<std::string, std::string>, std::string>
     set_config(const std::string &new_config) override;
     std::pair<LoadResult, std::string> list_plugins() override;
     std::pair<LoadResult, std::string> load_new_plugins() override;

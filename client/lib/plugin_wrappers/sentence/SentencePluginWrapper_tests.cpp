@@ -1,12 +1,12 @@
-//#include "../../include/wrappers/SentencePluginWrapper.h"
-//#include "mock_classes.h"
-//
-//#include <memory>
-//#include <string>
-//#include <vector>
-//
-//#include <gtest/gtest.h>
-//
+#include "SentencePluginWrapper.h"
+#include "mock_classes.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
+
 //TEST(SentencePWOutputTest, Get) {
 //    auto               memorizer = std::make_shared<Memorizer>();
 //    SentencePluginWrapper wrapper(memorizer);

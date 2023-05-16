@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "interfaces/IBasicPluginWrapper.h"
+#include "IBasicPluginWrapper.h"
 
 struct IFormatProcessorPluginWrapper : virtual public IBasicPluginWrapper {
     virtual std::string save(const std::string &cards_path,

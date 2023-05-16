@@ -1,12 +1,12 @@
-//#include "../../include/wrappers/FormatProcessorPluginWrapper.h"
-//#include "mock_classes.h"
-//
-//#include <memory>
-//#include <string>
-//#include <vector>
-//
-//#include <gtest/gtest.h>
-//
+#include "FormatProcessorPluginWrapper.h"
+#include "mock_classes.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
+
 //TEST(FormatProcessorPWOutputTest, Save) {
 //    auto                         memorizer = std::make_shared<Memorizer>();
 //    FormatProcessorPluginWrapper wrapper(memorizer);

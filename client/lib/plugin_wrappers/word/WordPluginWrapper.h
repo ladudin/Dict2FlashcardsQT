@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../basic/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 #include "Card.h"
 #include "IRequestable.h"
 #include "IWordPluginWrapper.h"

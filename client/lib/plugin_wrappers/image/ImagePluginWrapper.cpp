@@ -1,4 +1,4 @@
-#include "wrappers/ImagePluginWrapper.h"
+#include "ImagePluginWrapper.h"
 
 #include <memory>
 #include <string>

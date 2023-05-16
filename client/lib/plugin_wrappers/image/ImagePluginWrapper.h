@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "IImagePluginWrapper.h"
-#include "wrappers/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 
 class ImagePluginWrapper : public BasicPluginWrapper,
                            virtual public IImagePluginWrapper {

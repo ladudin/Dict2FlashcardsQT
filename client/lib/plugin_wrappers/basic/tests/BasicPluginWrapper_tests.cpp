@@ -1,4 +1,4 @@
-#include "BasicPluginWrapper.h"
+#include "../BasicPluginWrapper.h"
 #include "mock_classes.h"
 
 #include <memory>
@@ -62,17 +62,17 @@ TEST(BasicPWInitTest, Disconnect) {
     EXPECT_EQ(actual, expected);
 }
 
-//TEST(BasicPWOutputTest, GetDefaultConfig) {
-//    auto               memorizer = std::make_shared<Memorizer>();
-//    BasicPluginWrapper wrapper(memorizer, "tests");
-//    EXPECT_THROW(wrapper.get_default_config(), std::runtime_error);
-//
-//    json actual   = json::parse(memorizer->received_message);
-//    json expected = json::parse(
-//        R"({ "query_type" : "get_default_config", "plugin_type" : "tests" })");
-//    EXPECT_EQ(expected, actual);
-//}
-//
+TEST(BasicPWOutputTest, GetDefaultConfig) {
+    auto               memorizer = std::make_shared<Memorizer>();
+    BasicPluginWrapper wrapper(memorizer, "tests");
+    EXPECT_THROW(wrapper.get_default_config(), std::runtime_error);
+
+    json actual   = json::parse(memorizer->received_message);
+    json expected = json::parse(
+        R"({ "query_type" : "get_default_config", "plugin_type" : "tests" })");
+    EXPECT_EQ(expected, actual);
+}
+
 //TEST(BasicPWOutputTest, GetDefaultScheme) {
 //    auto               memorizer = std::make_shared<Memorizer>();
 //    BasicPluginWrapper wrapper(memorizer, "tests");

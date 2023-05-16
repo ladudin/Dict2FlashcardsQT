@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../basic/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 #include "IAudioPluginWrapper.h"
 
 class AudioPluginWrapper : public BasicPluginWrapper,

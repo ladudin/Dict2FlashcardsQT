@@ -35,16 +35,122 @@ std::string BasicPluginWrapper::init(const std::string &plugin_name) {
 }
 
 std::pair<std::string, std::string> BasicPluginWrapper::get_default_config() {
+    json request_message = {
+        {"query_type",  "get_default_config"},
+        {"plugin_type", plugin_type_        }
+    };
+    std::pair<bool, std::string> response(
+        std::move(connection_->request(request_message.dump())));
+    if (!response.first)
+        return {"", "Server disconnected"};
+    try {
+        json response_message = json::parse(response.second);
+        if (response_message.at("status").get<int>() != 0)
+            return {"", response_message.at("error").get<std::string>()};
+        return {response_message.at("result").dump(), ""};
+    } catch (...) {
+        return {"", "Wrong response format"};
+    }
 }
 
 std::pair<std::string, std::string> BasicPluginWrapper::get_default_scheme() {
+    json request_message = {
+        {"query_type",  "get_default_scheme"},
+        {"plugin_type", plugin_type_        }
+    };
+    std::pair<bool, std::string> response(
+        std::move(connection_->request(request_message.dump())));
+    if (!response.first)
+        return {"", "Server disconnected"};
+    try {
+        json response_message = json::parse(response.second);
+        if (response_message.at("status").get<int>() != 0)
+            return {"", response_message.at("error").get<std::string>()};
+        return {response_message.at("result").dump(), ""};
+    } catch (...) {
+        return {"", "Wrong response format"};
+    }
 }
 
-std::pair<std::string, std::string> BasicPluginWrapper::set_config(const std::string &new_config) {
+std::pair<std::map<std::string, std::string>, std::string>
+BasicPluginWrapper::set_config(const std::string &new_config) {
+    json config;
+    try {
+        config = json::parse(new_config);
+    } catch (...) {
+        return {{}, "Not a json"};
+    }
+    json request_message = {
+        {"query_type",  "set_config"},
+        {"plugin_type", plugin_type_},
+        {"query",       config      }
+    };
+    std::pair<bool, std::string> response(
+        std::move(connection_->request(request_message.dump())));
+    if (!response.first)
+        return {{}, "Server disconnected"};
+    try {
+        json response_message = json::parse(response.second);
+        if (response_message.at("status").get<int>() != 0)
+            return {{}, response_message.at("error").get<std::string>()};
+        return {response_message.at("result")
+                    .get<std::map<std::string, std::string>>(),
+                ""};
+    } catch (...) {
+        return {{}, "Wrong response format"};
+    }
 }
 
 std::pair<LoadResult, std::string> BasicPluginWrapper::list_plugins() {
+    json request_message = {
+        {"query_type",  "list_plugins"},
+        {"plugin_type", plugin_type_  }
+    };
+    std::pair<bool, std::string> response(
+        std::move(connection_->request(request_message.dump())));
+    if (!response.first)
+        return {{}, "Server disconnected"};
+    try {
+        json response_message = json::parse(response.second);
+        if (response_message.at("status").get<int>() != 0)
+            return {{}, response_message.at("error").get<std::string>()};
+        return {
+            LoadResult{response_message.at("result")
+                           .at("success")
+                           .get<std::vector<std::string>>(),
+                       response_message.at("result")
+                           .at("failed")
+                           .get<std::vector<std::string>>()},
+            ""
+        };
+    } catch (...) {
+        return {{}, "Wrong response format"};
+    }
 }
 
 std::pair<LoadResult, std::string> BasicPluginWrapper::load_new_plugins() {
+    json request_message = {
+        {"query_type",  "load_new_plugins"},
+        {"plugin_type", plugin_type_      }
+    };
+    std::pair<bool, std::string> response(
+        std::move(connection_->request(request_message.dump())));
+    if (!response.first)
+        return {{}, "Server disconnected"};
+    try {
+        json response_message = json::parse(response.second);
+        if (response_message.at("status").get<int>() != 0)
+            return {{}, response_message.at("error").get<std::string>()};
+        return {
+            LoadResult{response_message.at("result")
+                           .at("success")
+                           .get<std::vector<std::string>>(),
+                       response_message.at("result")
+                           .at("failed")
+                           .get<std::vector<std::string>>()},
+            ""
+        };
+    } catch (...) {
+        return {{}, "Wrong response format"};
+    }
 }

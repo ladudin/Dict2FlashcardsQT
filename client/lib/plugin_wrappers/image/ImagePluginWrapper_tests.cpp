@@ -1,12 +1,12 @@
-//#include "../../include/wrappers/ImagePluginWrapper.h"
-//#include "mock_classes.h"
-//
-//#include <memory>
-//#include <string>
-//#include <vector>
-//
-//#include <gtest/gtest.h>
-//
+#include "ImagePluginWrapper.h"
+#include "mock_classes.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
+
 //TEST(ImagePWOutputTest, Get) {
 //    auto               memorizer = std::make_shared<Memorizer>();
 //    ImagePluginWrapper wrapper(memorizer);

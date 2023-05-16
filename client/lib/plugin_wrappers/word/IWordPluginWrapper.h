@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../basic/IBasicPluginWrapper.h"
+#include "IBasicPluginWrapper.h"
 #include "Card.h"
 
 class IWordPluginWrapper : virtual public IBasicPluginWrapper {

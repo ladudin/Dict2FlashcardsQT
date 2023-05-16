@@ -1,11 +1,7 @@
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(basic_plugin_wrapper BasicPluginWrapper.cpp)
+target_link_libraries(basic_plugin_wrapper PUBLIC common connection)
+target_include_directories(basic_plugin_wrapper INTERFACE ./)
 
-add_executable(basic_plugin_wrapper_test BasicPluginWrapper_tests.cpp)
-
-target_link_libraries(basic_plugin_wrapper PUBLIC connection)
-target_link_libraries(basic_plugin_wrapper_test Private GTest::gtest_main)
-
-target_include_directories(basic_plugin_wrapper PUBLIC ./)
-target_include_directories(basic_plugin_wrapper PUBLIC ../include)
-
-add_test(basic_plugin_wrapper_test basic_plugin_wrapper_test)
+add_subdirectory(tests)

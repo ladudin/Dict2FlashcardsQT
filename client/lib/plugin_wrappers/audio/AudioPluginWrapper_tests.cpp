@@ -1,11 +1,11 @@
-//#include "../../include/wrappers/AudioPluginWrapper.h"
-//#include "mock_classes.h"
-//
-//#include <memory>
-//#include <string>
-//#include <vector>
-//
-//#include <gtest/gtest.h>
+#include "AudioPluginWrapper.h"
+#include "mock_classes.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
 //
 //TEST(AudioPWOutputTest, Get) {
 //    auto               memorizer = std::make_shared<Memorizer>();

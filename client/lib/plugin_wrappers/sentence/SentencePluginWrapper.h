@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "ISentencePluginWrapper.h"
-#include "wrappers/BasicPluginWrapper.h"
+#include "BasicPluginWrapper.h"
 
 class SentencePluginWrapper : public BasicPluginWrapper,
                               virtual public ISentencePluginWrapper {

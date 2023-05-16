@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../basic/IBasicPluginWrapper.h"
+#include "IBasicPluginWrapper.h"
 
 struct IImagePluginWrapper : virtual public IBasicPluginWrapper {
     virtual std::pair<std::vector<std::string>, std::string>

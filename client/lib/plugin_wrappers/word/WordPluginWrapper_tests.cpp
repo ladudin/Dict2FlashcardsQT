@@ -1,15 +1,15 @@
-//#include <memory>
-//#include <string>
-//#include <vector>
-//#include <iostream>
-//
-//#include "../../include/Card.h"
-//#include "../../include/wrappers/WordPluginWrapper.h"
-//#include "mock_classes.h"
-//
-//#include <gtest/gtest.h>
-//#include <nlohmann/json.hpp>
-//
+#include <memory>
+#include <string>
+#include <vector>
+#include <iostream>
+
+#include "Card.h"
+#include "WordPluginWrapper.h"
+#include "mock_classes.h"
+
+#include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
+
 //using namespace nlohmann;
 //
 //TEST(WordPWOutputTest, GetDictScheme) {
