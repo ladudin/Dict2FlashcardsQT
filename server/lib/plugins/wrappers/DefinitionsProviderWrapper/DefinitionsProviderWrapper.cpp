@@ -1,6 +1,7 @@
 #include "DefinitionsProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 #include "pyerrors.h"
+#include "pythonrun.h"
 #include <boost/python/errors.hpp>
 #include <boost/python/extract.hpp>
 #include <nlohmann/json_fwd.hpp>
@@ -28,9 +29,10 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
             boost::python::object test = container_.get()(word);
             generators_[word]          = test;
             generators_[word]->attr("__next__")();
-        } catch (boost::python::error_already_set &) {
+        } catch (const boost::python::error_already_set &) {
             generators_.erase(generators_.find(word));
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
     }
 
@@ -53,17 +55,28 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         auto cards         = json_res[0].get<std::vector<Card>>();
         return std::make_pair(cards, error_message);
     } catch (boost::python::error_already_set &) {
-        boost::python::object py_err =
-            boost::python::eval("str(sys.last_value)");
-        std::string exception_type =
-            boost::python::extract<std::string>(py_err);
-        if (exception_type == "<class 'StopIteration'>") {
-            PyErr_Clear();
-            return {};
-        }
-        return PyExceptionInfo::build().value();
+        // https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text
+        // boost::python::handle_exception();
+
+        PyErr_Print();
+        PyErr_Clear();
+        // TODO(blackdeer): NEED TO LEARN HOW TO CATCH StopIteration()
+        //
+        // boost::python::object main_namespace =
+        //     boost::python::import("__main__").attr("__dict__");
+        // boost::python::exec("import traceback, sys", main_namespace);
+        // boost::python::object py_err =
+        //     eval("str(sys.last_value)", main_namespace);
+        // std::string exception_type =
+        //     boost::python::extract<std::string>(py_err);
+        // if (exception_type == "StopIteration()") {
+        //     PyErr_Clear();
+        //     return {};
+        // }
+        // return PyExceptionInfo::build().value();
     }
-    return {};
+    std::vector<Card> empty(0);
+    return std::make_pair(empty, "");
 }
 
 auto DefinitionsProviderWrapper::get_dictionary_scheme()

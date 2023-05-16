@@ -8,3 +8,4 @@
 !/img/**
 !/server/**
 !/test_client/**
+!/plugins/**/*.py

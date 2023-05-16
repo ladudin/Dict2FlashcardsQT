@@ -45,7 +45,8 @@ class BasePluginWrapper : public IPluginWrapper {
             boost::python::object plugin_load = container_.load();
             plugin_load();
         } catch (const boost::python::error_already_set &) {
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
         return std::nullopt;
     }
@@ -55,7 +56,8 @@ class BasePluginWrapper : public IPluginWrapper {
             boost::python::object plugin_unload = container_.load();
             plugin_unload();
         } catch (const boost::python::error_already_set &) {
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
         return std::nullopt;
     }
@@ -78,7 +80,8 @@ class BasePluginWrapper : public IPluginWrapper {
             config_description =
                 nlohmann::json::parse(cpp_plugin_conf_description);
         } catch (const boost::python::error_already_set &) {
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
         return config_description;
     }
@@ -99,7 +102,8 @@ class BasePluginWrapper : public IPluginWrapper {
                 boost::python::extract<std::string>(py_str_json_default_conf);
             default_config = nlohmann::json::parse(cpp_plugin_default_conf);
         } catch (const boost::python::error_already_set &) {
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
         return default_config;
     }
@@ -123,7 +127,8 @@ class BasePluginWrapper : public IPluginWrapper {
             diagnostics = nlohmann::json::parse(cpp_conf_diagnostics_str);
             return diagnostics;
         } catch (const boost::python::error_already_set &) {
-            return PyExceptionInfo::build().value();
+            return PyExceptionInfo::build(container_.plugin_namespace())
+                .value();
         }
         return diagnostics;
     }

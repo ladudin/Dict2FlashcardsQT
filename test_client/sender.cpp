@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
                 size_t                    len = socket.write_some(
                     boost::asio::buffer(buf, strlen(buf.data())), error);
                 size_t len2 = socket.read_some(boost::asio::buffer(buf), error);
+                std::cout.write(buf.data(), strlen(buf.data())) << std::endl;
 
                 if (error == boost::asio::error::eof)
                     break;  // Connection closed cleanly by peer.
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
                         error);  // Some other error.
             }
             {
-                boost::array<char, 256> buf = {
+                boost::array<char, 4096> buf = {
                     R"(
 {
     "query_type": "get", 
@@ -68,6 +69,34 @@ int main(int argc, char *argv[]) {
                 size_t                    len = socket.write_some(
                     boost::asio::buffer(buf, strlen(buf.data())), error);
                 size_t len2 = socket.read_some(boost::asio::buffer(buf), error);
+                std::cout.write(buf.data(), strlen(buf.data())) << std::endl;
+
+                if (error == boost::asio::error::eof)
+                    break;  // Connection closed cleanly by peer.
+                else if (error)
+                    throw boost::system::system_error(
+                        error);  // Some other error.
+            }
+            {
+                boost::array<char, 4096> buf = {
+                    R"(
+{
+    "query_type": "get", 
+    "plugin_type": "word", 
+    "filter": "",
+    "word": "definitions",
+    "batch_size": 5,
+    "restart": false
+})"
+                    "\r\n"};
+                boost::system::error_code error;
+
+                // std::cout.write(buf.data(), 4);
+
+                size_t                    len = socket.write_some(
+                    boost::asio::buffer(buf, strlen(buf.data())), error);
+                size_t len2 = socket.read_some(boost::asio::buffer(buf), error);
+                std::cout.write(buf.data(), strlen(buf.data())) << std::endl;
 
                 if (error == boost::asio::error::eof)
                     break;  // Connection closed cleanly by peer.

@@ -7,8 +7,9 @@ auto Container::build(boost::python::object &&module)
     -> std::variant<Container, std::optional<PyExceptionInfo>> {
     auto plugin_container = Container();
     try {
-        plugin_container.load_ = module.attr("load");
-        plugin_container.get_  = module.attr("get");
+        plugin_container.plugin_namespace_ = module.attr("__dict__");
+        plugin_container.load_             = module.attr("load");
+        plugin_container.get_              = module.attr("get");
         plugin_container.get_config_description_ =
             module.attr("get_config_description");
         plugin_container.set_config_ = module.attr("set_config");
@@ -16,12 +17,16 @@ auto Container::build(boost::python::object &&module)
             module.attr("get_default_config");
         plugin_container.unload_ = module.attr("unload");
     } catch (const boost::python::error_already_set &) {
-        return PyExceptionInfo::build();
+        return PyExceptionInfo::build(plugin_container.plugin_namespace_);
     }
     return plugin_container;
 }
 
 Container::Container() = default;
+
+auto Container::plugin_namespace() -> boost::python::object & {
+    return plugin_namespace_;
+}
 
 auto Container::load() -> boost::python::object & {
     return load_;

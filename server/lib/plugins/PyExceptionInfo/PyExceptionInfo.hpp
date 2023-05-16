@@ -1,13 +1,15 @@
 #ifndef PY_EXCEPTION_INFO_H
 #define PY_EXCEPTION_INFO_H
 
+#include <boost/python/object_fwd.hpp>
 #include <optional>
 #include <string>
 #include <utility>
 
 class PyExceptionInfo {
  public:
-    static auto               build() -> std::optional<PyExceptionInfo>;
+    static auto build(boost::python::object &plugin_namespace)
+        -> std::optional<PyExceptionInfo>;
 
     [[nodiscard]] inline auto stack_trace() const -> const std::string & {
         return stack_trace_;
