@@ -18,6 +18,7 @@ AudioPluginWrapper::get(const std::string &word, size_t batch_size) {
     json request_message = {
         {"query_type",  "get"       },
         {"plugin_type", plugin_type_},
+        {"query",       "test_word"},
         {"batch_size",  batch_size  },
     };
     std::pair<bool, std::string> response(
@@ -29,7 +30,8 @@ AudioPluginWrapper::get(const std::string &word, size_t batch_size) {
         if (response_message.at("status").get<int>() != 0)
             return {audio_vector(),
                     response_message.at("error").get<std::string>()};
-        return {response_message.at("result").get<audio_vector>(), ""};
+        return {response_message.at("result").get<audio_vector>(),
+                response_message.at("error").get<std::string>()};
     } catch (...) {
         return {audio_vector(), "Wrong response format"};
     }

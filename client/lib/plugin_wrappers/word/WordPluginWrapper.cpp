@@ -21,6 +21,7 @@ WordPluginWrapper::get(const std::string &word,
     json request_message = {
         {"query_type",     "get"         },
         {"plugin_type",    plugin_type_  },
+        {"query",          word          },
         {"query_language", query_language},
         {"batch_size",     batch_size    },
         {"reload",         reload ? 1 : 0}
@@ -35,7 +36,7 @@ WordPluginWrapper::get(const std::string &word,
             return {std::vector<Card>(),
                     response_message.at("error").get<std::string>()};
         return {response_message.at("result").get<std::vector<Card>>(),
-                std::string()};
+                response_message.at("error").get<std::string>()};
     } catch (...) {
         return {std::vector<Card>(), "Wrong response format"};
     }
@@ -54,7 +55,8 @@ std::pair<std::string, std::string> WordPluginWrapper::get_dict_scheme() {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
             return {"", response_message.at("error").get<std::string>()};
-        return {response_message.at("result").dump(), ""};
+        return {response_message.at("result").dump(),
+                response_message.at("error").get<std::string>()};
     } catch (...) {
         return {"", "Wrong response format"};
     }

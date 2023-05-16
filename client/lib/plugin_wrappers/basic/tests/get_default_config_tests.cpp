@@ -22,11 +22,11 @@ TEST(BasicPWGetDefaultConfig, Output) {
     EXPECT_EQ(expected, actual);
 }
 
-TEST(BasicPWGetDefaultConfig, Success) {
+TEST(BasicPWGetDefaultConfig, PartialSuccess) {
     json answer = {
         {"status", 0                                         },
         {"result", {{"language", "english"}, {"level", "C2"}}},
-        {"error",  "null"                                    }
+        {"error",  "something"                               }
     };
     auto fixed_answer = std::make_shared<FixedAnswer>(answer.dump());
     BasicPluginWrapper           wrapper(fixed_answer, "tests");
@@ -36,7 +36,7 @@ TEST(BasicPWGetDefaultConfig, Success) {
         wrapper.get_default_config().second};
     std::pair<json, std::string> expected = {
         {{"language", "english"}, {"level", "C2"}},
-        ""
+        "something"
     };
 
     EXPECT_EQ(expected, actual);
