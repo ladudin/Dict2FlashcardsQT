@@ -244,16 +244,6 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     }
     auto plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
 
-    if (!request.contains(PLUGIN_NAME_FIELD)) {
-        return return_error("\""s + PLUGIN_NAME_FIELD +
-                            "\" filed was not found in request");
-    }
-    if (!request[PLUGIN_NAME_FIELD].is_string()) {
-        return return_error("\""s + PLUGIN_NAME_FIELD +
-                            "\" field is expected to be a string");
-    }
-    auto plugin_name = request[PLUGIN_NAME_FIELD].get<std::string>();
-
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
         auto &provider_opt = plugins_bundle_.definitions_provider();
         if (!provider_opt.has_value()) {
@@ -272,12 +262,12 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
         }
         auto word = request[WORD_FIELD].get<std::string>();
 
-        if (!request.contains(QUERY_TYPE_FIELD)) {
-            return return_error("\""s + QUERY_TYPE_FIELD +
-                                "\" filed was not found in request");
+        if (!request.contains(FILTER_QUERY_FIELD)) {
+            return return_error("\""s + FILTER_QUERY_FIELD +
+                                "\" fieled was not found in request");
         }
-        if (!request[QUERY_TYPE_FIELD].is_string()) {
-            return return_error("\""s + QUERY_TYPE_FIELD +
+        if (!request[FILTER_QUERY_FIELD].is_string()) {
+            return return_error("\""s + FILTER_QUERY_FIELD +
                                 "\" field is expected to be a string");
         }
         auto filter_query = request[FILTER_QUERY_FIELD].get<std::string>();
@@ -307,7 +297,8 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
         if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
             auto exception_info = std::get<PyExceptionInfo>(result_or_error);
 
-            return return_error("Exception was thrown during \"" + plugin_name +
+            return return_error("Exception was thrown during \"" +
+                                plugins_bundle_.definitions_provider()->name() +
                                 "\" definitions request:\n" +
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());

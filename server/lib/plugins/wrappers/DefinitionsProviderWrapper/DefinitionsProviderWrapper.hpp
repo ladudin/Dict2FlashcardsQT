@@ -38,8 +38,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
                                    examples,
                                    image_links,
                                    audio_links,
-                                   tags,
-                                   other);
+                                   tags
+                                   /* other */);
 
 class DefinitionsProviderWrapper : public BasePluginWrapper {
  public:

@@ -23,27 +23,26 @@ auto Container::build(boost::python::object &&module)
 
 Container::Container() = default;
 
-auto Container::load() const -> const boost::python::object & {
+auto Container::load() -> boost::python::object & {
     return load_;
 }
 
-auto Container::get() const -> const boost::python::object & {
+auto Container::get() -> boost::python::object & {
     return get_;
 }
 
-auto Container::get_config_description() const
-    -> const boost::python::object & {
+auto Container::get_config_description() -> boost::python::object & {
     return get_config_description_;
 }
 
-auto Container::set_config() const -> const boost::python::object & {
+auto Container::set_config() -> boost::python::object & {
     return set_config_;
 }
 
-auto Container::get_default_config() const -> const boost::python::object & {
+auto Container::get_default_config() -> boost::python::object & {
     return get_default_config_;
 }
 
-auto Container::unload() const -> const boost::python::object & {
+auto Container::unload() -> boost::python::object & {
     return unload_;
 }

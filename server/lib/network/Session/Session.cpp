@@ -29,21 +29,21 @@ void Session::do_read() {
                 spdlog::error("Couldn't read from user");
                 return;
             }
-            request_buffer.commit(length);
 
-            std::stringstream ssOut;
+            std::stringstream ss_out;
             std::copy(boost::asio::buffers_begin(request_buffer.data()),
                       boost::asio::buffers_begin(request_buffer.data()) +
                           length - 2,
-                      std::ostream_iterator<char>(ssOut));
+                      std::ostream_iterator<char>(ss_out));
 
             // std::istream istrm(&request_buffer);
             // std::string  result;
             // istrm >> result;
-            std::string result       = ssOut.str();
+            std::string result = ss_out.str();
+            request_buffer.consume(length);
 
-            json        response     = response_generator_->handle(result);
-            auto        str_response = response.dump() + "\r\n";
+            json response     = response_generator_->handle(result);
+            auto str_response = response.dump() + "\r\n";
             do_write(str_response);
         });
 }

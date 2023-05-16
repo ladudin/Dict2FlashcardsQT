@@ -18,13 +18,17 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
                                      bool               restart)
     -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo> {
     if (restart) {
-        generators_.erase(generators_.find(word));
+        auto found_item = generators_.find(word);
+        if (found_item != generators_.end()) {
+            generators_.erase(found_item);
+        }
     }
     if (generators_.find(word) == generators_.end()) {
         try {
-            generators_[word] = container_.get()();
+            boost::python::object test = container_.get()(word);
+            generators_[word]          = test;
             generators_[word]->attr("__next__")();
-        } catch (const boost::python::error_already_set &) {
+        } catch (boost::python::error_already_set &) {
             generators_.erase(generators_.find(word));
             return PyExceptionInfo::build().value();
         }
@@ -48,7 +52,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         auto error_message = json_res[1].get<std::string>();
         auto cards         = json_res[0].get<std::vector<Card>>();
         return std::make_pair(cards, error_message);
-    } catch (const boost::python::error_already_set &) {
+    } catch (boost::python::error_already_set &) {
         boost::python::object py_err =
             boost::python::eval("str(sys.last_value)");
         std::string exception_type =
