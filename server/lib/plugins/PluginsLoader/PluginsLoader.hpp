@@ -55,6 +55,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
                     return;
                 }
                 auto module_name   = dir_entry.filename();
+                // TODO(blackdeer): HANDLE IMPORT ERROR
                 auto loaded_module = boost::python::import(module_name.c_str());
                 auto plugin_container =
                     Container::build(std::move(loaded_module));
@@ -92,13 +93,13 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         spdlog::info(plugin_name + " was found");
+        // Выглядит ОЧЕНЬ плохо. Но что имеем
+        // Надо как-то сделать чтобы возвращался врапер сразу без ::build
         auto wrapper_or_error = Wrapper::build(plugin_name, res->second);
-        if (std::holds_alternative<BasePluginWrapper<typename Wrapper::type>>(
-                wrapper_or_error)) {
+        if (std::holds_alternative<BasePluginWrapper>(wrapper_or_error)) {
             auto base_wrapper =
-                std::get<BasePluginWrapper<typename Wrapper::type>>(
-                    wrapper_or_error);
-            auto after_cast = *static_cast<Wrapper *>(&base_wrapper);
+                std::move(std::get<BasePluginWrapper>(wrapper_or_error));
+            auto after_cast = Wrapper(std::move(base_wrapper));
             return after_cast;
         }
         return std::nullopt;

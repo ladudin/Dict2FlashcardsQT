@@ -37,12 +37,12 @@ class ResponseGenerator : public IResponceGenerator {
     auto handle(const std::string &request) -> nlohmann::json override;
 
  private:
-    static constexpr auto QUERY_TYPE_FIELD                = "batch_size";
+    static constexpr auto QUERY_TYPE_FIELD                = "query_type";
     static constexpr auto PLUGIN_TYPE_FIELD               = "plugin_type";
     static constexpr auto CONFIG_FIELD                    = "config";
     static constexpr auto PLUGIN_NAME_FIELD               = "plugin_name";
-    static constexpr auto FILTER_QUERY_FIELD              = "batch_size";
-    static constexpr auto WORD_FIELD                      = "batch_size";
+    static constexpr auto FILTER_QUERY_FIELD              = "filter";
+    static constexpr auto WORD_FIELD                      = "word";
     static constexpr auto BATCH_SIZE_FIELD                = "batch_size";
     static constexpr auto RESTART_FIELD                   = "restart";
 

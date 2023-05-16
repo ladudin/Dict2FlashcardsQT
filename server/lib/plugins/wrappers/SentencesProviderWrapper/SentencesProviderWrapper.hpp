@@ -10,10 +10,12 @@
 #include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class SentencesProviderWrapper
-    : public BasePluginWrapper<
-          std::pair<std::vector<std::string>, std::string>> {
+class SentencesProviderWrapper : public BasePluginWrapper {
  public:
+    using type = std::pair<std::vector<std::string>, std::string>;
+
+    explicit SentencesProviderWrapper(BasePluginWrapper &&base);
+
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<SentencesProviderWrapper::type, PyExceptionInfo>;
 };

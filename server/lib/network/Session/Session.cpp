@@ -30,12 +30,20 @@ void Session::do_read() {
                 return;
             }
             request_buffer.commit(length);
-            std::istream istrm(&request_buffer);
-            std::string  result;
-            istrm >> result;
 
-            json response = response_generator_->handle(result);
-            auto str_response = response.dump() + "\r\n";
+            std::stringstream ssOut;
+            std::copy(boost::asio::buffers_begin(request_buffer.data()),
+                      boost::asio::buffers_begin(request_buffer.data()) +
+                          length - 2,
+                      std::ostream_iterator<char>(ssOut));
+
+            // std::istream istrm(&request_buffer);
+            // std::string  result;
+            // istrm >> result;
+            std::string result       = ssOut.str();
+
+            json        response     = response_generator_->handle(result);
+            auto        str_response = response.dump() + "\r\n";
             do_write(str_response);
         });
 }

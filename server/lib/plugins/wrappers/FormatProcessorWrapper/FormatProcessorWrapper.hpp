@@ -10,8 +10,12 @@
 #include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class FormatProcessorWrapper : public BasePluginWrapper<std::string> {
+class FormatProcessorWrapper : public BasePluginWrapper {
  public:
+    using type = std::string;
+
+    explicit FormatProcessorWrapper(BasePluginWrapper &&base);
+
     auto get(ResultFilesPaths &&paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
 };

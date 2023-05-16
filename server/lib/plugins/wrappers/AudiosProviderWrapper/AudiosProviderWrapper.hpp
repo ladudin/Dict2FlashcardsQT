@@ -14,9 +14,12 @@ struct AudioInfo {
     std::string additional_info;
 };
 
-class AudiosProviderWrapper
-    : public BasePluginWrapper<std::pair<std::vector<AudioInfo>, std::string>> {
+class AudiosProviderWrapper : public BasePluginWrapper {
  public:
+    using type = std::pair<std::vector<AudioInfo>, std::string>;
+
+    explicit AudiosProviderWrapper(BasePluginWrapper &&base);
+
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo>;
 };

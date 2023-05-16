@@ -4,6 +4,7 @@
 #include <boost/python/errors.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/object_fwd.hpp>
+#include <memory>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <string>
@@ -13,15 +14,17 @@
 #include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-// using T = int;
-
-template <typename T>
-class BasePluginWrapper : public IPluginWrapper<T> {
+// TODO: MOVE DEFINITIONS TO A SEPARATE FILE
+class BasePluginWrapper : public IPluginWrapper {
  public:
+    BasePluginWrapper(const BasePluginWrapper &)                     = delete;
+    BasePluginWrapper(BasePluginWrapper &&)                          = default;
+    auto operator=(const BasePluginWrapper &) -> BasePluginWrapper & = delete;
+    auto operator=(BasePluginWrapper &&) -> BasePluginWrapper      & = default;
+
     static auto build(std::string name, Container container)
-        -> std::variant<BasePluginWrapper<T>, PyExceptionInfo> {
-        auto wrapper =
-            BasePluginWrapper<T>(std::move(name), std::move(container));
+        -> std::variant<BasePluginWrapper, PyExceptionInfo> {
+        auto wrapper = BasePluginWrapper(std::move(name), std::move(container));
         auto config_or_error = wrapper.get_default_config();
         if (std::holds_alternative<PyExceptionInfo>(config_or_error)) {
             auto error = std::get<PyExceptionInfo>(config_or_error);
@@ -30,6 +33,8 @@ class BasePluginWrapper : public IPluginWrapper<T> {
         wrapper.config_ = std::get<nlohmann::json>(config_or_error);
         return wrapper;
     }
+
+    ~BasePluginWrapper() override = default;
 
     [[nodiscard]] auto name() const -> const std::string & override {
         return name_;
@@ -124,7 +129,7 @@ class BasePluginWrapper : public IPluginWrapper<T> {
     }
 
  protected:
-    explicit BasePluginWrapper<T>(std::string &&name, Container &&container)
+    explicit BasePluginWrapper(std::string &&name, Container &&container)
         : name_(name), container_(container) {
     }
 
@@ -133,13 +138,18 @@ class BasePluginWrapper : public IPluginWrapper<T> {
     nlohmann::json config_;
 };
 
+struct ResultFilesPaths {
+    std::filesystem::path cards;
+    std::filesystem::path audios;
+    std::filesystem::path images;
+};
+
 template <class T>
 concept container_constructible =
     requires(T instance, std::string name, Container container) {
         {
             T::build(name, container)
-        } -> std::same_as<
-            std::variant<BasePluginWrapper<typename T::type>, PyExceptionInfo>>;
+        } -> std::same_as<std::variant<BasePluginWrapper, PyExceptionInfo>>;
     };
 
 template <class T>
@@ -155,7 +165,7 @@ concept implements_wrapper_get = (
     requires(T                  dependent_instance,
              const std::string &query,
              const std::string &filter,
-             bool restart,
+             bool               restart,
              uint64_t           batch_size) {
         {
             dependent_instance.get(query, filter, batch_size, restart)
@@ -170,7 +180,7 @@ concept implements_wrapper_get = (
 
 template <class T>
 concept is_plugin_wrapper =
-    implements_wrapper_interface<T> && container_constructible<T> &&
+    std::derived_from<T, BasePluginWrapper> && container_constructible<T> &&
     implements_wrapper_get<T>;
 
 #endif  // !BASE_PLUGIN_WRAPPER_H

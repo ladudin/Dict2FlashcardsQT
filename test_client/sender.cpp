@@ -30,12 +30,14 @@ int main(int argc, char *argv[]) {
 
         socket.connect(endpoint);
         for (;;) {
-            boost::array<char, 128>   buf = {"{}\r\n"};
+            boost::array<char, 256> buf = {
+                "{\"query_type\": \"init\", \"plugin_type\": \"word\", "
+                "\"plugin_name\": \"definitions\"}\r\n"};
             boost::system::error_code error;
 
             // std::cout.write(buf.data(), 4);
 
-            size_t len = socket.write_some(boost::asio::buffer(buf), error);
+            size_t len  = socket.write_some(boost::asio::buffer(buf), error);
             size_t len2 = socket.read_some(boost::asio::buffer(buf), error);
             if (error == boost::asio::error::eof)
                 break;  // Connection closed cleanly by peer.
@@ -45,4 +47,5 @@ int main(int argc, char *argv[]) {
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
     }
-return 0; }
+    return 0;
+}

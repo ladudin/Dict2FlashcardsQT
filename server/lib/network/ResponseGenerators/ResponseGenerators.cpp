@@ -105,7 +105,7 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
             return return_error("\"" + plugin_name +
                                 "\" definition provider not found");
         }
-        auto wrapper_variant = requested_wrapper_option.value();
+        auto &wrapper_variant = requested_wrapper_option.value();
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -114,16 +114,19 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<DefinitionsProviderWrapper>(wrapper_variant);
+        auto wrapper =
+            std::move(std::get<DefinitionsProviderWrapper>(wrapper_variant));
         plugins_bundle_.set_definitions_provider(std::move(wrapper));
-    } else if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
+        return R"({"status": 0, "message": ""})"_json;
+    }
+    if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
         auto requested_wrapper_option =
             plugins_provider_->get_sentences_provider(plugin_name);
         if (!requested_wrapper_option.has_value()) {
             return return_error("\"" + plugin_name +
                                 "\" sentences provider not found");
         }
-        auto wrapper_variant = requested_wrapper_option.value();
+        auto &wrapper_variant = requested_wrapper_option.value();
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -132,16 +135,18 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
+        auto &wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
         plugins_bundle_.set_sentences_provider(std::move(wrapper));
-    } else if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
+        return R"({"status": 0, "message": ""})"_json;
+    }
+    if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
         auto requested_wrapper_option =
             plugins_provider_->get_images_provider(plugin_name);
         if (!requested_wrapper_option.has_value()) {
             return return_error("\"" + plugin_name +
                                 "\" images provider not found");
         }
-        auto wrapper_variant = requested_wrapper_option.value();
+        auto &wrapper_variant = requested_wrapper_option.value();
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -150,16 +155,18 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
+        auto &wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
         plugins_bundle_.set_images_provider(std::move(wrapper));
-    } else if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
+        return R"({"status": 0, "message": ""})"_json;
+    }
+    if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
         auto requested_wrapper_option =
             plugins_provider_->get_audios_provider(plugin_name);
         if (!requested_wrapper_option.has_value()) {
             return return_error("\"" + plugin_name +
                                 "\" audios provider not found");
         }
-        auto wrapper_variant = requested_wrapper_option.value();
+        auto &wrapper_variant = requested_wrapper_option.value();
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -168,16 +175,18 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
+        auto &wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
         plugins_bundle_.set_audios_provider(std::move(wrapper));
-    } else if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
+        return R"({"status": 0, "message": ""})"_json;
+    }
+    if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
         auto requested_wrapper_option =
             plugins_provider_->get_format_processor(plugin_name);
         if (!requested_wrapper_option.has_value()) {
             return return_error("\"" + plugin_name +
                                 "\" format processor not found");
         }
-        auto wrapper_variant = requested_wrapper_option.value();
+        auto &wrapper_variant = requested_wrapper_option.value();
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -186,8 +195,9 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
+        auto &wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
         plugins_bundle_.set_format_processor(std::move(wrapper));
+        return R"({"status": 0, "message": ""})"_json;
     }
     return return_error("Unknown plugin_type: " + plugin_type);
 }
@@ -245,12 +255,12 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     auto plugin_name = request[PLUGIN_NAME_FIELD].get<std::string>();
 
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
-        auto provider_opt = plugins_bundle_.definitions_provider();
+        auto &provider_opt = plugins_bundle_.definitions_provider();
         if (!provider_opt.has_value()) {
             return return_error("Cannot return anything because definitions "
                                 "provider is not initialized");
         }
-        auto provider = provider_opt.value();
+        auto &provider = provider_opt.value();
 
         if (!request.contains(WORD_FIELD)) {
             return return_error("\""s + WORD_FIELD +

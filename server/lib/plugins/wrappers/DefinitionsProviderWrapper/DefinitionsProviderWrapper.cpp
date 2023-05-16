@@ -8,6 +8,10 @@
 #include <utility>
 #include <vector>
 
+DefinitionsProviderWrapper::DefinitionsProviderWrapper(BasePluginWrapper &&base)
+    : BasePluginWrapper(std::move(base)) {
+}
+
 auto DefinitionsProviderWrapper::get(const std::string &word,
                                      const std::string &filter_query,
                                      uint64_t           batch_size,
@@ -42,7 +46,6 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
             return {};
         }
         auto error_message = json_res[1].get<std::string>();
-        // auto a             = std::vector<Card>{};
         auto cards         = json_res[0].get<std::vector<Card>>();
         return std::make_pair(cards, error_message);
     } catch (const boost::python::error_already_set &) {

@@ -41,9 +41,12 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
                                    tags,
                                    other);
 
-class DefinitionsProviderWrapper
-    : public BasePluginWrapper<std::pair<std::vector<Card>, std::string>> {
+class DefinitionsProviderWrapper : public BasePluginWrapper {
  public:
+    using type = std::pair<std::vector<Card>, std::string>;
+
+    explicit DefinitionsProviderWrapper(BasePluginWrapper &&base);
+
     auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo>;
     auto get(const std::string &word,

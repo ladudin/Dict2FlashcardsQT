@@ -10,10 +10,12 @@
 #include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class ImagesProviderWrapper
-    : public BasePluginWrapper<
-          std::pair<std::vector<std::string>, std::string>> {
+class ImagesProviderWrapper : public BasePluginWrapper {
  public:
+    using type = std::pair<std::vector<std::string>, std::string>;
+
+    explicit ImagesProviderWrapper(BasePluginWrapper &&base);
+
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
 };
