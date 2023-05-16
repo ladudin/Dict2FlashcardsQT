@@ -13,6 +13,16 @@ DefinitionsProviderWrapper::DefinitionsProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
+auto DefinitionsProviderWrapper::build(Container container)
+    -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo> {
+    auto base_or_error = BasePluginWrapper::build(std::move(container));
+    if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {
+        return std::get<PyExceptionInfo>(base_or_error);
+    }
+    auto base = std::move(std::get<BasePluginWrapper>(base_or_error));
+    return DefinitionsProviderWrapper(std::move(base));
+}
+
 auto DefinitionsProviderWrapper::get(const std::string &word,
                                      const std::string &filter_query,
                                      uint64_t           batch_size,

@@ -14,10 +14,14 @@ class FormatProcessorWrapper : public BasePluginWrapper {
  public:
     using type = std::string;
 
-    explicit FormatProcessorWrapper(BasePluginWrapper &&base);
+    static auto build(Container container)
+        -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
     auto get(ResultFilesPaths &&paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
+
+ private:
+    explicit FormatProcessorWrapper(BasePluginWrapper &&base);
 };
 
 static_assert(is_plugin_wrapper<FormatProcessorWrapper>);

@@ -14,10 +14,14 @@ class ImagesProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<std::string>, std::string>;
 
-    explicit ImagesProviderWrapper(BasePluginWrapper &&base);
+    static auto build(Container container)
+        -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
+
+ private:
+    explicit ImagesProviderWrapper(BasePluginWrapper &&base);
 };
 
 static_assert(is_plugin_wrapper<ImagesProviderWrapper>);

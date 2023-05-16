@@ -21,7 +21,7 @@ class BasePluginWrapper : public IPluginWrapper {
     auto operator=(const BasePluginWrapper &) -> BasePluginWrapper & = delete;
     auto operator=(BasePluginWrapper &&) -> BasePluginWrapper      & = default;
 
-    static auto build(std::string name, Container container)
+    static auto build(Container container)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
     ~BasePluginWrapper() override = default;
@@ -42,9 +42,8 @@ class BasePluginWrapper : public IPluginWrapper {
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  protected:
-    explicit BasePluginWrapper(std::string &&name, Container &&container);
+    explicit BasePluginWrapper(Container &&container);
 
-    std::string    name_;
     Container      container_;
     nlohmann::json config_;
 };
@@ -59,13 +58,13 @@ template <class T>
 concept container_constructible =
     requires(T instance, std::string name, Container container) {
         {
-            T::build(name, container)
-        } -> std::same_as<std::variant<BasePluginWrapper, PyExceptionInfo>>;
+            T::build(container)
+        } -> std::same_as<std::variant<T, PyExceptionInfo>>;
     };
 
 template <class T>
 concept implements_wrapper_get = (
-    // DefinitionsProvider, SentencesProvider, AudiosProvider, ImagesProvider
+    // SentencesProvider, AudiosProvider, ImagesProvider
     requires(T                  dependent_instance,
              const std::string &query,
              uint64_t           batch_size) {
@@ -73,6 +72,7 @@ concept implements_wrapper_get = (
             dependent_instance.get(query, batch_size)
         } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
     } ||
+    // DefinitionsProvider
     requires(T                  dependent_instance,
              const std::string &query,
              const std::string &filter,

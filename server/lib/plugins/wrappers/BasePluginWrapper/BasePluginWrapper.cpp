@@ -1,12 +1,12 @@
 #include "BasePluginWrapper.hpp"
 
-BasePluginWrapper::BasePluginWrapper(std::string &&name, Container &&container)
-    : name_(name), container_(container) {
+BasePluginWrapper::BasePluginWrapper(Container &&container)
+    : container_(container) {
 }
 
-auto BasePluginWrapper::build(std::string name, Container container)
+auto BasePluginWrapper::build(Container container)
     -> std::variant<BasePluginWrapper, PyExceptionInfo> {
-    auto wrapper = BasePluginWrapper(std::move(name), std::move(container));
+    auto wrapper         = BasePluginWrapper(std::move(container));
     auto config_or_error = wrapper.get_default_config();
     if (std::holds_alternative<PyExceptionInfo>(config_or_error)) {
         auto error = std::get<PyExceptionInfo>(config_or_error);
@@ -17,7 +17,7 @@ auto BasePluginWrapper::build(std::string name, Container container)
 }
 
 [[nodiscard]] auto BasePluginWrapper::name() const -> const std::string & {
-    return name_;
+    return container_.name();
 }
 
 auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {

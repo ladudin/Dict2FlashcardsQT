@@ -14,7 +14,6 @@
 
 struct Card {
     Card()                                 = default;
-
     Card(const Card &)                     = default;
     Card(Card &&)                          = default;
     auto operator=(const Card &) -> Card & = default;
@@ -31,6 +30,7 @@ struct Card {
     nlohmann::json           other;
 };
 
+// TODO(blackdeer): solve optional keys
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
                                    word,
                                    special,
@@ -45,7 +45,8 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<Card>, std::string>;
 
-    explicit DefinitionsProviderWrapper(BasePluginWrapper &&base);
+    static auto build(Container container)
+        -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
     auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo>;
@@ -56,6 +57,8 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
         -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
 
  private:
+    explicit DefinitionsProviderWrapper(BasePluginWrapper &&base);
+
     std::unordered_map<std::string, std::optional<boost::python::object>>
         generators_;
 };

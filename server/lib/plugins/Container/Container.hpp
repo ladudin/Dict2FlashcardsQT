@@ -10,7 +10,7 @@
 
 class Container {
  public:
-    static auto build(boost::python::object &&module)
+    static auto build(std::string &&name, boost::python::object &&module)
         -> std::variant<Container, std::optional<PyExceptionInfo>>;
 
     Container(const Container &)                    = default;
@@ -18,16 +18,21 @@ class Container {
     Container         &operator=(const Container &) = default;
     Container         &operator=(Container &&)      = default;
 
-    [[nodiscard]] auto plugin_namespace() -> boost::python::object &;
-    [[nodiscard]] auto load() -> boost::python::object &;
-    [[nodiscard]] auto get() -> boost::python::object &;
-    [[nodiscard]] auto get_config_description() -> boost::python::object &;
-    [[nodiscard]] auto set_config() -> boost::python::object &;
-    [[nodiscard]] auto get_default_config() -> boost::python::object &;
-    [[nodiscard]] auto unload() -> boost::python::object &;
+    [[nodiscard]] auto name() const -> const std::string &;
+    [[nodiscard]] auto plugin_namespace() const
+        -> const boost::python::object &;
+    [[nodiscard]] auto load() const -> const boost::python::object &;
+    [[nodiscard]] auto get() const -> const boost::python::object &;
+    [[nodiscard]] auto get_config_description() const
+        -> const boost::python::object &;
+    [[nodiscard]] auto set_config() const -> const boost::python::object &;
+    [[nodiscard]] auto get_default_config() const
+        -> const boost::python::object &;
+    [[nodiscard]] auto unload() const -> const boost::python::object &;
 
  private:
     Container();
+    std::string           name_;
     boost::python::object load_;
     boost::python::object get_;
     boost::python::object get_config_description_;
