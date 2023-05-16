@@ -10,6 +10,10 @@ DeckMock::DeckMock()
     Card* card1 = new Card;
     card1->word = "go";
     card1->definition = "ходить";
+    std::vector<std::string> examples;
+    examples.push_back("you can go");
+    examples.push_back("let's go");
+    card1->exaples = examples;
     go_cards->addCard(card1);
 
     Card* card2 = new Card;

@@ -1,26 +1,26 @@
-#ifndef EXAMPLESMODEL_H
-#define EXAMPLESMODEL_H
+#ifndef IMAGESMODEL_H
+#define IMAGESMODEL_H
 
 #include <QAbstractListModel>
 #include <string>
 #include <vector>
 #include <memory>
 
-class ExamplesModel : public QAbstractListModel
+class ImagesModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    explicit ExamplesModel(QObject *parent = nullptr);
+    explicit ImagesModel(QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    void setExamples(std::vector<std::string> new_examples);
+    void setImages(std::vector<std::string> new_images_links);
 
 private:
-    std::vector<std::string> examples;
+    std::vector<std::string> images_links;
 };
 
-#endif // EXAMPLESMODEL_H
+#endif // IMAGESMODEL_H

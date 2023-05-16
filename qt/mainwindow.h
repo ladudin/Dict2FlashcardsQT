@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "deck_model.h"
 #include "examples_model.h"
+#include "audio_model.h"
+#include "images_model.h"
 #include "card.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,24 +22,23 @@ public:
 
 private slots:
     void onSearchReturned();
-    void onWordCardsClicked(QModelIndex);
     void updateCardFields();
     void updateWord(Card*);
     void updateDefinition(Card*);
     void updateTags(Card*);
-    void updateSentences(Card*);
+    void updateExamples(Card*);
+    void updateAudio(Card*);
+    void updateImages(Card*);
     void setCurrentIndex(QModelIndex);
     void onNextClicked();
     void onPrevClicked();
-
-signals:
-    void cardChanged(Card*);
 
 private:
     Ui::MainWindow *ui;
     DeckModel* deck_model;
     ExamplesModel* examples_model;
-    // Card* current_card;
+    AudioModel* audio_model;
+    ImagesModel* images_model;
     QModelIndex current_index;
 };
 #endif // MAINWINDOW_H

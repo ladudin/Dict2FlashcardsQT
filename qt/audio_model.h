@@ -1,24 +1,26 @@
-#ifndef AUDIOLINKS_H
-#define AUDIOLINKS_H
+#ifndef AUDIOMODEL_H
+#define AUDIOMODEL_H
 
 #include <QAbstractListModel>
-#include <vector>
 #include <string>
+#include <vector>
+#include <memory>
 
-class AudioLinks : public QAbstractListModel
+class AudioModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    explicit AudioLinks(std::vector<std::string> audio_links, QObject *parent = nullptr);
+    explicit AudioModel(QObject *parent = nullptr);
 
-    // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+    void setAudio(std::vector<std::string> new_audio_links);
 
 private:
     std::vector<std::string> audio_links;
 };
 
-#endif // AUDIOLINKS_H
+#endif // AUDIOMODEL_H

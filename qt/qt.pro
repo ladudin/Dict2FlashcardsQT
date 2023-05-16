@@ -9,25 +9,25 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    audiolinks.cpp \
+    audio_model.cpp \
     deck.cpp \
     deck_model.cpp \
     deckmock.cpp \
     examples_model.cpp \
-    image_links.cpp \
+    images_model.cpp \
     main.cpp \
     mainwindow.cpp \
     word_cards.cpp
 
 HEADERS += \
     IDeck.h \
-    audiolinks.h \
+    audio_model.h \
     card.h \
     deck.h \
     deck_model.h \
     deckmock.h \
     examples_model.h \
-    image_links.h \
+    images_model.h \
     mainwindow.h \
     word_cards.h
 

@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "deck_model.h"
 #include "deckmock.h"
-#include "govno.h"
 #include <memory>
 #include <QBoxLayout>
 
@@ -12,6 +11,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     auto deck = std::make_shared<DeckMock>();
+    examples_model = new ExamplesModel;
+    ui->examplesView->setModel(examples_model);
+    audio_model = new AudioModel;
+    ui->audioView->setModel(audio_model);
+    images_model = new ImagesModel;
+    ui->ImagesView->setModel(images_model);
     deck_model = new DeckModel(deck, ui->deckView);
     ui->deckView->setModel(deck_model);
     connect(ui->searchLine, SIGNAL(returnPressed()), this, SLOT(onSearchReturned()));
@@ -45,18 +50,13 @@ void MainWindow::onSearchReturned()
     emit ui->deckView->clicked(qm_idx);
 }
 
-void MainWindow::onWordCardsClicked(QModelIndex index)
-{
-
-}
-
 void MainWindow::updateCardFields()
 {
     QVariant qvar = deck_model->data(current_index, DeckModel::CardRole);
     Card* card = qvar.value<Card*>();
     updateWord(card);
     updateDefinition(card);
-    updateSentences(card);
+    updateExamples(card);
 }
 
 void MainWindow::updateWord(Card *card)
@@ -82,12 +82,20 @@ void MainWindow::updateTags(Card *)
 
 }
 
-void MainWindow::updateSentences(Card *card)
+void MainWindow::updateExamples(Card *card)
 {
-    examples_model->setExamples(&card->exaples);
+    examples_model->setExamples(card->exaples);
 }
 
+void MainWindow::updateAudio(Card *card)
+{
+    audio_model->setAudio(card->audio_links);
+}
 
+void MainWindow::updateImages(Card *card)
+{
+    images_model->setImages(card->image_links);
+}
 
 void MainWindow::setCurrentIndex(QModelIndex index)
 {
