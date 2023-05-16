@@ -280,9 +280,20 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
             return return_error("\""s + BATCH_SIZE_FIELD +
                                 "\" field is expected to be a number");
         }
-        auto batch_size      = request[BATCH_SIZE_FIELD].get<uint64_t>();
+        auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
 
-        auto result_or_error = provider.get(word, filter_query, batch_size);
+        if (!request.contains(RESTART_FIELD)) {
+            return return_error("\""s + RESTART_FIELD +
+                                "\" filed was not found in request");
+        }
+        if (!request[RESTART_FIELD].is_boolean()) {
+            return return_error("\""s + RESTART_FIELD +
+                                "\" field is expected to be a boolean");
+        }
+        auto restart = request[RESTART_FIELD].get<bool>();
+
+        auto result_or_error =
+            provider.get(word, filter_query, batch_size, restart);
         if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
             auto exception_info = std::get<PyExceptionInfo>(result_or_error);
 

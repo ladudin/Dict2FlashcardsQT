@@ -44,6 +44,7 @@ class ResponseGenerator : public IResponceGenerator {
     static constexpr auto FILTER_QUERY_FIELD              = "batch_size";
     static constexpr auto WORD_FIELD                      = "batch_size";
     static constexpr auto BATCH_SIZE_FIELD                = "batch_size";
+    static constexpr auto RESTART_FIELD                   = "restart";
 
     static constexpr auto DEFINITION_PROVIDER_PLUGIN_TYPE = "word";
     static constexpr auto SENTENCES_PROVIDER_PLUGIN_TYPE  = "sentences";

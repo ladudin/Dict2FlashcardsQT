@@ -5,6 +5,8 @@
 #include <boost/python/extract.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <utility>
+#include <vector>
 
 auto DefinitionsProviderWrapper::get(const std::string &word,
                                      const std::string &filter_query,
@@ -24,7 +26,6 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         }
     }
 
-    nlohmann::json json_res;
     try {
         boost::python::object py_json       = boost::python::import("json");
         boost::python::object py_json_dumps = py_json.attr("dumps");
@@ -34,8 +35,16 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         boost::python::object py_json_res = py_json_dumps(py_res);
 
         std::string str_res = boost::python::extract<std::string>(py_json_res);
+        nlohmann::json json_res = nlohmann::json::parse(str_res);
 
-        json_res            = nlohmann::json::parse(str_res);
+        // TODO(blackdeer): PROPER ERROR HANDLING
+        if (!json_res.is_array()) {
+            return {};
+        }
+        auto error_message = json_res[1].get<std::string>();
+        // auto a             = std::vector<Card>{};
+        auto cards         = json_res[0].get<std::vector<Card>>();
+        return std::make_pair(cards, error_message);
     } catch (const boost::python::error_already_set &) {
         boost::python::object py_err =
             boost::python::eval("str(sys.last_value)");
@@ -47,7 +56,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         }
         return PyExceptionInfo::build().value();
     }
-    return json_res;
+    return {};
 }
 
 auto DefinitionsProviderWrapper::get_dictionary_scheme()

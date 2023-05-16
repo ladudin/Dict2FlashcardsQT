@@ -13,6 +13,8 @@
 #include "PyExceptionInfo.hpp"
 
 struct Card {
+    Card()                                 = default;
+
     Card(const Card &)                     = default;
     Card(Card &&)                          = default;
     auto operator=(const Card &) -> Card & = default;
