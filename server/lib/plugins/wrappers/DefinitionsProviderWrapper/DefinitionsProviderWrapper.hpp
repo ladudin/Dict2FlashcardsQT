@@ -2,6 +2,7 @@
 #define DEFINITIONS_PROVIDER_WRAPPER_H
 
 #include <cstdint>
+#include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
@@ -27,12 +28,24 @@ struct Card {
     nlohmann::json           other;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
+                                   word,
+                                   special,
+                                   definition,
+                                   examples,
+                                   image_links,
+                                   audio_links,
+                                   tags,
+                                   other);
+
 class DefinitionsProviderWrapper
     : public BasePluginWrapper<std::pair<std::vector<Card>, std::string>> {
  public:
     auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo>;
-    auto get(const std::string &word, uint64_t batch_size)
+    auto get(const std::string &word,
+             const std::string &filter_query,
+             uint64_t           batch_size)
         -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
 };
 

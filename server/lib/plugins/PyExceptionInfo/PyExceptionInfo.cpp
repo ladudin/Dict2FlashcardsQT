@@ -22,11 +22,3 @@ auto PyExceptionInfo::build() -> std::optional<PyExceptionInfo> {
     }
     return info;
 }
-
-inline auto PyExceptionInfo::stack_trace() const -> const std::string & {
-    return stack_trace_;
-}
-
-inline auto PyExceptionInfo::error_summary() const -> const std::string & {
-    return error_summary_;
-}

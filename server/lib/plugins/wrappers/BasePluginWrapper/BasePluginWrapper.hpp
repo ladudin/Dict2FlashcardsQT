@@ -146,10 +146,18 @@ template <class T>
 concept implements_wrapper_get = (
     // DefinitionsProvider, SentencesProvider, AudiosProvider, ImagesProvider
     requires(T                  dependent_instance,
-             const std::string &word,
+             const std::string &query,
              uint64_t           batch_size) {
         {
-            dependent_instance.get(word, batch_size)
+            dependent_instance.get(query, batch_size)
+        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
+    } ||
+    requires(T                  dependent_instance,
+             const std::string &query,
+             const std::string &filter,
+             uint64_t           batch_size) {
+        {
+            dependent_instance.get(query, filter, batch_size)
         } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
     } ||
     // FormatProcessor
