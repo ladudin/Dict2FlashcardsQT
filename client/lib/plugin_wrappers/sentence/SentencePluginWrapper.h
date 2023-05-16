@@ -11,7 +11,7 @@
 class SentencePluginWrapper : public BasicPluginWrapper,
                               virtual public ISentencePluginWrapper {
  public:
-    SentencePluginWrapper(std::shared_ptr<IRequestable> connection);
+    explicit SentencePluginWrapper(std::shared_ptr<IRequestable> connection);
     std::pair<std::vector<std::string>, std::string>
     get(const std::string &word, size_t batch_size) override;
 };

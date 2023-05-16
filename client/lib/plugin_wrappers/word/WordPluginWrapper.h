@@ -13,7 +13,7 @@
 class WordPluginWrapper : public BasicPluginWrapper,
                           virtual public IWordPluginWrapper {
  public:
-    WordPluginWrapper(std::shared_ptr<IRequestable> connection);
+    explicit WordPluginWrapper(std::shared_ptr<IRequestable> connection);
     std::pair<std::vector<Card>, std::string>
                                         get(const std::string &word,
                                             const std::string &query_language,

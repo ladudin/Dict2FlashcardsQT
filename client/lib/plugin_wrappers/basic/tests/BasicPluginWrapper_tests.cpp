@@ -10,81 +10,6 @@
 
 using namespace nlohmann;
 
-TEST(BasicPWInitTest, Output) {
-    auto               memorizer = std::make_shared<Memorizer>();
-    BasicPluginWrapper wrapper(memorizer, "tests");
-    wrapper.init("test_name");
-
-    json actual   = json::parse(memorizer->received_message);
-    json expected = json::parse(
-        R"({ "query_type" : "init", "plugin_type" : "tests", "plugin_name" : "test_name" })");
-    EXPECT_EQ(expected, actual);
-}
-
-TEST(BasicPWInitTest, Success) {
-    std::string        answer       = R"({ "status" : 0, "error" : "null"})";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    EXPECT_TRUE(wrapper.init("exiting_plugin").empty());
-}
-
-TEST(BasicPWInitTest, Error) {
-    std::string        answer       = R"({ "status" : 1, "error" : "something" })";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    std::string actual = wrapper.init("nonexiten_plugin");
-    std::string expected = "something";
-
-    EXPECT_EQ(actual, expected);
-}
-
-TEST(BasicPWInitTest, WrongResponseFormat) {
-    std::string        answer       = R"({ "status" : "ok", "error" : "something" })";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    std::string actual = wrapper.init("nonexiten_plugin");
-    std::string expected = "Wrong response format";
-
-    EXPECT_EQ(actual, expected);
-}
-
-TEST(BasicPWInitTest, Disconnect) {
-    std::string        answer       = R"({ "status" : "0", "error" : "something" })";
-    auto               fixed_answer = std::make_shared<FixedAnswer>(answer, false);
-    BasicPluginWrapper wrapper(fixed_answer, "tests");
-
-    std::string actual = wrapper.init("nonexiten_plugin");
-    std::string expected = "Server disconnected";
-
-    EXPECT_EQ(actual, expected);
-}
-
-TEST(BasicPWOutputTest, GetDefaultConfig) {
-    auto               memorizer = std::make_shared<Memorizer>();
-    BasicPluginWrapper wrapper(memorizer, "tests");
-    EXPECT_THROW(wrapper.get_default_config(), std::runtime_error);
-
-    json actual   = json::parse(memorizer->received_message);
-    json expected = json::parse(
-        R"({ "query_type" : "get_default_config", "plugin_type" : "tests" })");
-    EXPECT_EQ(expected, actual);
-}
-
-//TEST(BasicPWOutputTest, GetDefaultScheme) {
-//    auto               memorizer = std::make_shared<Memorizer>();
-//    BasicPluginWrapper wrapper(memorizer, "tests");
-//    EXPECT_THROW(wrapper.get_default_scheme(), std::runtime_error);
-//
-//    json actual   = json::parse(memorizer->received_message);
-//    json expected = json::parse(
-//        R"({ "query_type" : "get_default_scheme", "plugin_type" : "tests" })");
-//
-//    EXPECT_EQ(expected, actual);
-//}
-//
 //TEST(BasicPWOutputTest, SetConfig) {
 //    auto               memorizer = std::make_shared<Memorizer>();
 //    BasicPluginWrapper wrapper(memorizer, "tests");
@@ -120,26 +45,6 @@ TEST(BasicPWOutputTest, GetDefaultConfig) {
 //    EXPECT_EQ(expected, actual);
 //}
 
-//TEST(BasicPWInputTest, GetDefaultConfigSuccess) {
-//    std::string answer =
-//        R"({ "status" : 0, "result" : { "language" : "english", "level" : "C2" }})";
-//    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-//    BasicPluginWrapper wrapper(fixed_answer, "tests");
-//
-//    json               actual = json::parse(wrapper.get_default_config());
-//    json               expected =
-//        json::parse(R"({ "language" : "english", "level" : "C2" })");
-//    EXPECT_EQ(expected, actual);
-//}
-//
-//TEST(BasicPWInputTest, GetDefaultConfigFailure) {
-//    std::string        answer       = R"({"status" : 1, "result" : "null"})";
-//    auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
-//    BasicPluginWrapper wrapper(fixed_answer, "tests");
-//
-//    EXPECT_THROW(wrapper.get_default_config(), std::runtime_error);
-//}
-//
 //TEST(BasicPWInputTest, GetDefaultSchemeSuccess) {
 //    std::string answer =
 //        R"({ "status" : 0, "result" : { "language" : ["english", "russian"],

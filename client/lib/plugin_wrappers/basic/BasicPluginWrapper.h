@@ -1,10 +1,10 @@
 #ifndef BASICPLUGINWRAPPER_H
 #define BASICPLUGINWRAPPER_H
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "IBasicPluginWrapper.h"
 #include "IRequestable.h"

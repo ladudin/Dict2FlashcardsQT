@@ -11,7 +11,7 @@
 class AudioPluginWrapper : public BasicPluginWrapper,
                            virtual public IAudioPluginWrapper {
  public:
-    AudioPluginWrapper(std::shared_ptr<IRequestable> connection);
+    explicit AudioPluginWrapper(std::shared_ptr<IRequestable> connection);
     std::pair<std::vector<std::pair<std::string, std::string>>, std::string>
     get(const std::string &word, size_t batch_size) override;
 };
