@@ -18,12 +18,12 @@ TEST(WordPWGet, Output) {
 
     json actual   = json::parse(memorizer->received_message);
     json expected = {
-        {"query_type",     "get"      },
-        {"plugin_type",    "word"     },
-        {"query",          "test_word"},
-        {"query_language", "pos::noun"},
-        {"batch_size",     3          },
-        {"reload",         1          }
+        {"query_type",  "get"      },
+        {"plugin_type", "word"     },
+        {"word",        "test_word"},
+        {"filter",      "pos::noun"},
+        {"batch_size",  3          },
+        {"restart",     true       }
     };
     EXPECT_EQ(expected, actual);
 }

@@ -22,10 +22,10 @@ WordPluginWrapper::get(const std::string &word,
     json request_message = {
         {"query_type",     "get"         },
         {"plugin_type",    plugin_type_  },
-        {"query",          word          },
-        {"query_language", query_language},
+        {"word",          word          },
+        {"filter", query_language},
         {"batch_size",     batch_size    },
-        {"reload",         reload ? 1 : 0}
+        {"restart",         reload}
     };
     std::pair<bool, std::string> response(
         std::move(connection_->request(request_message.dump())));
