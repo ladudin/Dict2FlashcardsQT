@@ -1,0 +1,11 @@
+*
+!*/
+!.gitignore
+!.gitignore
+!/spdlog/*
+!CMakeLists.txt
+!README.md
+!/img/**
+!/server/**
+!/test_client/**
+!/plugins/**/*.py
