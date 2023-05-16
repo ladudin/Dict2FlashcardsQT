@@ -28,7 +28,6 @@ class Container {
 
  private:
     Container();
-    boost::python::object plugin_namespace_;
     boost::python::object load_;
     boost::python::object get_;
     boost::python::object get_config_description_;
