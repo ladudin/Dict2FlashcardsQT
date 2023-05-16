@@ -155,9 +155,10 @@ concept implements_wrapper_get = (
     requires(T                  dependent_instance,
              const std::string &query,
              const std::string &filter,
+             bool restart,
              uint64_t           batch_size) {
         {
-            dependent_instance.get(query, filter, batch_size)
+            dependent_instance.get(query, filter, batch_size, restart)
         } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
     } ||
     // FormatProcessor

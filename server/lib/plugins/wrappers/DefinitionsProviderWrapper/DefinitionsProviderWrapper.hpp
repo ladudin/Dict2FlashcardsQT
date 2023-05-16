@@ -5,6 +5,7 @@
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -45,8 +46,13 @@ class DefinitionsProviderWrapper
         -> std::variant<nlohmann::json, PyExceptionInfo>;
     auto get(const std::string &word,
              const std::string &filter_query,
-             uint64_t           batch_size)
+             uint64_t           batch_size,
+             bool               restart)
         -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
+
+ private:
+    std::unordered_map<std::string, std::optional<boost::python::object>>
+        generators_;
 };
 
 static_assert(is_plugin_wrapper<DefinitionsProviderWrapper>);
