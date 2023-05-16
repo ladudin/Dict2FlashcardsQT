@@ -80,7 +80,7 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
     try {
         config = json::parse(new_config);
     } catch (...) {
-        return {{}, "Not a json"};
+        return {{}, "Wrong input format"};
     }
     json request_message = {
         {"query_type",  "set_config"},
@@ -94,10 +94,10 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
     try {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
-            return {{}, response_message.at("error").get<std::string>()};
-        return {response_message.at("result")
-                    .get<std::map<std::string, std::string>>(),
-                response_message.at("error").get<std::string>()};
+            return {response_message.at("result")
+                        .get<std::map<std::string, std::string>>(),
+                    ""};
+        return {{}, ""};
     } catch (...) {
         return {{}, "Wrong response format"};
     }

@@ -1,6 +1,7 @@
 #include "WordPluginWrapper.h"
 
 #include <vector>
+#include <string>
 
 #include <nlohmann/json.hpp>
 
