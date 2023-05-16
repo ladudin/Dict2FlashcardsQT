@@ -41,7 +41,7 @@ class ResponseGenerator : public IResponceGenerator {
     static constexpr auto PLUGIN_TYPE_FIELD               = "plugin_type";
     static constexpr auto CONFIG_FIELD                    = "config";
     static constexpr auto PLUGIN_NAME_FIELD               = "plugin_name";
-    static constexpr auto FILTER_QUERY_FIELD            = "batch_size";
+    static constexpr auto FILTER_QUERY_FIELD              = "batch_size";
     static constexpr auto WORD_FIELD                      = "batch_size";
     static constexpr auto BATCH_SIZE_FIELD                = "batch_size";
 

@@ -13,6 +13,7 @@ Session::Session(boost::asio::ip::tcp::socket        socket,
 }
 
 void Session::start() {
+    spdlog::info("Started new session");
     do_read();
 }
 
@@ -22,7 +23,7 @@ void Session::do_read() {
     boost::asio::async_read_until(
         socket_,
         request_buffer,
-        "\n\r",
+        "\r\n",
         [this, self](boost::system::error_code error_code, std::size_t length) {
             if (error_code) {
                 spdlog::error("Couldn't read from user");
@@ -34,7 +35,8 @@ void Session::do_read() {
             istrm >> result;
 
             json response = response_generator_->handle(result);
-            do_write(response);
+            auto str_response = response.dump() + "\r\n";
+            do_write(str_response);
         });
 }
 
