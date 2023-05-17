@@ -65,14 +65,14 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         }
     }
     if (generators_.find(word) == generators_.end()) {
+        boost::python::object generator;
         try {
-            boost::python::object test = specifics_.get(word);
-            generators_[word]          = test;
-            generators_[word]->attr("__next__")();
+            generator = specifics_.get(word);
+            generator.attr("__next__")();
         } catch (const boost::python::error_already_set &) {
-            generators_.erase(generators_.find(word));
             return PyExceptionInfo::build().value();
         }
+        generators_[word] = generator;
     }
 
     try {
