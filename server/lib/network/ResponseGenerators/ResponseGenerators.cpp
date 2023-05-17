@@ -250,86 +250,255 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     auto plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
 
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
-        auto *provider = plugins_bundle_.definitions_provider();
-        if (provider == nullptr) {
-            return return_error("Cannot return anything because definitions "
-                                "provider is not initialized");
-        }
-
-        if (!request.contains(WORD_FIELD)) {
-            return return_error("\""s + WORD_FIELD +
-                                "\" filed was not found in request");
-        }
-        if (!request[WORD_FIELD].is_string()) {
-            return return_error("\""s + WORD_FIELD +
-                                "\" field is expected to be a string");
-        }
-        auto word = request[WORD_FIELD].get<std::string>();
-
-        if (!request.contains(FILTER_QUERY_FIELD)) {
-            return return_error("\""s + FILTER_QUERY_FIELD +
-                                "\" fieled was not found in request");
-        }
-        if (!request[FILTER_QUERY_FIELD].is_string()) {
-            return return_error("\""s + FILTER_QUERY_FIELD +
-                                "\" field is expected to be a string");
-        }
-        auto filter_query = request[FILTER_QUERY_FIELD].get<std::string>();
-
-        if (!request.contains(BATCH_SIZE_FIELD)) {
-            return return_error("\""s + BATCH_SIZE_FIELD +
-                                "\" filed was not found in request");
-        }
-        if (!request[BATCH_SIZE_FIELD].is_number()) {
-            return return_error("\""s + BATCH_SIZE_FIELD +
-                                "\" field is expected to be a number");
-        }
-        auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
-
-        if (!request.contains(RESTART_FIELD)) {
-            return return_error("\""s + RESTART_FIELD +
-                                "\" filed was not found in request");
-        }
-        if (!request[RESTART_FIELD].is_boolean()) {
-            return return_error("\""s + RESTART_FIELD +
-                                "\" field is expected to be a boolean");
-        }
-        auto restart = request[RESTART_FIELD].get<bool>();
-
-        auto result_or_error =
-            provider->get(word, filter_query, batch_size, restart);
-        if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
-            auto exception_info = std::get<PyExceptionInfo>(result_or_error);
-            return return_error("Exception was thrown during \"" +
-                                provider->name() + "\" definitions request:\n" +
-                                exception_info.stack_trace());
-        }
-        if (std::holds_alternative<DefinitionsProviderWrapper::type>(
-                result_or_error)) {
-            auto result =
-                std::get<DefinitionsProviderWrapper::type>(result_or_error);
-            return result;
-        }
-        auto non_python_error_message = std::get<std::string>(result_or_error);
-
-        auto json_message             = R"({"status": 1, "message": ")"s +
-                            non_python_error_message + R"("})";
-        return json::parse(json_message);
+        return handle_get_definitions(request);
     }
     if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
-        return return_error(
-            "Requests to sentences provider is not implemented");
+        return handle_get_sentences(request);
     }
     if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
-        return return_error("Requests to images provider is not implemented");
+        return handle_get_images(request);
     }
     if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
-        return return_error("Requests to audios provider is not implemented");
+        return handle_get_audios(request);
     }
     if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
         return return_error("Requests to format processor is not implemented");
     }
     return return_error("Unknown plugin type: "s + plugin_type);
+}
+
+auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
+    -> nlohmann::json {
+    auto *provider = plugins_bundle_.definitions_provider();
+    if (provider == nullptr) {
+        return return_error("Definitions provider is not initialized");
+    }
+
+    if (!request.contains(WORD_FIELD)) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[WORD_FIELD].is_string()) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto word = request[WORD_FIELD].get<std::string>();
+
+    if (!request.contains(FILTER_QUERY_FIELD)) {
+        return return_error("\""s + FILTER_QUERY_FIELD +
+                            "\" fieled was not found in request");
+    }
+    if (!request[FILTER_QUERY_FIELD].is_string()) {
+        return return_error("\""s + FILTER_QUERY_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto filter_query = request[FILTER_QUERY_FIELD].get<std::string>();
+
+    if (!request.contains(BATCH_SIZE_FIELD)) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[BATCH_SIZE_FIELD].is_number()) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" field is expected to be a number");
+    }
+    auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
+
+    if (!request.contains(RESTART_FIELD)) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[RESTART_FIELD].is_boolean()) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" field is expected to be a boolean");
+    }
+    auto restart = request[RESTART_FIELD].get<bool>();
+
+    auto result_or_error =
+        provider->get(word, filter_query, batch_size, restart);
+    if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
+        auto exception_info = std::get<PyExceptionInfo>(result_or_error);
+        return return_error("Exception was thrown during \"" +
+                            provider->name() + "\" definitions request:\n" +
+                            exception_info.stack_trace());
+    }
+    if (std::holds_alternative<DefinitionsProviderWrapper::type>(
+            result_or_error)) {
+        auto result =
+            std::get<DefinitionsProviderWrapper::type>(result_or_error);
+        return result;
+    }
+    auto non_python_error_message = std::get<std::string>(result_or_error);
+
+    auto json_message =
+        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
+    return json::parse(json_message);
+}
+
+auto ResponseGenerator::handle_get_sentences(const nlohmann::json &request)
+    -> nlohmann::json {
+    auto *provider = plugins_bundle_.sentences_provider();
+    if (provider == nullptr) {
+        return return_error("Sentences provider is not initialized");
+    }
+
+    if (!request.contains(WORD_FIELD)) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[WORD_FIELD].is_string()) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto word = request[WORD_FIELD].get<std::string>();
+
+    if (!request.contains(BATCH_SIZE_FIELD)) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[BATCH_SIZE_FIELD].is_number()) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" field is expected to be a number");
+    }
+    auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
+
+    if (!request.contains(RESTART_FIELD)) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[RESTART_FIELD].is_boolean()) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" field is expected to be a boolean");
+    }
+    auto restart         = request[RESTART_FIELD].get<bool>();
+
+    auto result_or_error = provider->get(word, batch_size, restart);
+    if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
+        auto exception_info = std::get<PyExceptionInfo>(result_or_error);
+        return return_error("Exception was thrown during \"" +
+                            provider->name() + "\" sentences request:\n" +
+                            exception_info.stack_trace());
+    }
+    if (std::holds_alternative<SentencesProviderWrapper::type>(
+            result_or_error)) {
+        auto result = std::get<SentencesProviderWrapper::type>(result_or_error);
+        return result;
+    }
+    auto non_python_error_message = std::get<std::string>(result_or_error);
+
+    auto json_message =
+        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
+    return json::parse(json_message);
+}
+
+auto ResponseGenerator::handle_get_images(const nlohmann::json &request)
+    -> nlohmann::json {
+    auto *provider = plugins_bundle_.images_provider();
+    if (provider == nullptr) {
+        return return_error("Images provider is not initialized");
+    }
+
+    if (!request.contains(WORD_FIELD)) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[WORD_FIELD].is_string()) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto word = request[WORD_FIELD].get<std::string>();
+
+    if (!request.contains(BATCH_SIZE_FIELD)) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[BATCH_SIZE_FIELD].is_number()) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" field is expected to be a number");
+    }
+    auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
+
+    if (!request.contains(RESTART_FIELD)) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[RESTART_FIELD].is_boolean()) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" field is expected to be a boolean");
+    }
+    auto restart         = request[RESTART_FIELD].get<bool>();
+
+    auto result_or_error = provider->get(word, batch_size, restart);
+    if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
+        auto exception_info = std::get<PyExceptionInfo>(result_or_error);
+        return return_error("Exception was thrown during \"" +
+                            provider->name() + "\" images request:\n" +
+                            exception_info.stack_trace());
+    }
+    if (std::holds_alternative<ImagesProviderWrapper::type>(result_or_error)) {
+        auto result = std::get<ImagesProviderWrapper::type>(result_or_error);
+        return result;
+    }
+    auto non_python_error_message = std::get<std::string>(result_or_error);
+
+    auto json_message =
+        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
+    return json::parse(json_message);
+}
+
+auto ResponseGenerator::handle_get_audios(const nlohmann::json &request)
+    -> nlohmann::json {
+    auto *provider = plugins_bundle_.audios_provider();
+    if (provider == nullptr) {
+        return return_error("Audios provider is not initialized");
+    }
+
+    if (!request.contains(WORD_FIELD)) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[WORD_FIELD].is_string()) {
+        return return_error("\""s + WORD_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto word = request[WORD_FIELD].get<std::string>();
+
+    if (!request.contains(BATCH_SIZE_FIELD)) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[BATCH_SIZE_FIELD].is_number()) {
+        return return_error("\""s + BATCH_SIZE_FIELD +
+                            "\" field is expected to be a number");
+    }
+    auto batch_size = request[BATCH_SIZE_FIELD].get<uint64_t>();
+
+    if (!request.contains(RESTART_FIELD)) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[RESTART_FIELD].is_boolean()) {
+        return return_error("\""s + RESTART_FIELD +
+                            "\" field is expected to be a boolean");
+    }
+    auto restart         = request[RESTART_FIELD].get<bool>();
+
+    auto result_or_error = provider->get(word, batch_size, restart);
+    if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
+        auto exception_info = std::get<PyExceptionInfo>(result_or_error);
+        return return_error("Exception was thrown during \"" +
+                            provider->name() + "\" definitions request:\n" +
+                            exception_info.stack_trace());
+    }
+    if (std::holds_alternative<AudiosProviderWrapper::type>(result_or_error)) {
+        auto result = std::get<AudiosProviderWrapper::type>(result_or_error);
+        return result;
+    }
+    auto non_python_error_message = std::get<std::string>(result_or_error);
+
+    auto json_message =
+        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
+    return json::parse(json_message);
 }
 
 auto ResponseGenerator::handle_get_dict_scheme(const nlohmann::json &request)

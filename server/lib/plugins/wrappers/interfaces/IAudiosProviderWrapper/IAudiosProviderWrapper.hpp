@@ -18,6 +18,10 @@ inline void from_json(const nlohmann::json &json_arr, AudioInfo &info) {
     json_arr.at(1).get_to(info.additional_info);
 }
 
+inline void to_json(nlohmann::json &json_arr, const AudioInfo &info) {
+    json_arr = {info.audio, info.additional_info};
+}
+
 class IAudiosProviderWrapper : public virtual IPluginWrapper {
  public:
     using type = std::pair<std::vector<AudioInfo>, std::string>;
