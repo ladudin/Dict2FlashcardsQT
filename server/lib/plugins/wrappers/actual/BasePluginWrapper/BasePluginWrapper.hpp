@@ -14,7 +14,7 @@
 #include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class BasePluginWrapper : public IPluginWrapper {
+class BasePluginWrapper : public virtual IPluginWrapper {
  public:
     BasePluginWrapper(const BasePluginWrapper &)                     = default;
     BasePluginWrapper(BasePluginWrapper &&)                          = default;
@@ -26,7 +26,7 @@ class BasePluginWrapper : public IPluginWrapper {
                       const boost::python::object &module)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
-    [[nodiscard]] auto name() const -> const std::string & override;
+    [[nodiscard]] auto name() const -> const std::string &;
     auto               load() -> std::optional<PyExceptionInfo> override;
     auto               unload() -> std::optional<PyExceptionInfo> override;
     auto               get_config_description()
@@ -53,12 +53,6 @@ class BasePluginWrapper : public IPluginWrapper {
     std::string     name_;
     CommonFunctions common_;
     nlohmann::json  config_;
-};
-
-struct ResultFilesPaths {
-    std::filesystem::path cards;
-    std::filesystem::path audios;
-    std::filesystem::path images;
 };
 
 template <class T>

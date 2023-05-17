@@ -1,20 +1,18 @@
 #ifndef AUDIOS_PROVIDER_WRAPPER_H
 #define AUDIOS_PROVIDER_WRAPPER_H
 
-#include "BasePluginWrapper.hpp"
-#include "PyExceptionInfo.hpp"
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <variant>
 #include <vector>
 
-struct AudioInfo {
-    std::string audio;
-    std::string additional_info;
-};
+#include "BasePluginWrapper.hpp"
+#include "IAudiosProviderWrapper.hpp"
+#include "PyExceptionInfo.hpp"
 
-class AudiosProviderWrapper : public BasePluginWrapper {
+class AudiosProviderWrapper : public BasePluginWrapper,
+                              public IAudiosProviderWrapper {
  public:
     AudiosProviderWrapper(const AudiosProviderWrapper &);
     AudiosProviderWrapper(AudiosProviderWrapper &&) = default;
@@ -24,14 +22,12 @@ class AudiosProviderWrapper : public BasePluginWrapper {
         -> AudiosProviderWrapper    & = default;
     ~AudiosProviderWrapper() override = default;
 
-    using type = std::pair<std::vector<AudioInfo>, std::string>;
-
     static auto build(const std::string           &name,
                       const boost::python::object &module)
         -> std::variant<AudiosProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo>;
+        -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo> override;
 
  protected:
     struct AudiosProvidesFunctions {

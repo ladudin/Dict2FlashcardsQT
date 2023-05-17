@@ -8,12 +8,12 @@
 #include <vector>
 
 #include "BasePluginWrapper.hpp"
+#include "IFormatProcessorWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class FormatProcessorWrapper : public BasePluginWrapper {
+class FormatProcessorWrapper : public IFormatProcessorWrapper,
+                               public BasePluginWrapper {
  public:
-    using type = std::string;
-
     FormatProcessorWrapper(const FormatProcessorWrapper &);
     FormatProcessorWrapper(FormatProcessorWrapper &&) = default;
     auto operator=(const FormatProcessorWrapper &)
@@ -26,7 +26,7 @@ class FormatProcessorWrapper : public BasePluginWrapper {
         -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
     auto save(const ResultFilesPaths &paths)
-        -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
+        -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo> override;
 
  protected:
     struct FormatProcessorsFunctions {

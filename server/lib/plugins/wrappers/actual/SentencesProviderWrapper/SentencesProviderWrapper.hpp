@@ -1,19 +1,21 @@
 #ifndef SENTENCES_PROVIDER_WRAPPER_H
 #define SENTENCES_PROVIDER_WRAPPER_H
 
+#include <concepts>
 #include <cstdint>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "BasePluginWrapper.hpp"
+#include "ISentencesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class SentencesProviderWrapper : public BasePluginWrapper {
+class SentencesProviderWrapper : public BasePluginWrapper,
+                                 public ISentencesProviderWrapper {
  public:
-    using type = std::pair<std::vector<std::string>, std::string>;
-
     SentencesProviderWrapper(const SentencesProviderWrapper &other);
     SentencesProviderWrapper(SentencesProviderWrapper &&) = default;
     auto operator=(const SentencesProviderWrapper &)
@@ -26,7 +28,7 @@ class SentencesProviderWrapper : public BasePluginWrapper {
         -> std::variant<SentencesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<SentencesProviderWrapper::type, PyExceptionInfo>;
+        -> std::variant<ISentencesProviderWrapper::type, PyExceptionInfo>;
 
  protected:
     struct SentencesProvidersFunctions {

@@ -1,4 +1,5 @@
 #include "SentencesProviderWrapper.hpp"
+#include "BasePluginWrapper.hpp"
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
 
@@ -24,6 +25,11 @@ SentencesProviderWrapper::SentencesProviderWrapper(
       specifics_(other.specifics_) {
 }
 
+auto SentencesProviderWrapper::get(const std::string &word, uint64_t batch_size)
+    -> std::variant<SentencesProviderWrapper::type, PyExceptionInfo> {
+    return {};
+}
+
 auto SentencesProviderWrapper::build(const std::string           &name,
                                      const boost::python::object &module)
     -> std::variant<SentencesProviderWrapper, PyExceptionInfo> {
@@ -42,9 +48,4 @@ auto SentencesProviderWrapper::build(const std::string           &name,
     auto wrapper   = SentencesProviderWrapper(std::move(base));
     wrapper.specifics_ = specifics;
     return wrapper;
-}
-
-auto SentencesProviderWrapper::get(const std::string &word, uint64_t batch_size)
-    -> std::variant<SentencesProviderWrapper::type, PyExceptionInfo> {
-    return {};
 }

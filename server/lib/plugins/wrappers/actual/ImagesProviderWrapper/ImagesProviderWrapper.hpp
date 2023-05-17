@@ -8,12 +8,12 @@
 #include <vector>
 
 #include "BasePluginWrapper.hpp"
+#include "IImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class ImagesProviderWrapper : public BasePluginWrapper {
+class ImagesProviderWrapper : public IImageProviderWrapper,
+                              public BasePluginWrapper {
  public:
-    using type = std::pair<std::vector<std::string>, std::string>;
-
     ImagesProviderWrapper(const ImagesProviderWrapper &);
     ImagesProviderWrapper(ImagesProviderWrapper &&) = default;
     auto operator=(const ImagesProviderWrapper &)
@@ -26,7 +26,7 @@ class ImagesProviderWrapper : public BasePluginWrapper {
         -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
+        -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo> override;
 
  protected:
     struct ImagesProvidersFunctions {
