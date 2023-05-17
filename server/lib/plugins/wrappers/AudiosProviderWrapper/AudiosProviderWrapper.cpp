@@ -1,6 +1,8 @@
 #include "AudiosProviderWrapper.hpp"
 #include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
+#include "spdlog/common.h"
+#include "spdlog/spdlog.h"
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
 #include <cstdint>
@@ -11,18 +13,40 @@
 #include <variant>
 #include <vector>
 
+auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
+    const boost::python::object &module)
+    -> std::variant<AudiosProvidesFunctions, PyExceptionInfo> {
+    auto plugin_container = AudiosProvidesFunctions();
+    try {
+        plugin_container.get = module.attr("get");
+    } catch (const boost::python::error_already_set &) {
+        return PyExceptionInfo::build().value();
+    }
+    return plugin_container;
+}
+
 AudiosProviderWrapper::AudiosProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto AudiosProviderWrapper::build(Container container)
+auto AudiosProviderWrapper::build(std::string                &&name,
+                                  const boost::python::object &module)
     -> std::variant<AudiosProviderWrapper, PyExceptionInfo> {
-    auto base_or_error = BasePluginWrapper::build(std::move(container));
+    auto base_or_error = BasePluginWrapper::build(std::move(name), module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {
         return std::get<PyExceptionInfo>(base_or_error);
     }
     auto base = std::move(std::get<BasePluginWrapper>(base_or_error));
-    return AudiosProviderWrapper(std::move(base));
+
+    auto specifics_or_error = AudiosProvidesFunctions::build(module);
+    if (std::holds_alternative<PyExceptionInfo>(specifics_or_error)) {
+        return std::get<PyExceptionInfo>(specifics_or_error);
+    }
+    auto specifics     = std::get<AudiosProvidesFunctions>(specifics_or_error);
+
+    auto wrapper       = AudiosProviderWrapper(std::move(base));
+    wrapper.specifics_ = specifics;
+    return wrapper;
 }
 
 auto AudiosProviderWrapper::get(const std::string &word, uint64_t batch_size)

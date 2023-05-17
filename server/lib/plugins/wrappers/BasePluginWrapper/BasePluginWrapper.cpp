@@ -1,28 +1,49 @@
 #include "BasePluginWrapper.hpp"
+#include "PyExceptionInfo.hpp"
+#include <boost/python/import.hpp>
+#include <variant>
 
-BasePluginWrapper::BasePluginWrapper(Container &&container)
-    : container_(container) {
+auto BasePluginWrapper::CommonFunctions::build(
+    const boost::python::object &module)
+    -> std::variant<CommonFunctions, PyExceptionInfo> {
+    auto plugin_container = CommonFunctions();
+    try {
+        plugin_container.load = module.attr("load");
+        plugin_container.get_config_description =
+            module.attr("get_config_description");
+        plugin_container.set_config         = module.attr("set_config");
+        plugin_container.get_default_config = module.attr("get_default_config");
+        plugin_container.unload             = module.attr("unload");
+    } catch (const boost::python::error_already_set &) {
+        return PyExceptionInfo::build().value();
+    }
+    return plugin_container;
 }
 
-auto BasePluginWrapper::build(Container container)
+BasePluginWrapper::BasePluginWrapper(std::string     &&name,
+                                     CommonFunctions &&common)
+    : name_(name), common_(common) {
+}
+
+auto BasePluginWrapper::build(std::string                &&name,
+                              const boost::python::object &module)
     -> std::variant<BasePluginWrapper, PyExceptionInfo> {
-    auto wrapper         = BasePluginWrapper(std::move(container));
-    auto config_or_error = wrapper.get_default_config();
-    if (std::holds_alternative<PyExceptionInfo>(config_or_error)) {
-        auto error = std::get<PyExceptionInfo>(config_or_error);
-        return error;
+    auto common_or_error = CommonFunctions::build(module);
+    if (std::holds_alternative<PyExceptionInfo>(common_or_error)) {
+        auto info = std::get<PyExceptionInfo>(common_or_error);
+        return info;
     }
-    wrapper.config_ = std::get<nlohmann::json>(config_or_error);
-    return wrapper;
+    auto common = std::get<CommonFunctions>(common_or_error);
+    return BasePluginWrapper(std::move(name), std::move(common));
 }
 
 [[nodiscard]] auto BasePluginWrapper::name() const -> const std::string & {
-    return container_.name();
+    return name_;
 }
 
 auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {
     try {
-        boost::python::object plugin_load = container_.load();
+        boost::python::object &plugin_load = common_.load;
         plugin_load();
     } catch (const boost::python::error_already_set &) {
         return PyExceptionInfo::build().value();
@@ -32,7 +53,7 @@ auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {
 
 auto BasePluginWrapper::unload() -> std::optional<PyExceptionInfo> {
     try {
-        boost::python::object plugin_unload = container_.load();
+        boost::python::object &plugin_unload = common_.unload;
         plugin_unload();
     } catch (const boost::python::error_already_set &) {
         return PyExceptionInfo::build().value();
@@ -48,7 +69,7 @@ auto BasePluginWrapper::get_config_description()
         boost::python::object py_json_dumps = py_json.attr("dumps");
 
         boost::python::object py_plugin_conf_description =
-            container_.get_config_description()();
+            common_.get_config_description();
         boost::python::object py_str_json_conf_description =
             py_json_dumps(py_plugin_conf_description);
 
@@ -69,7 +90,7 @@ auto BasePluginWrapper::get_default_config()
         boost::python::object py_json_dumps = py_json.attr("dumps");
 
         boost::python::object py_plugin_default_conf =
-            container_.get_default_config()();
+            common_.get_default_config();
         boost::python::object py_str_json_default_conf =
             py_json_dumps(py_plugin_default_conf);
 
@@ -93,7 +114,7 @@ auto BasePluginWrapper::set_config(nlohmann::json &&new_config)
         std::string           new_conf_str  = new_config.dump();
         boost::python::object py_new_conf   = py_json_loads(py_json_loads);
         boost::python::object py_conf_diagnostics =
-            container_.set_config()(py_new_conf);
+            common_.set_config(py_new_conf);
         boost::python::object py_conf_diagnostics_str =
             py_json_dumps(py_conf_diagnostics);
         std::string cpp_conf_diagnostics_str =

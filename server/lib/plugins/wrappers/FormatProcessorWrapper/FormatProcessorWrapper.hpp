@@ -14,7 +14,7 @@ class FormatProcessorWrapper : public BasePluginWrapper {
  public:
     using type = std::string;
 
-    static auto build(Container container)
+    static auto build(BaseContainer container)
         -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
     auto get(ResultFilesPaths &&paths)

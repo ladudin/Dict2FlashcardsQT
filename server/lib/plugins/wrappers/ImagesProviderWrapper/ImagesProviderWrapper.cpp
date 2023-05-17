@@ -4,7 +4,7 @@ ImagesProviderWrapper::ImagesProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto ImagesProviderWrapper::build(Container container)
+auto ImagesProviderWrapper::build(BaseContainer container)
     -> std::variant<ImagesProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(std::move(container));
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

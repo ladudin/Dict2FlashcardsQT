@@ -20,32 +20,41 @@ class BasePluginWrapper : public IPluginWrapper {
     BasePluginWrapper(BasePluginWrapper &&)                          = default;
     auto operator=(const BasePluginWrapper &) -> BasePluginWrapper & = delete;
     auto operator=(BasePluginWrapper &&) -> BasePluginWrapper      & = default;
+    ~BasePluginWrapper() override                                    = default;
 
-    static auto build(Container container)
+    static auto build(std::string &&name, const boost::python::object &module)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
-    ~BasePluginWrapper() override = default;
-
     [[nodiscard]] auto name() const -> const std::string & override;
-
     auto               load() -> std::optional<PyExceptionInfo> override;
-
     auto               unload() -> std::optional<PyExceptionInfo> override;
-
     auto               get_config_description()
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
-
     auto get_default_config()
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
-
     auto set_config(nlohmann::json &&new_config)
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  protected:
-    explicit BasePluginWrapper(Container &&container);
+    struct CommonFunctions {
+        static auto build(const boost::python::object &module)
+            -> std::variant<CommonFunctions, PyExceptionInfo>;
 
-    Container      container_;
-    nlohmann::json config_;
+        boost::python::object load;
+        boost::python::object get_config_description;
+        boost::python::object set_config;
+        boost::python::object get_default_config;
+        boost::python::object unload;
+
+     private:
+        CommonFunctions();
+    };
+
+    BasePluginWrapper(std::string &&name, CommonFunctions &&common);
+
+    std::string     name_;
+    CommonFunctions common_;
+    nlohmann::json  config_;
 };
 
 struct ResultFilesPaths {
@@ -53,14 +62,6 @@ struct ResultFilesPaths {
     std::filesystem::path audios;
     std::filesystem::path images;
 };
-
-template <class T>
-concept container_constructible =
-    requires(T instance, std::string name, Container container) {
-        {
-            T::build(container)
-        } -> std::same_as<std::variant<T, PyExceptionInfo>>;
-    };
 
 template <class T>
 concept implements_wrapper_get = (
@@ -91,7 +92,6 @@ concept implements_wrapper_get = (
 
 template <class T>
 concept is_plugin_wrapper =
-    std::derived_from<T, BasePluginWrapper> && container_constructible<T> &&
-    implements_wrapper_get<T>;
+    std::derived_from<T, BasePluginWrapper> && implements_wrapper_get<T>;
 
 #endif  // !BASE_PLUGIN_WRAPPER_H

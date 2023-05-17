@@ -9,18 +9,40 @@
 #include <utility>
 #include <vector>
 
+auto DefinitionsProviderWrapper::DefinitionsProvidersFunctions::build(
+    const boost::python::object &module)
+    -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo> {
+    auto plugin_container = DefinitionsProvidersFunctions();
+    try {
+        plugin_container.get = module.attr("get");
+    } catch (const boost::python::error_already_set &) {
+        return PyExceptionInfo::build().value();
+    }
+    return plugin_container;
+}
+
 DefinitionsProviderWrapper::DefinitionsProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto DefinitionsProviderWrapper::build(Container container)
+auto DefinitionsProviderWrapper::build(std::string                &&name,
+                                       const boost::python::object &module)
     -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo> {
-    auto base_or_error = BasePluginWrapper::build(std::move(container));
+    auto base_or_error = BasePluginWrapper::build(std::move(name), module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {
         return std::get<PyExceptionInfo>(base_or_error);
     }
     auto base = std::move(std::get<BasePluginWrapper>(base_or_error));
-    return DefinitionsProviderWrapper(std::move(base));
+
+    auto specifics_or_error = DefinitionsProvidersFunctions::build(module);
+    if (std::holds_alternative<PyExceptionInfo>(specifics_or_error)) {
+        return std::get<PyExceptionInfo>(specifics_or_error);
+    }
+    auto specifics = std::get<DefinitionsProvidersFunctions>(specifics_or_error);
+
+    auto wrapper   = DefinitionsProviderWrapper(std::move(base));
+    wrapper.specifics_ = specifics;
+    return wrapper;
 }
 
 auto DefinitionsProviderWrapper::get(const std::string &word,
@@ -36,7 +58,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
     }
     if (generators_.find(word) == generators_.end()) {
         try {
-            boost::python::object test = container_.get()(word);
+            boost::python::object test = specifics_.get(word);
             generators_[word]          = test;
             generators_[word]->attr("__next__")();
         } catch (const boost::python::error_already_set &) {

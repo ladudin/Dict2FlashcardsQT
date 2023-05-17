@@ -5,7 +5,7 @@ FormatProcessorWrapper::FormatProcessorWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto FormatProcessorWrapper::build(Container container)
+auto FormatProcessorWrapper::build(BaseContainer container)
     -> std::variant<FormatProcessorWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(std::move(container));
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

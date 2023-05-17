@@ -4,6 +4,7 @@
 #include "BasePluginWrapper.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include <boost/python/errors.hpp>
 #include <complex>
 #include <concepts>
 #include <filesystem>
@@ -49,16 +50,30 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             std::filesystem::directory_iterator(plugins_dir),
             [this](const std::filesystem::path &dir_entry) {
                 using std::string_literals::operator""s;
-
                 spdlog::info("Loading plugin from "s + dir_entry.string());
+
                 if (!std::filesystem::is_directory(dir_entry)) {
                     return;
                 }
-                auto module_name   = dir_entry.filename();
+
+                auto                  module_name = dir_entry.filename();
                 // TODO(blackdeer): HANDLE IMPORT ERROR
-                auto loaded_module = boost::python::import(module_name.c_str());
-                auto plugin_container =
-                    Container::build(std::move(loaded_module));
+                boost::python::object loaded_module;
+                try {
+                    loaded_module = boost::python::import(module_name.c_str());
+                } catch (const boost::python::error_already_set &) {
+                    spdlog::info("Failed to import module: "s +
+                                 module_name.string());
+                    auto error_info = PyExceptionInfo::build();
+                    failed_containers_.emplace(std::move(module_name),
+                                               std::move(error_info));
+                    return;
+                }
+                spdlog::info("Successfully imported Python module: "s +
+                             module_name.string());
+
+                auto plugin_container = BaseContainer::build(
+                    module_name.string(), std::move(loaded_module));
 
                 if (std::holds_alternative<std::optional<PyExceptionInfo>>(
                         plugin_container)) {
@@ -68,9 +83,9 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
                                  dir_entry.string());
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(info));
-                } else if (std::holds_alternative<Container>(
+                } else if (std::holds_alternative<BaseContainer>(
                                plugin_container)) {
-                    auto container = std::get<Container>(plugin_container);
+                    auto container = std::get<BaseContainer>(plugin_container);
                     spdlog::info("Successfully loaded plugin from "s +
                                  dir_entry.string());
                     loaded_containers_.emplace(std::move(module_name),
@@ -110,7 +125,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
     }
 
  private:
-    std::unordered_map<std::string, Container> loaded_containers_;
+    std::unordered_map<std::string, BaseContainer> loaded_containers_;
     std::unordered_map<std::string, std::optional<PyExceptionInfo>>
         failed_containers_;
 };

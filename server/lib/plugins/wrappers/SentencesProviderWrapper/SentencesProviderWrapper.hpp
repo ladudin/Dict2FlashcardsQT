@@ -14,7 +14,7 @@ class SentencesProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<std::string>, std::string>;
 
-    static auto build(Container container)
+    static auto build(BaseContainer container)
         -> std::variant<SentencesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)

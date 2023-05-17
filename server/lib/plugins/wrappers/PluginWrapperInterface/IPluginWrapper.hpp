@@ -1,7 +1,6 @@
 #ifndef PLUGIN_WRAPPER_INTERFACE_H
 #define PLUGIN_WRAPPER_INTERFACE_H
 
-#include "Container.hpp"
 #include "PyExceptionInfo.hpp"
 #include <concepts>
 #include <cstdint>
@@ -10,6 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <utility>
+#include <variant>
 
 class IPluginWrapper {
  public:

@@ -4,7 +4,7 @@ SentencesProviderWrapper::SentencesProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto SentencesProviderWrapper::build(Container container)
+auto SentencesProviderWrapper::build(BaseContainer container)
     -> std::variant<SentencesProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(std::move(container));
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

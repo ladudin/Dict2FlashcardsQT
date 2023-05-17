@@ -45,7 +45,7 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<Card>, std::string>;
 
-    static auto build(Container container)
+    static auto build(std::string &&name, const boost::python::object &module)
         -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
     auto get_dictionary_scheme()
@@ -55,6 +55,16 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
              uint64_t           batch_size,
              bool               restart)
         -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
+
+ protected:
+    struct DefinitionsProvidersFunctions {
+        static auto build(const boost::python::object &module)
+            -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo>;
+
+        boost::python::object get;
+    };
+
+    DefinitionsProvidersFunctions specifics_;
 
  private:
     explicit DefinitionsProviderWrapper(BasePluginWrapper &&base);
