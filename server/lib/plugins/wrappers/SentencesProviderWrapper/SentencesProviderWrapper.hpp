@@ -21,7 +21,8 @@ class SentencesProviderWrapper : public BasePluginWrapper {
     auto operator=(SentencesProviderWrapper &&)
         -> SentencesProviderWrapper & = default;
 
-    static auto build(const std::string &name, boost::python::object module)
+    static auto build(const std::string           &name,
+                      const boost::python::object &module)
         -> std::variant<SentencesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
@@ -29,7 +30,7 @@ class SentencesProviderWrapper : public BasePluginWrapper {
 
  protected:
     struct SentencesProvidersFunctions {
-        static auto build(boost::python::object module)
+        static auto build(const boost::python::object &module)
             -> std::variant<SentencesProvidersFunctions, PyExceptionInfo>;
 
         boost::python::object get;

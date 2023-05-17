@@ -11,7 +11,7 @@
 #include <vector>
 
 auto DefinitionsProviderWrapper::DefinitionsProvidersFunctions::build(
-    boost::python::object module)
+    const boost::python::object &module)
     -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo> {
     auto plugin_container = DefinitionsProvidersFunctions();
     try {
@@ -32,8 +32,8 @@ DefinitionsProviderWrapper::DefinitionsProviderWrapper(
       specifics_(other.specifics_) {
 }
 
-auto DefinitionsProviderWrapper::build(const std::string    &name,
-                                       boost::python::object module)
+auto DefinitionsProviderWrapper::build(const std::string           &name,
+                                       const boost::python::object &module)
     -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

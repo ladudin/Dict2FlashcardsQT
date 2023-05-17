@@ -15,7 +15,7 @@
 #include <vector>
 
 auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
-    boost::python::object module)
+    const boost::python::object &module)
     -> std::variant<AudiosProvidesFunctions, PyExceptionInfo> {
     auto plugin_container = AudiosProvidesFunctions();
     try {
@@ -35,8 +35,8 @@ AudiosProviderWrapper::AudiosProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto AudiosProviderWrapper::build(const std::string    &name,
-                                  boost::python::object module)
+auto AudiosProviderWrapper::build(const std::string           &name,
+                                  const boost::python::object &module)
     -> std::variant<AudiosProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

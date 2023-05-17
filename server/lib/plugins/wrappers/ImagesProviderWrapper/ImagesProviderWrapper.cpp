@@ -3,7 +3,7 @@
 #include <boost/python/import.hpp>
 
 auto ImagesProviderWrapper::ImagesProvidersFunctions::build(
-    boost::python::object module)
+    const boost::python::object &module)
     -> std::variant<ImagesProvidersFunctions, PyExceptionInfo> {
     auto plugin_container = ImagesProvidersFunctions();
     try {
@@ -23,8 +23,8 @@ ImagesProviderWrapper::ImagesProviderWrapper(const ImagesProviderWrapper &other)
       specifics_(other.specifics_) {
 }
 
-auto ImagesProviderWrapper::build(const std::string    &name,
-                                  boost::python::object module)
+auto ImagesProviderWrapper::build(const std::string           &name,
+                                  const boost::python::object &module)
     -> std::variant<ImagesProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

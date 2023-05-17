@@ -22,7 +22,8 @@ class BasePluginWrapper : public IPluginWrapper {
     auto operator=(BasePluginWrapper &&) -> BasePluginWrapper      & = default;
     ~BasePluginWrapper() override                                    = default;
 
-    static auto build(const std::string &name, boost::python::object module)
+    static auto build(const std::string           &name,
+                      const boost::python::object &module)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
     [[nodiscard]] auto name() const -> const std::string & override;
@@ -37,7 +38,7 @@ class BasePluginWrapper : public IPluginWrapper {
 
  protected:
     struct CommonFunctions {
-        static auto build(boost::python::object module)
+        static auto build(const boost::python::object &module)
             -> std::variant<CommonFunctions, PyExceptionInfo>;
 
         boost::python::object load;

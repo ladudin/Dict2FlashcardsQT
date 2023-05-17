@@ -26,7 +26,8 @@ class AudiosProviderWrapper : public BasePluginWrapper {
 
     using type = std::pair<std::vector<AudioInfo>, std::string>;
 
-    static auto build(const std::string &name, boost::python::object module)
+    static auto build(const std::string           &name,
+                      const boost::python::object &module)
         -> std::variant<AudiosProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
@@ -34,7 +35,7 @@ class AudiosProviderWrapper : public BasePluginWrapper {
 
  protected:
     struct AudiosProvidesFunctions {
-        static auto build(boost::python::object module)
+        static auto build(const boost::python::object &module)
             -> std::variant<AudiosProvidesFunctions, PyExceptionInfo>;
 
         boost::python::object get;

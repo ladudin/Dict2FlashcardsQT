@@ -3,7 +3,8 @@
 #include <boost/python/import.hpp>
 #include <variant>
 
-auto BasePluginWrapper::CommonFunctions::build(boost::python::object module)
+auto BasePluginWrapper::CommonFunctions::build(
+    const boost::python::object &module)
     -> std::variant<CommonFunctions, PyExceptionInfo> {
     auto plugin_container = CommonFunctions();
     try {
@@ -24,8 +25,8 @@ BasePluginWrapper::BasePluginWrapper(const std::string     &name,
     : name_(name), common_(common) {
 }
 
-auto BasePluginWrapper::build(const std::string    &name,
-                              boost::python::object module)
+auto BasePluginWrapper::build(const std::string           &name,
+                              const boost::python::object &module)
     -> std::variant<BasePluginWrapper, PyExceptionInfo> {
     auto common_or_error = CommonFunctions::build(module);
     if (std::holds_alternative<PyExceptionInfo>(common_or_error)) {

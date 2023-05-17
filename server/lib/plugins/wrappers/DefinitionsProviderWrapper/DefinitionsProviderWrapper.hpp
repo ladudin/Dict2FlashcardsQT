@@ -53,7 +53,8 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
     auto operator=(DefinitionsProviderWrapper &&)
         -> DefinitionsProviderWrapper & = default;
 
-    static auto build(const std::string &name, boost::python::object module)
+    static auto build(const std::string           &name,
+                      const boost::python::object &module)
         -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
     auto get_dictionary_scheme()
@@ -66,7 +67,7 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
 
  protected:
     struct DefinitionsProvidersFunctions {
-        static auto build(boost::python::object module)
+        static auto build(const boost::python::object &module)
             -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo>;
 
         boost::python::object get;

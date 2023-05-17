@@ -3,7 +3,7 @@
 #include <boost/python/import.hpp>
 
 auto SentencesProviderWrapper::SentencesProvidersFunctions::build(
-    boost::python::object module)
+    const boost::python::object &module)
     -> std::variant<SentencesProvidersFunctions, PyExceptionInfo> {
     auto plugin_container = SentencesProvidersFunctions();
     try {
@@ -24,8 +24,8 @@ SentencesProviderWrapper::SentencesProviderWrapper(
       specifics_(other.specifics_) {
 }
 
-auto SentencesProviderWrapper::build(const std::string    &name,
-                                     boost::python::object module)
+auto SentencesProviderWrapper::build(const std::string           &name,
+                                     const boost::python::object &module)
     -> std::variant<SentencesProviderWrapper, PyExceptionInfo> {
     auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {

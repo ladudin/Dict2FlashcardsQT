@@ -21,15 +21,16 @@ class FormatProcessorWrapper : public BasePluginWrapper {
     auto operator=(FormatProcessorWrapper &&)
         -> FormatProcessorWrapper & = default;
 
-    static auto build(const std::string &name, boost::python::object module)
+    static auto build(const std::string           &name,
+                      const boost::python::object &module)
         -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
-    auto save(ResultFilesPaths &&paths)
+    auto save(const ResultFilesPaths &paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
 
  protected:
     struct FormatProcessorsFunctions {
-        static auto build(boost::python::object module)
+        static auto build(const boost::python::object &module)
             -> std::variant<FormatProcessorsFunctions, PyExceptionInfo>;
 
         boost::python::object save;
