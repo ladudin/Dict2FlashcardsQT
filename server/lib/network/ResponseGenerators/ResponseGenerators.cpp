@@ -111,12 +111,13 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
             return return_error("Exception was thrown during \"" + plugin_name +
                                 "\" definitions provider's construction:\n" +
-                                exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
         auto wrapper =
             std::move(std::get<DefinitionsProviderWrapper>(wrapper_variant));
-        plugins_bundle_.set_definitions_provider(std::move(wrapper));
+        auto unique_wrapper =
+            std::make_unique<DefinitionsProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_definitions_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
@@ -132,11 +133,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
             return return_error("Exception was thrown during \"" + plugin_name +
                                 "\" sentence provider's construction:\n" +
-                                exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_sentences_provider(std::move(wrapper));
+        auto wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<SentencesProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_sentences_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
@@ -152,11 +154,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
             return return_error("Exception was thrown during \"" + plugin_name +
                                 "\" images provider's construction:\n" +
-                                exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_images_provider(std::move(wrapper));
+        auto wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<ImagesProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_images_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
@@ -172,11 +175,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
             return return_error("Exception was thrown during \"" + plugin_name +
                                 "\" audios provider's construction:\n" +
-                                exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_audios_provider(std::move(wrapper));
+        auto wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<AudiosProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_audios_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
@@ -192,11 +196,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
             return return_error("Exception was thrown during \"" + plugin_name +
                                 "\" format processor's construction:\n" +
-                                exception_info.error_summary() + '\n' +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
-        plugins_bundle_.set_format_processor(std::move(wrapper));
+        auto wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<FormatProcessorWrapper>(std::move(wrapper));
+        plugins_bundle_.set_format_processor(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     return return_error("Unknown plugin_type: " + plugin_type);
@@ -245,12 +250,11 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     auto plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
 
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
-        auto &provider_opt = plugins_bundle_.definitions_provider();
-        if (!provider_opt.has_value()) {
+        auto *provider = plugins_bundle_.definitions_provider();
+        if (provider == nullptr) {
             return return_error("Cannot return anything because definitions "
                                 "provider is not initialized");
         }
-        auto &provider = provider_opt.value();
 
         if (!request.contains(WORD_FIELD)) {
             return return_error("\""s + WORD_FIELD +
@@ -293,27 +297,36 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
         auto restart = request[RESTART_FIELD].get<bool>();
 
         auto result_or_error =
-            provider.get(word, filter_query, batch_size, restart);
+            provider->get(word, filter_query, batch_size, restart);
         if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
             auto exception_info = std::get<PyExceptionInfo>(result_or_error);
-
             return return_error("Exception was thrown during \"" +
-                                plugins_bundle_.definitions_provider()->name() +
-                                "\" definitions request:\n" +
-                                exception_info.error_summary() + '\n' +
+                                provider->name() + "\" definitions request:\n" +
                                 exception_info.stack_trace());
         }
-        auto result =
-            std::get<DefinitionsProviderWrapper::type>(result_or_error);
-        return result;
-    } else if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
+        if (std::holds_alternative<DefinitionsProviderWrapper::type>(
+                result_or_error)) {
+            auto result =
+                std::get<DefinitionsProviderWrapper::type>(result_or_error);
+            return result;
+        }
+        auto non_python_error_message = std::get<std::string>(result_or_error);
+
+        auto json_message             = R"({"status": 1, "message": ")"s +
+                            non_python_error_message + R"("})";
+        return json::parse(json_message);
+    }
+    if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
         return return_error(
             "Requests to sentences provider is not implemented");
-    } else if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
+    }
+    if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
         return return_error("Requests to images provider is not implemented");
-    } else if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
+    }
+    if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
         return return_error("Requests to audios provider is not implemented");
-    } else if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
+    }
+    if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
         return return_error("Requests to format processor is not implemented");
     }
     return return_error("Unknown plugin type: "s + plugin_type);

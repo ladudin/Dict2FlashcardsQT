@@ -1,9 +1,10 @@
 #ifndef PLUGINS_LOADER_H
 #define PLUGINS_LOADER_H
 
-#include "BasePluginWrapper.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include <boost/python/errors.hpp>
+#include <boost/python/import.hpp>
 #include <complex>
 #include <concepts>
 #include <filesystem>
@@ -16,6 +17,7 @@
 #include <utility>
 #include <variant>
 
+#include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
 template <typename Wrapper>
@@ -49,32 +51,43 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             std::filesystem::directory_iterator(plugins_dir),
             [this](const std::filesystem::path &dir_entry) {
                 using std::string_literals::operator""s;
-
                 spdlog::info("Loading plugin from "s + dir_entry.string());
+
                 if (!std::filesystem::is_directory(dir_entry)) {
                     return;
                 }
-                auto module_name   = dir_entry.filename();
-                // TODO(blackdeer): HANDLE IMPORT ERROR
-                auto loaded_module = boost::python::import(module_name.c_str());
-                auto plugin_container =
-                    Container::build(std::move(loaded_module));
 
-                if (std::holds_alternative<std::optional<PyExceptionInfo>>(
-                        plugin_container)) {
-                    auto info = std::get<std::optional<PyExceptionInfo>>(
-                        plugin_container);
+                auto                  module_name = dir_entry.filename();
+                boost::python::object loaded_module;
+                try {
+                    loaded_module = boost::python::import(module_name.c_str());
+                } catch (const boost::python::error_already_set &) {
+                    spdlog::info("Failed to import module: "s +
+                                 module_name.string());
+                    auto error_info = PyExceptionInfo::build();
+                    failed_containers_.emplace(std::move(module_name),
+                                               std::move(error_info));
+                    return;
+                }
+                spdlog::info("Successfully imported Python module: "s +
+                             module_name.string());
+
+                auto wrapper_or_error =
+                    Wrapper::build(module_name.string(), loaded_module);
+
+                if (std::holds_alternative<PyExceptionInfo>(wrapper_or_error)) {
+                    auto info = std::get<PyExceptionInfo>(wrapper_or_error);
                     spdlog::info("Failed to load plugin from "s +
                                  dir_entry.string());
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(info));
-                } else if (std::holds_alternative<Container>(
-                               plugin_container)) {
-                    auto container = std::get<Container>(plugin_container);
+                } else if (std::holds_alternative<Wrapper>(wrapper_or_error)) {
+                    auto wrapper =
+                        std::move(std::get<Wrapper>(wrapper_or_error));
                     spdlog::info("Successfully loaded plugin from "s +
                                  dir_entry.string());
                     loaded_containers_.emplace(std::move(module_name),
-                                               std::move(container));
+                                               std::move(wrapper));
                 } else {
                     spdlog::throw_spdlog_ex(
                         "Unknown return from a container build");
@@ -93,16 +106,8 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         spdlog::info(plugin_name + " was found");
-        // Выглядит ОЧЕНЬ плохо. Но что имеем
-        // Надо как-то сделать чтобы возвращался врапер сразу без ::build
-        auto wrapper_or_error = Wrapper::build(plugin_name, res->second);
-        if (std::holds_alternative<BasePluginWrapper>(wrapper_or_error)) {
-            auto base_wrapper =
-                std::move(std::get<BasePluginWrapper>(wrapper_or_error));
-            auto after_cast = Wrapper(std::move(base_wrapper));
-            return after_cast;
-        }
-        return std::nullopt;
+        auto found_wrapper = res->second;
+        return found_wrapper;
     }
 
     auto load_new_plugins() -> void override {
@@ -110,7 +115,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
     }
 
  private:
-    std::unordered_map<std::string, Container> loaded_containers_;
+    std::unordered_map<std::string, Wrapper> loaded_containers_;
     std::unordered_map<std::string, std::optional<PyExceptionInfo>>
         failed_containers_;
 };

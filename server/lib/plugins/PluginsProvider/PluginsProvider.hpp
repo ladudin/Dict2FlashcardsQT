@@ -67,11 +67,13 @@ class PluginsProvider : public IPluginsProvider {
     auto load_new_plugins() -> void override;
 
  private:
-    PluginsLoader<DefinitionsProviderWrapper> definitions_providers_;
-    PluginsLoader<SentencesProviderWrapper>   sentences_providers_;
-    PluginsLoader<ImagesProviderWrapper>      images_providers_;
-    PluginsLoader<AudiosProviderWrapper>      audios_providers_;
-    PluginsLoader<FormatProcessorWrapper>     format_processors_;
+    std::unique_ptr<IPluginsLoader<DefinitionsProviderWrapper>>
+        definitions_providers_;
+    std::unique_ptr<IPluginsLoader<SentencesProviderWrapper>>
+                                                           sentences_providers_;
+    std::unique_ptr<IPluginsLoader<ImagesProviderWrapper>> images_providers_;
+    std::unique_ptr<IPluginsLoader<AudiosProviderWrapper>> audios_providers_;
+    std::unique_ptr<IPluginsLoader<FormatProcessorWrapper>> format_processors_;
 };
 
 #endif  // !PLUGINS_PROVIDER_H

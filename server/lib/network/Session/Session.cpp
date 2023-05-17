@@ -36,9 +36,6 @@ void Session::do_read() {
                           length - 2,
                       std::ostream_iterator<char>(ss_out));
 
-            // std::istream istrm(&request_buffer);
-            // std::string  result;
-            // istrm >> result;
             std::string result = ss_out.str();
             request_buffer.consume(length);
 
