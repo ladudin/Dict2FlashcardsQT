@@ -2,6 +2,7 @@
 #define PLUGIN_WRAPPER_INTERFACE_H
 
 #include "PyExceptionInfo.hpp"
+#include <boost/asio/require_concept.hpp>
 #include <concepts>
 #include <cstdint>
 #include <filesystem>
@@ -25,5 +26,15 @@ class IPluginWrapper {
         -> std::variant<PyExceptionInfo, nlohmann::json>    = 0;
     virtual auto unload() -> std::optional<PyExceptionInfo> = 0;
 };
+
+template <typename T>
+concept is_plugin_wrapper =
+    requires(T                            instance,
+             const std::string           &name,
+             const boost::python::object &module) {
+        {
+            T::build(name, module)
+        } -> std::same_as<std::variant<T, PyExceptionInfo>>;
+    };
 
 #endif  // !PLUGIN_WRAPPER_INTERFACE_H

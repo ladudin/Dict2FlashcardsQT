@@ -7,7 +7,7 @@
 
 #include "IPluginWrapper.hpp"
 
-class IImageProviderWrapper : public virtual IPluginWrapper {
+class IImagesProviderWrapper : public virtual IPluginWrapper {
  public:
     using type = std::pair<std::vector<std::string>, std::string>;
 

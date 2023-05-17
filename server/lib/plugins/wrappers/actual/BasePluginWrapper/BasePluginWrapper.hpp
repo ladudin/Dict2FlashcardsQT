@@ -26,7 +26,7 @@ class BasePluginWrapper : public virtual IPluginWrapper {
                       const boost::python::object &module)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
-    [[nodiscard]] auto name() const -> const std::string &;
+    [[nodiscard]] auto name() const -> const std::string & override;
     auto               load() -> std::optional<PyExceptionInfo> override;
     auto               unload() -> std::optional<PyExceptionInfo> override;
     auto               get_config_description()
@@ -55,34 +55,6 @@ class BasePluginWrapper : public virtual IPluginWrapper {
     nlohmann::json  config_;
 };
 
-template <class T>
-concept implements_wrapper_get = true;
-// // SentencesProvider, AudiosProvider, ImagesProvider
-// (requires(T                  dependent_instance,
-//          const std::string &query,
-//          uint64_t           batch_size) {
-//     {
-//         dependent_instance.get(query, batch_size)
-//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
-// } ||
-// // DefinitionsProvider
-// requires(T                  dependent_instance,
-//          const std::string &query,
-//          const std::string &filter,
-//          bool               restart,
-//          uint64_t           batch_size) {
-//     {
-//         dependent_instance.get(query, filter, batch_size, restart)
-//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
-// } ||
-// // FormatProcessor
-// requires(T dependent_instance, ResultFilesPaths paths) {
-//     {
-//         dependent_instance.get(std::move(paths))
-//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;})
-
-template <class T>
-concept is_plugin_wrapper = true;
-// std::derived_from<T, BasePluginWrapper> && implements_wrapper_get<T>;
+static_assert(is_plugin_wrapper<BasePluginWrapper>);
 
 #endif  // !BASE_PLUGIN_WRAPPER_H

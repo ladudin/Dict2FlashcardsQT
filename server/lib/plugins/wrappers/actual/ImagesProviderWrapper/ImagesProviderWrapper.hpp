@@ -11,7 +11,7 @@
 #include "IImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-class ImagesProviderWrapper : public IImageProviderWrapper,
+class ImagesProviderWrapper : public IImagesProviderWrapper,
                               public BasePluginWrapper {
  public:
     ImagesProviderWrapper(const ImagesProviderWrapper &);
