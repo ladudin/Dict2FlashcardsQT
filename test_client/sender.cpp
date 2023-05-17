@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     "query_type": "get", 
     "plugin_type": "word", 
     "filter": "",
-    "word": "definitions",
+    "word": "go",
     "batch_size": 5,
     "restart": false
 })"
@@ -79,59 +79,59 @@ int main(int argc, char *argv[]) {
         // SENTENCES
         request(socket,
                 R"(
-                {
-                    "query_type": "init",
-                    "plugin_name": "sentences",
-                    "plugin_type": "sentences"
-                })"
+                        {
+                            "query_type": "init",
+                            "plugin_name": "sentences",
+                            "plugin_type": "sentences"
+                        })"
                 "\r\n");
         request(socket,
                 R"(
-{
-    "query_type": "get", 
-    "plugin_type": "sentences", 
-    "word": "go",
-    "batch_size": 5,
-    "restart": false
-})"
+        {
+            "query_type": "get",
+            "plugin_type": "sentences",
+            "word": "go",
+            "batch_size": 5,
+            "restart": false
+        })"
                 "\r\n");
         // AUDIOS
         request(socket,
                 R"(
-                {
-                    "query_type": "init",
-                    "plugin_name": "audios",
-                    "plugin_type": "audios"
-                })"
+                        {
+                            "query_type": "init",
+                            "plugin_name": "audios",
+                            "plugin_type": "audios"
+                        })"
                 "\r\n");
         request(socket,
                 R"(
-{
-    "query_type": "get", 
-    "plugin_type": "audios", 
-    "word": "go",
-    "batch_size": 5,
-    "restart": false
-})"
+        {
+            "query_type": "get",
+            "plugin_type": "audios",
+            "word": "go",
+            "batch_size": 5,
+            "restart": false
+        })"
                 "\r\n");
         // IMAGES
         request(socket,
                 R"(
-                {
-                    "query_type": "init",
-                    "plugin_name": "images",
-                    "plugin_type": "images"
-                })"
+                        {
+                            "query_type": "init",
+                            "plugin_name": "images",
+                            "plugin_type": "images"
+                        })"
                 "\r\n");
         request(socket,
                 R"(
-{
-    "query_type": "get", 
-    "plugin_type": "images", 
-    "word": "go",
-    "batch_size": 5,
-    "restart": false
-})"
+        {
+            "query_type": "get",
+            "plugin_type": "images",
+            "word": "go",
+            "batch_size": 5,
+            "restart": false
+        })"
                 "\r\n");
 
         // DEFINITIONS
@@ -141,10 +141,11 @@ int main(int argc, char *argv[]) {
     "query_type": "get", 
     "plugin_type": "word", 
     "filter": "",
-    "word": "definitions",
+    "word": "go",
     "batch_size": 5,
     "restart": false
-})");
+})"
+                "\r\n");
 
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
