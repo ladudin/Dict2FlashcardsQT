@@ -29,6 +29,7 @@ class IPluginWrapper {
 
 template <typename T>
 concept is_plugin_wrapper =
+    std::derived_from<T, IPluginWrapper> &&
     requires(T                            instance,
              const std::string           &name,
              const boost::python::object &module) {

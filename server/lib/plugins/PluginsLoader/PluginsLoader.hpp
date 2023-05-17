@@ -1,7 +1,6 @@
 #ifndef PLUGINS_LOADER_H
 #define PLUGINS_LOADER_H
 
-#include "BasePluginWrapper.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
 #include <boost/python/errors.hpp>
@@ -18,6 +17,7 @@
 #include <utility>
 #include <variant>
 
+#include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
 template <typename Wrapper>
