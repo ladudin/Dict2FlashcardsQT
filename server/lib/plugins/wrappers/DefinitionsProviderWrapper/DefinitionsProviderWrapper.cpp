@@ -2,15 +2,16 @@
 #include "PyExceptionInfo.hpp"
 #include "pyerrors.h"
 #include "pythonrun.h"
-#include <boost/python/errors.hpp>
-#include <boost/python/extract.hpp>
+#include <boost/python/exec.hpp>
+#include <boost/python/import.hpp>
+#include <exception>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
 
 auto DefinitionsProviderWrapper::DefinitionsProvidersFunctions::build(
-    const boost::python::object &module)
+    boost::python::object module)
     -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo> {
     auto plugin_container = DefinitionsProvidersFunctions();
     try {
@@ -25,10 +26,16 @@ DefinitionsProviderWrapper::DefinitionsProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto DefinitionsProviderWrapper::build(std::string                &&name,
-                                       const boost::python::object &module)
+DefinitionsProviderWrapper::DefinitionsProviderWrapper(
+    const DefinitionsProviderWrapper &other)
+    : BasePluginWrapper(other.name(), other.common_),
+      specifics_(other.specifics_) {
+}
+
+auto DefinitionsProviderWrapper::build(const std::string    &name,
+                                       boost::python::object module)
     -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo> {
-    auto base_or_error = BasePluginWrapper::build(std::move(name), module);
+    auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {
         return std::get<PyExceptionInfo>(base_or_error);
     }
@@ -38,9 +45,10 @@ auto DefinitionsProviderWrapper::build(std::string                &&name,
     if (std::holds_alternative<PyExceptionInfo>(specifics_or_error)) {
         return std::get<PyExceptionInfo>(specifics_or_error);
     }
-    auto specifics = std::get<DefinitionsProvidersFunctions>(specifics_or_error);
+    auto specifics =
+        std::get<DefinitionsProvidersFunctions>(specifics_or_error);
 
-    auto wrapper   = DefinitionsProviderWrapper(std::move(base));
+    auto wrapper       = DefinitionsProviderWrapper(std::move(base));
     wrapper.specifics_ = specifics;
     return wrapper;
 }
@@ -48,8 +56,8 @@ auto DefinitionsProviderWrapper::build(std::string                &&name,
 auto DefinitionsProviderWrapper::get(const std::string &word,
                                      const std::string &filter_query,
                                      uint64_t           batch_size,
-                                     bool               restart)
-    -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo> {
+                                     bool               restart) -> std::
+    variant<DefinitionsProviderWrapper::type, std::string, PyExceptionInfo> {
     if (restart) {
         auto found_item = generators_.find(word);
         if (found_item != generators_.end()) {
@@ -78,13 +86,13 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         std::string str_res = boost::python::extract<std::string>(py_json_res);
         nlohmann::json json_res = nlohmann::json::parse(str_res);
 
-        // TODO(blackdeer): PROPER ERROR HANDLING
-        if (!json_res.is_array()) {
-            return {};
+        try {
+            auto error_message = json_res[1].get<std::string>();
+            auto cards         = json_res[0].get<std::vector<Card>>();
+            return std::make_pair(cards, error_message);
+        } catch (const std::exception &error) {
+            return error.what();
         }
-        auto error_message = json_res[1].get<std::string>();
-        auto cards         = json_res[0].get<std::vector<Card>>();
-        return std::make_pair(cards, error_message);
     } catch (boost::python::error_already_set &) {
         PyErr_Print();
         boost::python::object main_namespace =

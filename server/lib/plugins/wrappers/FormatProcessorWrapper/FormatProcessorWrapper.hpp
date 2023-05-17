@@ -14,11 +14,28 @@ class FormatProcessorWrapper : public BasePluginWrapper {
  public:
     using type = std::string;
 
-    static auto build(BaseContainer container)
+    FormatProcessorWrapper(const FormatProcessorWrapper &);
+    FormatProcessorWrapper(FormatProcessorWrapper &&) = default;
+    auto operator=(const FormatProcessorWrapper &)
+        -> FormatProcessorWrapper & = delete;
+    auto operator=(FormatProcessorWrapper &&)
+        -> FormatProcessorWrapper & = default;
+
+    static auto build(const std::string &name, boost::python::object module)
         -> std::variant<FormatProcessorWrapper, PyExceptionInfo>;
 
-    auto get(ResultFilesPaths &&paths)
+    auto save(ResultFilesPaths &&paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo>;
+
+ protected:
+    struct FormatProcessorsFunctions {
+        static auto build(boost::python::object module)
+            -> std::variant<FormatProcessorsFunctions, PyExceptionInfo>;
+
+        boost::python::object save;
+    };
+
+    FormatProcessorsFunctions specifics_;
 
  private:
     explicit FormatProcessorWrapper(BasePluginWrapper &&base);

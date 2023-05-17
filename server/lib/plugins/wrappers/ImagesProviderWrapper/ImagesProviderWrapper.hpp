@@ -14,11 +14,28 @@ class ImagesProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<std::string>, std::string>;
 
-    static auto build(BaseContainer container)
+    ImagesProviderWrapper(const ImagesProviderWrapper &);
+    ImagesProviderWrapper(ImagesProviderWrapper &&) = default;
+    auto operator=(const ImagesProviderWrapper &)
+        -> ImagesProviderWrapper & = delete;
+    auto operator=(ImagesProviderWrapper &&)
+        -> ImagesProviderWrapper & = default;
+
+    static auto build(const std::string &name, boost::python::object module)
         -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
     auto get(const std::string &word, uint64_t batch_size)
         -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo>;
+
+ protected:
+    struct ImagesProvidersFunctions {
+        static auto build(boost::python::object module)
+            -> std::variant<ImagesProvidersFunctions, PyExceptionInfo>;
+
+        boost::python::object get;
+    };
+
+    ImagesProvidersFunctions specifics_;
 
  private:
     explicit ImagesProviderWrapper(BasePluginWrapper &&base);

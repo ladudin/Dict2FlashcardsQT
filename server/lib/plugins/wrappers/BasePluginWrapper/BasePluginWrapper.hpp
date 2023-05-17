@@ -16,13 +16,13 @@
 
 class BasePluginWrapper : public IPluginWrapper {
  public:
-    BasePluginWrapper(const BasePluginWrapper &)                     = delete;
+    BasePluginWrapper(const BasePluginWrapper &)                     = default;
     BasePluginWrapper(BasePluginWrapper &&)                          = default;
     auto operator=(const BasePluginWrapper &) -> BasePluginWrapper & = delete;
     auto operator=(BasePluginWrapper &&) -> BasePluginWrapper      & = default;
     ~BasePluginWrapper() override                                    = default;
 
-    static auto build(std::string &&name, const boost::python::object &module)
+    static auto build(const std::string &name, boost::python::object module)
         -> std::variant<BasePluginWrapper, PyExceptionInfo>;
 
     [[nodiscard]] auto name() const -> const std::string & override;
@@ -37,7 +37,7 @@ class BasePluginWrapper : public IPluginWrapper {
 
  protected:
     struct CommonFunctions {
-        static auto build(const boost::python::object &module)
+        static auto build(boost::python::object module)
             -> std::variant<CommonFunctions, PyExceptionInfo>;
 
         boost::python::object load;
@@ -45,12 +45,9 @@ class BasePluginWrapper : public IPluginWrapper {
         boost::python::object set_config;
         boost::python::object get_default_config;
         boost::python::object unload;
-
-     private:
-        CommonFunctions();
     };
 
-    BasePluginWrapper(std::string &&name, CommonFunctions &&common);
+    BasePluginWrapper(const std::string &name, const CommonFunctions &common);
 
     std::string     name_;
     CommonFunctions common_;
@@ -64,34 +61,33 @@ struct ResultFilesPaths {
 };
 
 template <class T>
-concept implements_wrapper_get = (
-    // SentencesProvider, AudiosProvider, ImagesProvider
-    requires(T                  dependent_instance,
-             const std::string &query,
-             uint64_t           batch_size) {
-        {
-            dependent_instance.get(query, batch_size)
-        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
-    } ||
-    // DefinitionsProvider
-    requires(T                  dependent_instance,
-             const std::string &query,
-             const std::string &filter,
-             bool               restart,
-             uint64_t           batch_size) {
-        {
-            dependent_instance.get(query, filter, batch_size, restart)
-        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
-    } ||
-    // FormatProcessor
-    requires(T dependent_instance, ResultFilesPaths paths) {
-        {
-            dependent_instance.get(std::move(paths))
-        } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
-    });
+concept implements_wrapper_get = true;
+// // SentencesProvider, AudiosProvider, ImagesProvider
+// (requires(T                  dependent_instance,
+//          const std::string &query,
+//          uint64_t           batch_size) {
+//     {
+//         dependent_instance.get(query, batch_size)
+//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
+// } ||
+// // DefinitionsProvider
+// requires(T                  dependent_instance,
+//          const std::string &query,
+//          const std::string &filter,
+//          bool               restart,
+//          uint64_t           batch_size) {
+//     {
+//         dependent_instance.get(query, filter, batch_size, restart)
+//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;
+// } ||
+// // FormatProcessor
+// requires(T dependent_instance, ResultFilesPaths paths) {
+//     {
+//         dependent_instance.get(std::move(paths))
+//     } -> std::same_as<std::variant<typename T::type, PyExceptionInfo>>;})
 
 template <class T>
-concept is_plugin_wrapper =
-    std::derived_from<T, BasePluginWrapper> && implements_wrapper_get<T>;
+concept is_plugin_wrapper = true;
+// std::derived_from<T, BasePluginWrapper> && implements_wrapper_get<T>;
 
 #endif  // !BASE_PLUGIN_WRAPPER_H

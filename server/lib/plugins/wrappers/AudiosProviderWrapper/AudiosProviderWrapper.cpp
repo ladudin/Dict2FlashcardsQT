@@ -3,6 +3,7 @@
 #include "PyExceptionInfo.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include <algorithm>
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
 #include <cstdint>
@@ -14,7 +15,7 @@
 #include <vector>
 
 auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
-    const boost::python::object &module)
+    boost::python::object module)
     -> std::variant<AudiosProvidesFunctions, PyExceptionInfo> {
     auto plugin_container = AudiosProvidesFunctions();
     try {
@@ -25,14 +26,19 @@ auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
     return plugin_container;
 }
 
+AudiosProviderWrapper::AudiosProviderWrapper(const AudiosProviderWrapper &other)
+    : BasePluginWrapper(other.name(), other.common_),
+      specifics_(other.specifics_) {
+}
+
 AudiosProviderWrapper::AudiosProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
-auto AudiosProviderWrapper::build(std::string                &&name,
-                                  const boost::python::object &module)
+auto AudiosProviderWrapper::build(const std::string    &name,
+                                  boost::python::object module)
     -> std::variant<AudiosProviderWrapper, PyExceptionInfo> {
-    auto base_or_error = BasePluginWrapper::build(std::move(name), module);
+    auto base_or_error = BasePluginWrapper::build(name, module);
     if (std::holds_alternative<PyExceptionInfo>(base_or_error)) {
         return std::get<PyExceptionInfo>(base_or_error);
     }

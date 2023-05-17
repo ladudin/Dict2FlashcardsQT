@@ -1,6 +1,8 @@
 #ifndef DEFINITIONS_PROVIDER_WRAPPER_H
 #define DEFINITIONS_PROVIDER_WRAPPER_H
 
+#include <boost/python/errors.hpp>
+#include <boost/python/extract.hpp>
 #include <cstdint>
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json_fwd.hpp>
@@ -44,8 +46,14 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
 class DefinitionsProviderWrapper : public BasePluginWrapper {
  public:
     using type = std::pair<std::vector<Card>, std::string>;
+    DefinitionsProviderWrapper(const DefinitionsProviderWrapper &);
+    DefinitionsProviderWrapper(DefinitionsProviderWrapper &&) = default;
+    auto operator=(const DefinitionsProviderWrapper &)
+        -> DefinitionsProviderWrapper & = delete;
+    auto operator=(DefinitionsProviderWrapper &&)
+        -> DefinitionsProviderWrapper & = default;
 
-    static auto build(std::string &&name, const boost::python::object &module)
+    static auto build(const std::string &name, boost::python::object module)
         -> std::variant<DefinitionsProviderWrapper, PyExceptionInfo>;
 
     auto get_dictionary_scheme()
@@ -53,12 +61,12 @@ class DefinitionsProviderWrapper : public BasePluginWrapper {
     auto get(const std::string &word,
              const std::string &filter_query,
              uint64_t           batch_size,
-             bool               restart)
-        -> std::variant<DefinitionsProviderWrapper::type, PyExceptionInfo>;
+             bool               restart) -> std::
+        variant<DefinitionsProviderWrapper::type, std::string, PyExceptionInfo>;
 
  protected:
     struct DefinitionsProvidersFunctions {
-        static auto build(const boost::python::object &module)
+        static auto build(boost::python::object module)
             -> std::variant<DefinitionsProvidersFunctions, PyExceptionInfo>;
 
         boost::python::object get;

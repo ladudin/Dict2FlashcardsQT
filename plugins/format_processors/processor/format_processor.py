@@ -1,5 +1,5 @@
-def get():
-    return ""
+def save():
+    return
 
 
 def load():
