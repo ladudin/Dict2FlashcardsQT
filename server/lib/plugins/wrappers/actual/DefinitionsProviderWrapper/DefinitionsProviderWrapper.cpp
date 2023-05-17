@@ -89,7 +89,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         try {
             auto error_message = json_res[1].get<std::string>();
             auto cards         = json_res[0].get<std::vector<Card>>();
-            // TODO: ЗДЕСЬ БУДЕТ ФИЛЬТР ПО ЗАПРОСУ
+            // TODO(QUERY LANGUAGE): ЗДЕСЬ БУДЕТ ФИЛЬТР ПО ЗАПРОСУ
             return std::make_pair(cards, error_message);
         } catch (const std::exception &error) {
             return error.what();

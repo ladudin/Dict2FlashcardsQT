@@ -27,8 +27,10 @@ class SentencesProviderWrapper : public BasePluginWrapper,
                       const boost::python::object &module)
         -> std::variant<SentencesProviderWrapper, PyExceptionInfo>;
 
-    auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<ISentencesProviderWrapper::type, PyExceptionInfo>;
+    auto get(const std::string &word, uint64_t batch_size, bool restart)
+        -> std::variant<ISentencesProviderWrapper::type,
+                        std::string,
+                        PyExceptionInfo>;
 
  protected:
     struct SentencesProvidersFunctions {
@@ -42,6 +44,9 @@ class SentencesProviderWrapper : public BasePluginWrapper,
 
  private:
     explicit SentencesProviderWrapper(BasePluginWrapper &&base);
+
+    std::unordered_map<std::string, std::optional<boost::python::object>>
+        generators_;
 };
 
 static_assert(is_plugin_wrapper<SentencesProviderWrapper>);
