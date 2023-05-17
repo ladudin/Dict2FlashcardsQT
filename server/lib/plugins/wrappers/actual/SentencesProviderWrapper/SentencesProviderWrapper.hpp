@@ -45,8 +45,7 @@ class SentencesProviderWrapper : public BasePluginWrapper,
  private:
     explicit SentencesProviderWrapper(BasePluginWrapper &&base);
 
-    std::unordered_map<std::string, std::optional<boost::python::object>>
-        generators_;
+    std::unordered_map<std::string, boost::python::object> generators_;
 };
 
 static_assert(is_plugin_wrapper<SentencesProviderWrapper>);

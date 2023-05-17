@@ -80,7 +80,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         boost::python::object py_json_dumps = py_json.attr("dumps");
 
         boost::python::object py_res =
-            generators_[word]->attr("send")(batch_size);
+            generators_[word].attr("send")(batch_size);
         boost::python::object py_json_res = py_json_dumps(py_res);
 
         std::string str_res = boost::python::extract<std::string>(py_json_res);
@@ -98,6 +98,7 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         auto        py_exc_info    = PyExceptionInfo::build().value();
         const auto &exception_type = py_exc_info.last_type();
 
+        generators_.erase(word);
         if (exception_type == "<class 'StopIteration'>") {
             return {};
         }

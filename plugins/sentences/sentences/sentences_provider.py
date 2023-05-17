@@ -6,7 +6,7 @@ import requests
 FILE_PATH = os.path.split(os.path.dirname(__file__))[-1]
 
 
-def get(word: str, card_data: dict):
+def get(word: str):
     try:
         page = requests.get(
             f"https://searchsentences.com/words/{word}-in-a-sentence",

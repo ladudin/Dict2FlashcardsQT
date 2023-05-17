@@ -95,6 +95,56 @@ int main(int argc, char *argv[]) {
     "restart": false
 })"
                 "\r\n");
+        // AUDIOS
+        request(socket,
+                R"(
+                {
+                    "query_type": "init",
+                    "plugin_name": "audios",
+                    "plugin_type": "audios"
+                })"
+                "\r\n");
+        request(socket,
+                R"(
+{
+    "query_type": "get", 
+    "plugin_type": "audios", 
+    "word": "go",
+    "batch_size": 5,
+    "restart": false
+})"
+                "\r\n");
+        // IMAGES
+        request(socket,
+                R"(
+                {
+                    "query_type": "init",
+                    "plugin_name": "images",
+                    "plugin_type": "images"
+                })"
+                "\r\n");
+        request(socket,
+                R"(
+{
+    "query_type": "get", 
+    "plugin_type": "images", 
+    "word": "go",
+    "batch_size": 5,
+    "restart": false
+})"
+                "\r\n");
+
+        // DEFINITIONS
+        request(socket,
+                R"(
+{
+    "query_type": "get", 
+    "plugin_type": "word", 
+    "filter": "",
+    "word": "definitions",
+    "batch_size": 5,
+    "restart": false
+})");
 
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
