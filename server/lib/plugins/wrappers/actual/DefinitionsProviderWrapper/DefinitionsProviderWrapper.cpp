@@ -89,24 +89,19 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
         try {
             auto error_message = json_res[1].get<std::string>();
             auto cards         = json_res[0].get<std::vector<Card>>();
+            // TODO: ЗДЕСЬ БУДЕТ ФИЛЬТР ПО ЗАПРОСУ
             return std::make_pair(cards, error_message);
         } catch (const std::exception &error) {
             return error.what();
         }
     } catch (boost::python::error_already_set &) {
-        PyErr_Print();
-        boost::python::object main_namespace =
-            boost::python::import("__main__").attr("__dict__");
+        auto        py_exc_info    = PyExceptionInfo::build().value();
+        const auto &exception_type = py_exc_info.last_type();
 
-        exec("import traceback, sys", main_namespace);
-        auto        py_err = eval("str(sys.last_value)", main_namespace);
-        std::string exception_type =
-            boost::python::extract<std::string>(py_err);
-        if (exception_type == "StopIteration") {
-            PyErr_Clear();
+        if (exception_type == "<class 'StopIteration'>") {
             return {};
         }
-        return PyExceptionInfo::build().value();
+        return py_exc_info;
     }
     std::vector<Card> empty(0);
     return std::make_pair(empty, "");

@@ -115,7 +115,9 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
         }
         auto wrapper =
             std::move(std::get<DefinitionsProviderWrapper>(wrapper_variant));
-        plugins_bundle_.set_definitions_provider(std::move(wrapper));
+        auto unique_wrapper =
+            std::make_unique<DefinitionsProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_definitions_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
@@ -133,8 +135,10 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" sentence provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_sentences_provider(std::move(wrapper));
+        auto wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<SentencesProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_sentences_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
@@ -152,8 +156,10 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" images provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_images_provider(std::move(wrapper));
+        auto wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<ImagesProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_images_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
@@ -171,8 +177,10 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" audios provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
-        plugins_bundle_.set_audios_provider(std::move(wrapper));
+        auto wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<AudiosProviderWrapper>(std::move(wrapper));
+        plugins_bundle_.set_audios_provider(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
@@ -190,8 +198,10 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" format processor's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto &wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
-        plugins_bundle_.set_format_processor(std::move(wrapper));
+        auto wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
+        auto unique_wrapper =
+            std::make_unique<FormatProcessorWrapper>(std::move(wrapper));
+        plugins_bundle_.set_format_processor(std::move(unique_wrapper));
         return R"({"status": 0, "message": ""})"_json;
     }
     return return_error("Unknown plugin_type: " + plugin_type);
@@ -240,12 +250,11 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     auto plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
 
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
-        auto &provider_opt = plugins_bundle_.definitions_provider();
-        if (!provider_opt.has_value()) {
+        auto *provider = plugins_bundle_.definitions_provider();
+        if (provider == nullptr) {
             return return_error("Cannot return anything because definitions "
                                 "provider is not initialized");
         }
-        auto &provider = provider_opt.value();
 
         if (!request.contains(WORD_FIELD)) {
             return return_error("\""s + WORD_FIELD +
@@ -288,11 +297,11 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
         auto restart = request[RESTART_FIELD].get<bool>();
 
         auto result_or_error =
-            provider.get(word, filter_query, batch_size, restart);
+            provider->get(word, filter_query, batch_size, restart);
         if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
             auto exception_info = std::get<PyExceptionInfo>(result_or_error);
             return return_error("Exception was thrown during \"" +
-                                provider.name() + "\" definitions request:\n" +
+                                provider->name() + "\" definitions request:\n" +
                                 exception_info.stack_trace());
         }
         if (std::holds_alternative<DefinitionsProviderWrapper::type>(

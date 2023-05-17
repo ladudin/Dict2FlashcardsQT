@@ -20,31 +20,32 @@ class PluginsBundle {
     PluginsBundle();
 
     auto set_definitions_provider(
-        std::unique_ptr<IDefinitionsProviderWrapper> &&new_provider) -> void;
+        std::unique_ptr<IDefinitionsProviderWrapper> new_provider) -> void;
 
     auto set_sentences_provider(
-        std::unique_ptr<ISentencesProviderWrapper> &&new_provider) -> void;
+        std::unique_ptr<ISentencesProviderWrapper> new_provider) -> void;
 
     auto
-    set_images_provider(std::unique_ptr<IImagesProviderWrapper> &&new_provider)
+    set_images_provider(std::unique_ptr<IImagesProviderWrapper> new_provider)
         -> void;
 
     auto
-    set_audios_provider(std::unique_ptr<IAudiosProviderWrapper> &&new_provider)
+    set_audios_provider(std::unique_ptr<IAudiosProviderWrapper> new_provider)
         -> void;
 
-    auto set_format_processor(
-        std::unique_ptr<IFormatProcessorWrapper> &&new_provider) -> void;
+    auto
+    set_format_processor(std::unique_ptr<IFormatProcessorWrapper> new_provider)
+        -> void;
 
-    auto definitions_provider() -> const IDefinitionsProviderWrapper *;
+    auto definitions_provider() -> IDefinitionsProviderWrapper *;
 
-    auto sentences_provider() -> const ISentencesProviderWrapper *;
+    auto sentences_provider() -> ISentencesProviderWrapper *;
 
-    auto images_provider() -> const IImagesProviderWrapper *;
+    auto images_provider() -> IImagesProviderWrapper *;
 
-    auto audios_provider() -> const IAudiosProviderWrapper *;
+    auto audios_provider() -> IAudiosProviderWrapper *;
 
-    auto format_processor() -> const IFormatProcessorWrapper *;
+    auto format_processor() -> IFormatProcessorWrapper *;
 
  private:
     std::unique_ptr<IDefinitionsProviderWrapper> definitions_provider_ =

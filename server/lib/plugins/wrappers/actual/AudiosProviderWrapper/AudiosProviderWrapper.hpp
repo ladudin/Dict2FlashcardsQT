@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -26,8 +27,10 @@ class AudiosProviderWrapper : public BasePluginWrapper,
                       const boost::python::object &module)
         -> std::variant<AudiosProviderWrapper, PyExceptionInfo>;
 
-    auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<AudiosProviderWrapper::type, PyExceptionInfo> override;
+    auto get(const std::string &word, uint64_t batch_size, bool restart)
+        -> std::variant<AudiosProviderWrapper::type,
+                        std::string,
+                        PyExceptionInfo> override;
 
  protected:
     struct AudiosProvidesFunctions {
@@ -41,6 +44,9 @@ class AudiosProviderWrapper : public BasePluginWrapper,
 
  private:
     explicit AudiosProviderWrapper(BasePluginWrapper &&base);
+
+    std::unordered_map<std::string, std::optional<boost::python::object>>
+        generators_;
 };
 
 static_assert(is_plugin_wrapper<AudiosProviderWrapper>);
