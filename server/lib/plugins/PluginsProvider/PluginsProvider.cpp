@@ -49,5 +49,5 @@ auto PluginsProvider::get_format_processor(const std::string &name)
 }
 
 auto PluginsProvider::load_new_plugins() -> void {
-    spdlog::throw_spdlog_ex("load_new_plugins() is not implemented");
+    SPDLOG_THROW("load_new_plugins() is not implemented");
 }
