@@ -1,6 +1,7 @@
 #include "Card.h"
 
 #include <string>
+#include <fstream>
 
 #include <gtest/gtest.h>
 
@@ -30,7 +31,7 @@ TEST(ParseTags, STR_to_STR) {
     EXPECT_EQ(expected, actual);
 }
 
-TEST(LOAD_SAVE, test_1) {
+TEST(LOAD_SAVE, SuccessfulSaveLoad) {
     std::vector<Card> cards = {
         {"go",
          {"special_1", "special_2"},
@@ -53,4 +54,15 @@ TEST(LOAD_SAVE, test_1) {
     EXPECT_EQ("", load_result.second);
 
     EXPECT_EQ(cards, load_result.first);
+}
+
+TEST(LOAD_SAVE, WrognFormat) {
+    std::string data        = R"({"word": "go"})";
+    std::string path        = "test.json";
+
+    std::ofstream file(path);
+    file << data;
+    file.close();
+    std::pair<std::vector<Card>, std::string> load_result = load_cards(path);
+    EXPECT_EQ("Wrong data format", load_result.second);
 }

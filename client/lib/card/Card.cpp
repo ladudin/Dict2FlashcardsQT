@@ -105,9 +105,13 @@ std::pair<std::vector<Card>, std::string> load_cards(const std::string &path) {
     }
     std::stringstream buffer;
     if (buffer << file.rdbuf()) {
-        return {json::parse(buffer.str()).get<std::vector<Card>>(), ""};
+        try {
+            return {json::parse(buffer.str()).get<std::vector<Card>>(), ""};
+        } catch (...) {
+            return {{}, "Wrong data format"};
+        }
     }
-    return {{}, "Can't write into file"};
+    return {{}, "Can't read from file"};
 }
 
 std::string save_cards(const std::vector<Card> &cards,
