@@ -1,5 +1,6 @@
 // https://github.com/gabime/spdlog/issues/1515
 #include "spdlog/common.h"
+#include <boost/bind/bind.hpp>
 #define SPDLOG_ACTIVE_LEVEL                                                    \
     SPDLOG_LEVEL_TRACE  // Must: define SPDLOG_ACTIVE_LEVEL before `#include
                         // "spdlog/spdlog.h"`
@@ -33,7 +34,11 @@ auto main(int argc, char *argv[]) -> int {
                                  "plugins/format_processors/"};
 
     boost::asio::io_context io_context;
-    auto                    plugins_provider =
+    boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
+    signals.async_wait(
+        boost::bind(&boost::asio::io_service::stop, &io_context));
+
+    auto plugins_provider =
         std::make_shared<PluginsProvider>(std::move(plugins_dirs));
     constexpr uint16_t port = 8888;
     auto server = PluginServer(std::move(plugins_provider), io_context, port);
