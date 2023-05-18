@@ -2,7 +2,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(sentence_plugin_wrapper SentencePluginWrapper.cpp)
 target_link_libraries(sentence_plugin_wrapper PUBLIC
-        common
+        card
         connection
         basic_plugin_wrapper)
 target_include_directories(sentence_plugin_wrapper PUBLIC ./)

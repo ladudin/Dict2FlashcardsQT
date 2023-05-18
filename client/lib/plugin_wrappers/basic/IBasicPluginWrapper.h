@@ -5,7 +5,14 @@
 #include <string>
 #include <vector>
 
-#include "LoadResult.h"
+struct LoadResult {
+    std::vector<std::string> success;
+    std::vector<std::string> fail;
+};
+
+inline bool operator==(const LoadResult &lhs, const LoadResult &rhs) {
+    return lhs.success == rhs.success && lhs.fail == rhs.fail;
+}
 
 struct IBasicPluginWrapper {
     virtual ~IBasicPluginWrapper()                                   = default;

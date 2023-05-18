@@ -10,3 +10,6 @@ enable_testing()
 find_package(GTest REQUIRED)
 
 add_subdirectory(client)
+
+add_executable(Dict2FlashcardsQT src/main.cpp)
+target_link_libraries(Dict2FlashcardsQT card)

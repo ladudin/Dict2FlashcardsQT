@@ -2,7 +2,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(audio_plugin_wrapper AudioPluginWrapper.cpp)
 target_link_libraries(audio_plugin_wrapper PUBLIC
-        common
+        card
         connection
         basic_plugin_wrapper)
 target_include_directories(audio_plugin_wrapper PUBLIC ./)

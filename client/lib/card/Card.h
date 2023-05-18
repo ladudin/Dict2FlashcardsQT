@@ -17,12 +17,18 @@ struct Card {
     std::string              tags;
 };
 
+bool          operator==(const Card &lhs, const Card &rhs);
+std::ostream &operator<<(std::ostream &os, const Card &card);
+
 void          traverse_tags(const nlohmann::json &tags,
                             const std::string    &prefix,
                             std::string          &result);
 std::string   parse_tags(const nlohmann::json &tags);
+
 void          from_json(const nlohmann::json &j, Card &card);
-bool          operator==(const Card &lhs, const Card &rhs);
-std::ostream &operator<<(std::ostream &os, const Card &card);
+void          to_json(nlohmann::json &j, const Card &card);
+
+std::pair<std::vector<Card>, std::string> load_cards(const std::string &path);
+std::string save_cards(const std::vector<Card> &cards, const std::string &path);
 
 #endif  // CARD_H
