@@ -13,7 +13,7 @@ Session::Session(boost::asio::ip::tcp::socket        socket,
 }
 
 void Session::start() {
-    spdlog::info("Started new session");
+    SPDLOG_INFO("Started new session");
     do_read();
 }
 
@@ -26,7 +26,7 @@ void Session::do_read() {
         "\r\n",
         [this, self](boost::system::error_code error_code, std::size_t length) {
             if (error_code) {
-                spdlog::error("Couldn't read from user");
+                SPDLOG_ERROR("Couldn't read from user");
                 return;
             }
 
@@ -52,7 +52,7 @@ void Session::do_write(std::string response) {
         boost::asio::buffer(response, response.length()),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
-                spdlog::error("Couldn't respond to user");
+                SPDLOG_ERROR("Couldn't respond to user");
             }
             do_read();
         });

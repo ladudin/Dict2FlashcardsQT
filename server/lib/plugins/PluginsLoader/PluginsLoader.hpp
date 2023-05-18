@@ -44,14 +44,14 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             boost::python::object sys = boost::python::import("sys");
             sys.attr("path").attr("append")(plugins_dir.c_str());
         } catch (const boost::python::error_already_set &) {
-            spdlog::throw_spdlog_ex("Couldn't import sys module");
+            SPDLOG_THROW("Couldn't import sys module");
         }
 
         std::ranges::for_each(
             std::filesystem::directory_iterator(plugins_dir),
             [this](const std::filesystem::path &dir_entry) {
                 using std::string_literals::operator""s;
-                spdlog::info("Loading plugin from "s + dir_entry.string());
+                SPDLOG_INFO("Loading plugin from "s + dir_entry.string());
 
                 if (!std::filesystem::is_directory(dir_entry)) {
                     return;
@@ -62,35 +62,35 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
                 try {
                     loaded_module = boost::python::import(module_name.c_str());
                 } catch (const boost::python::error_already_set &) {
-                    spdlog::info("Failed to import module: "s +
-                                 module_name.string());
+                    SPDLOG_INFO("Failed to import module: "s +
+                                module_name.string());
                     auto error_info = PyExceptionInfo::build();
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(error_info));
                     return;
                 }
-                spdlog::info("Successfully imported Python module: "s +
-                             module_name.string());
 
                 auto wrapper_or_error =
                     Wrapper::build(module_name.string(), loaded_module);
 
+                SPDLOG_INFO("Successfully imported Python module: "s +
+                            module_name.string());
+
                 if (std::holds_alternative<PyExceptionInfo>(wrapper_or_error)) {
                     auto info = std::get<PyExceptionInfo>(wrapper_or_error);
-                    spdlog::info("Failed to load plugin from "s +
-                                 dir_entry.string());
+                    SPDLOG_INFO("Failed to load plugin from "s +
+                                dir_entry.string());
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(info));
                 } else if (std::holds_alternative<Wrapper>(wrapper_or_error)) {
                     auto wrapper =
                         std::move(std::get<Wrapper>(wrapper_or_error));
-                    spdlog::info("Successfully loaded plugin from "s +
-                                 dir_entry.string());
+                    SPDLOG_INFO("Successfully loaded plugin from "s +
+                                dir_entry.string());
                     loaded_containers_.emplace(std::move(module_name),
                                                std::move(wrapper));
                 } else {
-                    spdlog::throw_spdlog_ex(
-                        "Unknown return from a container build");
+                    SPDLOG_THROW("Unknown return from a container build");
                 }
             });
     }
@@ -98,14 +98,14 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
     auto get(const std::string &plugin_name)
         -> std::optional<std::variant<Wrapper, PyExceptionInfo>> override {
         using std::string_literals::operator""s;
-        spdlog::info(plugin_name + " was requested");
+        SPDLOG_INFO(plugin_name + " was requested");
 
         auto res = loaded_containers_.find(plugin_name);
         if (res == loaded_containers_.end()) {
-            spdlog::info(plugin_name + " not found");
+            SPDLOG_INFO(plugin_name + " not found");
             return std::nullopt;
         }
-        spdlog::info(plugin_name + " was found");
+        SPDLOG_INFO(plugin_name + " was found");
         auto found_wrapper = res->second;
         return found_wrapper;
     }

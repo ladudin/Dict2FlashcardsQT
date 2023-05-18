@@ -1,1 +1,1 @@
-from .audios_provider import *
+from .main import *

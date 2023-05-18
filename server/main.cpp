@@ -1,3 +1,11 @@
+// https://github.com/gabime/spdlog/issues/1515
+#include "spdlog/common.h"
+#define SPDLOG_ACTIVE_LEVEL                                                    \
+    SPDLOG_LEVEL_TRACE  // Must: define SPDLOG_ACTIVE_LEVEL before `#include
+                        // "spdlog/spdlog.h"`
+#include "spdlog/sinks/stdout_sinks.h"
+#include "spdlog/spdlog.h"
+
 #include "DefinitionsProviderWrapper.hpp"
 #include "FormatProcessorWrapper.hpp"
 #include "PluginsProvider.hpp"
@@ -8,6 +16,9 @@
 #include <memory>
 
 auto main(int argc, char *argv[]) -> int {
+    // https://github.com/gabime/spdlog/wiki/3.-Custom-formatting
+    spdlog::set_pattern("[%H:%M:%S] [%s] line %# %v");
+
     Py_Initialize();
     auto plugins_dirs = PluginTypesLocationsConfig{
         .definitions_providers_dir =

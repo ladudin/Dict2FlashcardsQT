@@ -25,8 +25,10 @@ class ImagesProviderWrapper : public IImagesProviderWrapper,
                       const boost::python::object &module)
         -> std::variant<ImagesProviderWrapper, PyExceptionInfo>;
 
-    auto get(const std::string &word, uint64_t batch_size)
-        -> std::variant<ImagesProviderWrapper::type, PyExceptionInfo> override;
+    auto get(const std::string &word, uint64_t batch_size, bool restart)
+        -> std::variant<ImagesProviderWrapper::type,
+                        std::string,
+                        PyExceptionInfo> override;
 
  protected:
     struct ImagesProvidersFunctions {
@@ -40,6 +42,8 @@ class ImagesProviderWrapper : public IImagesProviderWrapper,
 
  private:
     explicit ImagesProviderWrapper(BasePluginWrapper &&base);
+
+    std::unordered_map<std::string, boost::python::object> generators_;
 };
 
 static_assert(is_plugin_wrapper<ImagesProviderWrapper>);

@@ -61,49 +61,111 @@ auto AudiosProviderWrapper::get(const std::string &word,
                                 uint64_t           batch_size,
                                 bool               restart)
     -> std::variant<AudiosProviderWrapper::type, std::string, PyExceptionInfo> {
-    std::vector<AudioInfo> test;
+    SPDLOG_INFO(
+        "[{}] Handling request: word: `{}`, batch_size: `{}`, restart: `{}`",
+        name(),
+        word,
+        batch_size,
+        restart);
+
     if (restart) {
         auto found_item = generators_.find(word);
         if (found_item != generators_.end()) {
+
+            SPDLOG_INFO(
+                "[{}] Restarting generator for word `{}`", name(), word);
+
             generators_.erase(found_item);
+        } else {
+            SPDLOG_WARN("[{}] restart request was given but no generator for "
+                        "word `{}` was found",
+                        name(),
+                        word);
         }
     }
     if (generators_.find(word) == generators_.end()) {
+        SPDLOG_INFO("[{}] Initializing generator for word `{}`", name(), word);
+
+        boost::python::object generator;
         try {
-            boost::python::object test = specifics_.get(word);
-            generators_[word]          = test;
-            generators_[word]->attr("__next__")();
+            generator = specifics_.get(word);
+            generator.attr("__next__")();
         } catch (const boost::python::error_already_set &) {
-            generators_.erase(generators_.find(word));
             return PyExceptionInfo::build().value();
         }
+        generators_[word] = generator;
     }
 
     try {
+        SPDLOG_INFO("[{}] (Python side) Loading JSON module", name());
+
         boost::python::object py_json       = boost::python::import("json");
         boost::python::object py_json_dumps = py_json.attr("dumps");
 
+        SPDLOG_INFO(
+            "[{}] (Python side) Trying to obtain data batch for word `{}`",
+            name(),
+            word);
+
         boost::python::object py_res =
-            generators_[word]->attr("send")(batch_size);
+            generators_[word].attr("send")(batch_size);
+
+        SPDLOG_INFO("[{}] (Python side) successfully obtained data batch for "
+                    "word `{}`. Trying to "
+                    "serialize it to JSON",
+                    name(),
+                    word);
+
         boost::python::object py_json_res = py_json_dumps(py_res);
+
+        SPDLOG_INFO("[{}] (Python side) successfully serialized data batch for "
+                    "word `{}` to JSON",
+                    name(),
+                    word);
 
         std::string str_res = boost::python::extract<std::string>(py_json_res);
         nlohmann::json json_res = nlohmann::json::parse(str_res);
 
         try {
+            SPDLOG_INFO(
+                "[{}] (Server side) Trying to deserialize JSON data batch "
+                "for word `{}`",
+                name(),
+                word);
+
             auto audio_information = json_res[0].get<std::vector<AudioInfo>>();
             auto error_message     = json_res[1].get<std::string>();
+
+            SPDLOG_INFO(
+                "[{}] (Server side) successfully deserialized JSON data batch "
+                "for word `{}`",
+                name(),
+                word);
+
             return std::make_pair(audio_information, error_message);
         } catch (const std::exception &error) {
             return error.what();
         }
     } catch (boost::python::error_already_set &) {
+        SPDLOG_INFO("[{}] caught Python exception during response construction "
+                    "for word `{}`. Destroying corresponding Python generator",
+                    name(),
+                    word);
+
+        generators_.erase(word);
         auto        py_exc_info    = PyExceptionInfo::build().value();
         const auto &exception_type = py_exc_info.last_type();
 
         if (exception_type == "<class 'StopIteration'>") {
+            SPDLOG_INFO("[{}] caught Python StopIteration exception during "
+                        "response construction "
+                        "for word `{}`. Respoding with empty object",
+                        name(),
+                        word);
+
             return {};
         }
+
         return py_exc_info;
     }
     std::vector<AudioInfo> empty(0);

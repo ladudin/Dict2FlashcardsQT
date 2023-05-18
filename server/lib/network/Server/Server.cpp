@@ -26,7 +26,11 @@ PluginServer::PluginServer(std::shared_ptr<PluginsProvider> &&provider,
     : io_context_(context),
       acceptor_(io_context_, tcp::endpoint(tcp::v4(), port)),
       plugins_provider_(std::move(provider)) {
+    SPDLOG_INFO("Initializing Python interpreter");
     Py_Initialize();
+    SPDLOG_INFO("Successfully initialized Python interpreter");
+
+    SPDLOG_INFO("Starting accepting requests");
     start_accept();
 }
 

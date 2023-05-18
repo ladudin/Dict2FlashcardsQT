@@ -5,6 +5,7 @@
 #include "PluginsProvider.hpp"
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 
 class IResponceGenerator {
@@ -75,6 +76,13 @@ class ResponseGenerator : public IResponceGenerator {
     auto handle_get(const nlohmann::json &request) -> nlohmann::json override;
     auto handle_get_dict_scheme(const nlohmann::json &request)
         -> nlohmann::json override;
+
+    auto handle_get_definitions(const nlohmann::json &request)
+        -> nlohmann::json;
+
+    auto handle_get_sentences(const nlohmann::json &request) -> nlohmann::json;
+    auto handle_get_images(const nlohmann::json &request) -> nlohmann::json;
+    auto handle_get_audios(const nlohmann::json &request) -> nlohmann::json;
 
  private:
     PluginsBundle                          plugins_bundle_;

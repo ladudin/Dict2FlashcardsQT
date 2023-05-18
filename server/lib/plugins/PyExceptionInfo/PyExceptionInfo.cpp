@@ -10,6 +10,7 @@ auto PyExceptionInfo::build() -> std::optional<PyExceptionInfo> {
     // PyErr_Print обязатетен
     // https://stackoverflow.com/a/57896281
     PyExceptionInfo info;
+
     try {
         PyErr_Print();
         boost::python::object main_namespace =
@@ -35,7 +36,7 @@ auto PyExceptionInfo::build() -> std::optional<PyExceptionInfo> {
 
         PyErr_Clear();
     } catch (const boost::python::error_already_set &) {
-        spdlog::error("Couldn't extract python exception info");
+        SPDLOG_ERROR("Couldn't extract python exception info");
         return std::nullopt;
     }
     return info;
