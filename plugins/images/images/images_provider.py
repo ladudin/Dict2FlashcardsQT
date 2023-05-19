@@ -40,7 +40,7 @@ def get(word: str):
                     try:
                         results.append(d[1][3][0])
                         if not len(results) % batch_size:
-                            batch_size = yield results, ""
+                            batch_size = yield {"web": results, "local": []}, ""
                             results = []
                     except Exception as exception:
                         pass
