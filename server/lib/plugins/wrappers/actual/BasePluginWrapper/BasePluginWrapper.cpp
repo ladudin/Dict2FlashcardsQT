@@ -39,7 +39,8 @@ auto BasePluginWrapper::build(const std::string           &name,
 }
 
 [[nodiscard]] auto BasePluginWrapper::name() const -> const std::string & {
-    return name_;
+    static auto quoted_name = '`' + name_ + '`';
+    return quoted_name;
 }
 
 auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {

@@ -57,7 +57,7 @@ class PluginsLoader : public IPluginsLoader<Wrapper, IWrapper> {
             std::filesystem::directory_iterator(plugins_dir),
             [this](const std::filesystem::path &dir_entry) {
                 using std::string_literals::operator""s;
-                SPDLOG_INFO("Loading plugin from "s + dir_entry.string());
+                SPDLOG_INFO("Registering plugin from "s + dir_entry.string());
 
                 if (!std::filesystem::is_directory(dir_entry)) {
                     return;
@@ -84,14 +84,14 @@ class PluginsLoader : public IPluginsLoader<Wrapper, IWrapper> {
 
                 if (std::holds_alternative<PyExceptionInfo>(wrapper_or_error)) {
                     auto info = std::get<PyExceptionInfo>(wrapper_or_error);
-                    SPDLOG_INFO("Failed to load plugin from "s +
+                    SPDLOG_INFO("Failed to Register plugin from "s +
                                 dir_entry.string());
                     failed_containers_.emplace(std::move(module_name),
                                                std::move(info));
                 } else if (std::holds_alternative<Wrapper>(wrapper_or_error)) {
                     auto wrapper =
                         std::move(std::get<Wrapper>(wrapper_or_error));
-                    SPDLOG_INFO("Successfully loaded plugin from "s +
+                    SPDLOG_INFO("Successfully registered plugin from "s +
                                 dir_entry.string());
                     loaded_containers_.emplace(std::move(module_name),
                                                std::move(wrapper));
