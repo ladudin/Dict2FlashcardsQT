@@ -30,6 +30,8 @@ class ImagesProviderWrapper : public IImagesProviderWrapper,
                         std::string,
                         PyExceptionInfo> override;
 
+    [[nodiscard]] auto name() const -> const std::string & override;
+
  protected:
     struct ImagesProvidersFunctions {
         static auto build(const boost::python::object &module)

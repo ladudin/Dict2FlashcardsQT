@@ -32,6 +32,8 @@ class AudiosProviderWrapper : public BasePluginWrapper,
                         std::string,
                         PyExceptionInfo> override;
 
+    [[nodiscard]] auto name() const -> const std::string & override;
+
  protected:
     struct AudiosProvidesFunctions {
         static auto build(const boost::python::object &module)

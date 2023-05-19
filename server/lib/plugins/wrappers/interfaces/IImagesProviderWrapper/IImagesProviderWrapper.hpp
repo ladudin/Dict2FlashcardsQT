@@ -7,6 +7,7 @@
 
 #include "IPluginWrapper.hpp"
 
+// TODO(blackdeer): REWORK RETURN: ADD SUPPORT FOR LOCAL AND WEB MEDIA
 class IImagesProviderWrapper : public virtual IPluginWrapper {
  public:
     using type = std::pair<std::vector<std::string>, std::string>;

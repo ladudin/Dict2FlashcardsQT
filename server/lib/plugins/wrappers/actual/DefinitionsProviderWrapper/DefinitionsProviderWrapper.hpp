@@ -32,12 +32,14 @@ class DefinitionsProviderWrapper : public IDefinitionsProviderWrapper,
     auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo> override;
 
-    auto get(const std::string &word,
-             const std::string &filter_query,
-             uint64_t           batch_size,
-             bool restart) -> std::variant<DefinitionsProviderWrapper::type,
+    auto               get(const std::string &word,
+                           const std::string &filter_query,
+                           uint64_t           batch_size,
+                           bool restart) -> std::variant<DefinitionsProviderWrapper::type,
                                            std::string,
                                            PyExceptionInfo> override;
+
+    [[nodiscard]] auto name() const -> const std::string & override;
 
  protected:
     struct DefinitionsProvidersFunctions {

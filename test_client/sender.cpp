@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     "query_type": "get", 
     "plugin_type": "word", 
     "filter": "",
-    "word": "go",
+    "word": "sunshade",
     "batch_size": 5,
     "restart": false
 })"
