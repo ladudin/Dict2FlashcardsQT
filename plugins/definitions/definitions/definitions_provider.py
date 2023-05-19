@@ -46,11 +46,11 @@ def translate(definitons_data: RESULT_FORMAT):
                     else definition,
                     "examples": examples,
                     "audios": {
-                        "web": region_audio_links,
+                        "web": [(link, "") for link in region_audio_links],
                         "local": [],
                     },
                     "images": {
-                        "web": [image] if image else [],
+                        "web": [(image, "")] if image else [],
                         "local": [],
                     },
                     "other": [],
