@@ -2,6 +2,7 @@
 #define I_DEFINITIONS_PROVIDER_WRAPPER_H
 
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>

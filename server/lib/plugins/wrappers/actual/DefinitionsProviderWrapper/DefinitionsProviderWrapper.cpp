@@ -23,6 +23,12 @@ auto DefinitionsProviderWrapper::DefinitionsProvidersFunctions::build(
     return plugin_container;
 }
 
+auto DefinitionsProviderWrapper::name() const -> const std::string & {
+    static auto base_name      = BasePluginWrapper::name();
+    static auto typed_provider = "[DefinitionsProviderWrapper] " + base_name;
+    return typed_provider;
+}
+
 DefinitionsProviderWrapper::DefinitionsProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }

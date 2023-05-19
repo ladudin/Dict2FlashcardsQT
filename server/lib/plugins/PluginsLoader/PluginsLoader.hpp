@@ -1,12 +1,14 @@
 #ifndef PLUGINS_LOADER_H
 #define PLUGINS_LOADER_H
 
+#include "IDefinitionsProviderWrapper.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
 #include <boost/python/errors.hpp>
 #include <boost/python/import.hpp>
 #include <complex>
 #include <concepts>
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -20,23 +22,27 @@
 #include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 
-template <typename Wrapper>
+template <typename Wrapper, typename IWrapper>
     requires is_plugin_wrapper<Wrapper>
 class IPluginsLoader {
  public:
     virtual ~IPluginsLoader() = default;
 
-    virtual auto get(const std::string &plugin_name)
-        -> std::optional<std::variant<Wrapper, PyExceptionInfo>> = 0;
-    virtual auto load_new_plugins() -> void                      = 0;
+    virtual auto get(const std::string &plugin_name) -> std::optional<
+        std::variant<std::unique_ptr<Wrapper, std::function<void(IWrapper *)>>,
+                     PyExceptionInfo>>      = 0;
+    virtual auto load_new_plugins() -> void = 0;
 };
 
 // #include "DefinitionsProviderWrapper.hpp"
-// using Wrapper = DefinitionsProviderWrapper;
+// using Wrapper  = DefinitionsProviderWrapper;
+// using IWrapper = IDefinitionsProviderWrapper;
 
-template <typename Wrapper>
-    requires is_plugin_wrapper<Wrapper>
-class PluginsLoader : public IPluginsLoader<Wrapper> {
+// Почему через темплейты? Не знаю, надо будет переделать
+// TODO(blackdeer): REWORK PluginsLoader
+template <typename Wrapper, typename IWrapper>
+    requires std::derived_from<Wrapper, IWrapper> && is_plugin_wrapper<Wrapper>
+class PluginsLoader : public IPluginsLoader<Wrapper, IWrapper> {
  public:
     explicit PluginsLoader(std::filesystem::path &&plugins_dir) noexcept(
         false) {
@@ -95,8 +101,9 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             });
     }
 
-    auto get(const std::string &plugin_name)
-        -> std::optional<std::variant<Wrapper, PyExceptionInfo>> override {
+    auto get(const std::string &plugin_name) -> std::optional<
+        std::variant<std::unique_ptr<Wrapper, std::function<void(IWrapper *)>>,
+                     PyExceptionInfo>> override {
         using std::string_literals::operator""s;
         SPDLOG_INFO(plugin_name + " was requested");
 
@@ -106,8 +113,29 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
             return std::nullopt;
         }
         SPDLOG_INFO(plugin_name + " was found");
-        auto found_wrapper = res->second;
-        return found_wrapper;
+        auto &found_wrapper_usage_pair = res->second;
+        if (++found_wrapper_usage_pair.usage_count == 1) {
+            auto load_result = found_wrapper_usage_pair.wrapper.load();
+            if (load_result.has_value()) {
+                return load_result.value();
+            }
+        }
+
+        auto wrapper_copy = found_wrapper_usage_pair.wrapper;
+        auto wrapper_with_usage_counter =
+            std::unique_ptr<Wrapper, std::function<void(IWrapper *)>>(
+                new Wrapper(wrapper_copy), [&](IWrapper *contained_wrapper) {
+                    if (--found_wrapper_usage_pair.usage_count == 0) {
+                        auto unload_result = contained_wrapper->unload();
+                        if (unload_result.has_value()) {
+                            SPDLOG_ERROR("Wrapper {} unloaded with error: {}",
+                                         contained_wrapper->name(),
+                                         unload_result->stack_trace());
+                        }
+                    }
+                    delete contained_wrapper;
+                });
+        return wrapper_with_usage_counter;
     }
 
     auto load_new_plugins() -> void override {
@@ -115,7 +143,12 @@ class PluginsLoader : public IPluginsLoader<Wrapper> {
     }
 
  private:
-    std::unordered_map<std::string, Wrapper> loaded_containers_;
+    struct WrapperUsageTracker {
+        Wrapper  wrapper;
+        uint64_t usage_count;
+    };
+
+    std::unordered_map<std::string, WrapperUsageTracker> loaded_containers_;
     std::unordered_map<std::string, std::optional<PyExceptionInfo>>
         failed_containers_;
 };

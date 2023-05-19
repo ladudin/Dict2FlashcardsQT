@@ -11,6 +11,7 @@ target_link_libraries(plugins_loader
     INTERFACE
     base_plugin_wrapper
     py_exception_info
+    definitions_provider_wrapper
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
 )

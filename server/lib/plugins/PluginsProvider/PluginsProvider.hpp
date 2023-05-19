@@ -4,6 +4,11 @@
 #include "AudiosProviderWrapper.hpp"
 #include "DefinitionsProviderWrapper.hpp"
 #include "FormatProcessorWrapper.hpp"
+#include "IAudiosProviderWrapper.hpp"
+#include "IDefinitionsProviderWrapper.hpp"
+#include "IFormatProcessorWrapper.hpp"
+#include "IImagesProviderWrapper.hpp"
+#include "ISentencesProviderWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
 #include "PluginsLoader.hpp"
 #include "SentencesProviderWrapper.hpp"
@@ -18,23 +23,36 @@ class IPluginsProvider {
     virtual ~IPluginsProvider() = default;
 
     virtual auto get_definitions_provider(const std::string &name)
-        -> std::optional<
-            std::variant<DefinitionsProviderWrapper, PyExceptionInfo>> = 0;
+        -> std::optional<std::variant<
+            std::unique_ptr<DefinitionsProviderWrapper,
+                            std::function<void(IDefinitionsProviderWrapper *)>>,
+            PyExceptionInfo>> = 0;
 
     virtual auto get_sentences_provider(const std::string &name)
-        -> std::optional<
-            std::variant<SentencesProviderWrapper, PyExceptionInfo>> = 0;
+        -> std::optional<std::variant<
+            std::unique_ptr<SentencesProviderWrapper,
+                            std::function<void(ISentencesProviderWrapper *)>>,
+            PyExceptionInfo>> = 0;
 
-    virtual auto get_images_provider(const std::string &name) -> std::optional<
-        std::variant<ImagesProviderWrapper, PyExceptionInfo>> = 0;
+    virtual auto get_images_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<ImagesProviderWrapper,
+                            std::function<void(IImagesProviderWrapper *)>>,
+            PyExceptionInfo>> = 0;
 
-    virtual auto get_audios_provider(const std::string &name) -> std::optional<
-        std::variant<AudiosProviderWrapper, PyExceptionInfo>> = 0;
+    virtual auto get_audios_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<AudiosProviderWrapper,
+                            std::function<void(IAudiosProviderWrapper *)>>,
+            PyExceptionInfo>> = 0;
 
-    virtual auto get_format_processor(const std::string &name) -> std::optional<
-        std::variant<FormatProcessorWrapper, PyExceptionInfo>> = 0;
+    virtual auto get_format_processor(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<FormatProcessorWrapper,
+                            std::function<void(IFormatProcessorWrapper *)>>,
+            PyExceptionInfo>>               = 0;
 
-    virtual auto load_new_plugins() -> void                    = 0;
+    virtual auto load_new_plugins() -> void = 0;
 };
 
 struct PluginTypesLocationsConfig {
@@ -49,31 +67,54 @@ class PluginsProvider : public IPluginsProvider {
  public:
     explicit PluginsProvider(PluginTypesLocationsConfig &&config);
 
-    auto get_definitions_provider(const std::string &name) -> std::optional<
-        std::variant<DefinitionsProviderWrapper, PyExceptionInfo>> override;
+    auto get_definitions_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<DefinitionsProviderWrapper,
+                            std::function<void(IDefinitionsProviderWrapper *)>>,
+            PyExceptionInfo>> override;
 
-    auto get_sentences_provider(const std::string &name) -> std::optional<
-        std::variant<SentencesProviderWrapper, PyExceptionInfo>> override;
+    auto get_sentences_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<SentencesProviderWrapper,
+                            std::function<void(ISentencesProviderWrapper *)>>,
+            PyExceptionInfo>> override;
 
-    auto get_images_provider(const std::string &name) -> std::optional<
-        std::variant<ImagesProviderWrapper, PyExceptionInfo>> override;
+    auto get_images_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<ImagesProviderWrapper,
+                            std::function<void(IImagesProviderWrapper *)>>,
+            PyExceptionInfo>> override;
 
-    auto get_audios_provider(const std::string &name) -> std::optional<
-        std::variant<AudiosProviderWrapper, PyExceptionInfo>> override;
+    auto get_audios_provider(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<AudiosProviderWrapper,
+                            std::function<void(IAudiosProviderWrapper *)>>,
+            PyExceptionInfo>> override;
 
-    auto get_format_processor(const std::string &name) -> std::optional<
-        std::variant<FormatProcessorWrapper, PyExceptionInfo>> override;
+    auto get_format_processor(const std::string &name)
+        -> std::optional<std::variant<
+            std::unique_ptr<FormatProcessorWrapper,
+                            std::function<void(IFormatProcessorWrapper *)>>,
+            PyExceptionInfo>> override;
 
     auto load_new_plugins() -> void override;
 
  private:
-    std::unique_ptr<IPluginsLoader<DefinitionsProviderWrapper>>
+    std::unique_ptr<
+        IPluginsLoader<DefinitionsProviderWrapper, IDefinitionsProviderWrapper>>
         definitions_providers_;
-    std::unique_ptr<IPluginsLoader<SentencesProviderWrapper>>
-                                                           sentences_providers_;
-    std::unique_ptr<IPluginsLoader<ImagesProviderWrapper>> images_providers_;
-    std::unique_ptr<IPluginsLoader<AudiosProviderWrapper>> audios_providers_;
-    std::unique_ptr<IPluginsLoader<FormatProcessorWrapper>> format_processors_;
+    std::unique_ptr<
+        IPluginsLoader<SentencesProviderWrapper, ISentencesProviderWrapper>>
+        sentences_providers_;
+    std::unique_ptr<
+        IPluginsLoader<ImagesProviderWrapper, IImagesProviderWrapper>>
+        images_providers_;
+    std::unique_ptr<
+        IPluginsLoader<AudiosProviderWrapper, IAudiosProviderWrapper>>
+        audios_providers_;
+    std::unique_ptr<
+        IPluginsLoader<FormatProcessorWrapper, IFormatProcessorWrapper>>
+        format_processors_;
 };
 
 #endif  // !PLUGINS_PROVIDER_H

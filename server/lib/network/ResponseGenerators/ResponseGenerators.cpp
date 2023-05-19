@@ -2,6 +2,10 @@
 #include "AudiosProviderWrapper.hpp"
 #include "DefinitionsProviderWrapper.hpp"
 #include "FormatProcessorWrapper.hpp"
+#include "IAudiosProviderWrapper.hpp"
+#include "IFormatProcessorWrapper.hpp"
+#include "IImagesProviderWrapper.hpp"
+#include "ISentencesProviderWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 #include "SentencesProviderWrapper.hpp"
@@ -123,7 +127,7 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
             return return_error("\"" + plugin_name +
                                 "\" definition provider not found");
         }
-        auto &wrapper_variant = requested_wrapper_option.value();
+        auto wrapper_variant = std::move(requested_wrapper_option.value());
         if (std::holds_alternative<PyExceptionInfo>(wrapper_variant)) {
             auto exception_info = std::get<PyExceptionInfo>(wrapper_variant);
 
@@ -133,11 +137,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
         }
 
         auto wrapper =
-            std::move(std::get<DefinitionsProviderWrapper>(wrapper_variant));
-        auto unique_wrapper =
-            std::make_unique<DefinitionsProviderWrapper>(std::move(wrapper));
+            std::move(std::get<std::unique_ptr<
+                          DefinitionsProviderWrapper,
+                          std::function<void(IDefinitionsProviderWrapper *)>>>(
+                wrapper_variant));
 
-        plugins_bundle_.set_definitions_provider(std::move(unique_wrapper));
+        plugins_bundle_.set_definitions_provider(std::move(wrapper));
 
         SPDLOG_INFO("Successfully handled {} definition provider's "
                     "initialization request",
@@ -162,10 +167,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" sentence provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<SentencesProviderWrapper>(wrapper_variant);
-        auto unique_wrapper =
-            std::make_unique<SentencesProviderWrapper>(std::move(wrapper));
-        plugins_bundle_.set_sentences_provider(std::move(unique_wrapper));
+        auto wrapper =
+            std::move(std::get<std::unique_ptr<
+                          SentencesProviderWrapper,
+                          std::function<void(ISentencesProviderWrapper *)>>>(
+                wrapper_variant));
+        plugins_bundle_.set_sentences_provider(std::move(wrapper));
 
         SPDLOG_INFO("Successfully handled {} sentences provider's "
                     "initialization request",
@@ -190,10 +197,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" images provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<ImagesProviderWrapper>(wrapper_variant);
-        auto unique_wrapper =
-            std::make_unique<ImagesProviderWrapper>(std::move(wrapper));
-        plugins_bundle_.set_images_provider(std::move(unique_wrapper));
+        auto wrapper = std::move(
+            std::get<
+                std::unique_ptr<ImagesProviderWrapper,
+                                std::function<void(IImagesProviderWrapper *)>>>(
+                wrapper_variant));
+        plugins_bundle_.set_images_provider(std::move(wrapper));
 
         SPDLOG_INFO("Successfully handled {} images provider's "
                     "initialization request",
@@ -218,10 +227,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" audios provider's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<AudiosProviderWrapper>(wrapper_variant);
-        auto unique_wrapper =
-            std::make_unique<AudiosProviderWrapper>(std::move(wrapper));
-        plugins_bundle_.set_audios_provider(std::move(unique_wrapper));
+        auto wrapper = std::move(
+            std::get<
+                std::unique_ptr<AudiosProviderWrapper,
+                                std::function<void(IAudiosProviderWrapper *)>>>(
+                wrapper_variant));
+        plugins_bundle_.set_audios_provider(std::move(wrapper));
 
         SPDLOG_INFO("Successfully handled {} audios provider's "
                     "initialization request",
@@ -246,10 +257,12 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
                                 "\" format processor's construction:\n" +
                                 exception_info.stack_trace());
         }
-        auto wrapper = std::get<FormatProcessorWrapper>(wrapper_variant);
-        auto unique_wrapper =
-            std::make_unique<FormatProcessorWrapper>(std::move(wrapper));
-        plugins_bundle_.set_format_processor(std::move(unique_wrapper));
+        auto wrapper =
+            std::move(std::get<std::unique_ptr<
+                          FormatProcessorWrapper,
+                          std::function<void(IFormatProcessorWrapper *)>>>(
+                wrapper_variant));
+        plugins_bundle_.set_format_processor(std::move(wrapper));
 
         SPDLOG_INFO("Successfully handled {} format processor's "
                     "initialization request",

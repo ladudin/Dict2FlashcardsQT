@@ -16,6 +16,12 @@ auto ImagesProviderWrapper::ImagesProvidersFunctions::build(
     return plugin_container;
 }
 
+auto ImagesProviderWrapper::name() const -> const std::string & {
+    static auto base_name      = BasePluginWrapper::name();
+    static auto typed_provider = "[ImagesProviderWrapper] " + base_name;
+    return typed_provider;
+}
+
 ImagesProviderWrapper::ImagesProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }

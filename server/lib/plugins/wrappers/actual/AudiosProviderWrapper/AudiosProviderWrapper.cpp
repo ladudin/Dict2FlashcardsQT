@@ -28,6 +28,12 @@ auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
     return plugin_container;
 }
 
+auto AudiosProviderWrapper::name() const -> const std::string & {
+    static auto base_name      = BasePluginWrapper::name();
+    static auto typed_provider = "[AudiosProviderWrapper] " + base_name;
+    return typed_provider;
+}
+
 AudiosProviderWrapper::AudiosProviderWrapper(const AudiosProviderWrapper &other)
     : BasePluginWrapper(other.name(), other.common_),
       specifics_(other.specifics_) {

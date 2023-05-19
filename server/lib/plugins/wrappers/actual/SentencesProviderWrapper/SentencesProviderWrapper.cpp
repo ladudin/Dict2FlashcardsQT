@@ -16,6 +16,12 @@ auto SentencesProviderWrapper::SentencesProvidersFunctions::build(
     return plugin_container;
 }
 
+auto SentencesProviderWrapper::name() const -> const std::string & {
+    static auto base_name      = BasePluginWrapper::name();
+    static auto typed_provider = "[SentencesProviderWrapper] " + base_name;
+    return typed_provider;
+}
+
 SentencesProviderWrapper::SentencesProviderWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }

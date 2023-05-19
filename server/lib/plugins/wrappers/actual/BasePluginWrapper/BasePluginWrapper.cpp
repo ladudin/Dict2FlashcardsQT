@@ -1,5 +1,6 @@
 #include "BasePluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
+#include "spdlog/spdlog.h"
 #include <boost/python/import.hpp>
 #include <variant>
 
@@ -42,6 +43,7 @@ auto BasePluginWrapper::build(const std::string           &name,
 }
 
 auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {
+    SPDLOG_INFO("{} is being loaded", name());
     try {
         boost::python::object &plugin_load = common_.load;
         plugin_load();
@@ -52,6 +54,8 @@ auto BasePluginWrapper::load() -> std::optional<PyExceptionInfo> {
 }
 
 auto BasePluginWrapper::unload() -> std::optional<PyExceptionInfo> {
+    SPDLOG_INFO("{} is being unloaded", name());
+
     try {
         boost::python::object &plugin_unload = common_.unload;
         plugin_unload();

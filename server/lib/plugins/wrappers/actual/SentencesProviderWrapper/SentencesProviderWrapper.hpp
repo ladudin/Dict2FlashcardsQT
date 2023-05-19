@@ -32,6 +32,8 @@ class SentencesProviderWrapper : public BasePluginWrapper,
                         std::string,
                         PyExceptionInfo>;
 
+    [[nodiscard]] auto name() const -> const std::string & override;
+
  protected:
     struct SentencesProvidersFunctions {
         static auto build(const boost::python::object &module)
