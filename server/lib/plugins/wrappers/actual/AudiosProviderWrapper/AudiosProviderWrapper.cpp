@@ -139,7 +139,7 @@ auto AudiosProviderWrapper::get(const std::string &word,
                 name(),
                 word);
 
-            auto audio_information = json_res[0].get<std::vector<AudioInfo>>();
+            auto audio_information = json_res[0].get<Media>();
             auto error_message     = json_res[1].get<std::string>();
 
             SPDLOG_INFO(
@@ -174,6 +174,6 @@ auto AudiosProviderWrapper::get(const std::string &word,
 
         return py_exc_info;
     }
-    std::vector<AudioInfo> empty(0);
+    Media empty;
     return std::make_pair(empty, "");
 }

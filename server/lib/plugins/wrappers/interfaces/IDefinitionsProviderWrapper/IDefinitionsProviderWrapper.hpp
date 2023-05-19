@@ -9,29 +9,7 @@
 #include <vector>
 
 #include "IPluginWrapper.hpp"
-
-struct SourceWithAdditionalInfo {
-    std::string src;
-    std::string info;
-};
-
-inline void to_json(nlohmann ::json                &nlohmann_json_j,
-                    const SourceWithAdditionalInfo &nlohmann_json_t) {
-    nlohmann_json_j = {nlohmann_json_t.src, nlohmann_json_t.info};
-}
-
-inline void from_json(const nlohmann ::json    &nlohmann_json_j,
-                      SourceWithAdditionalInfo &nlohmann_json_t) {
-    nlohmann_json_j.at(0).get_to(nlohmann_json_t.src);
-    nlohmann_json_j.at(1).get_to(nlohmann_json_t.info);
-}
-
-struct Media {
-    std::vector<SourceWithAdditionalInfo> local;
-    std::vector<SourceWithAdditionalInfo> web;
-};
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Media, local, web);
+#include "Media.hpp"
 
 struct Card {
     Card()                                 = default;
