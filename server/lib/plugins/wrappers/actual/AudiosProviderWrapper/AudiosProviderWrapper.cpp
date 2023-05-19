@@ -29,7 +29,7 @@ auto AudiosProviderWrapper::AudiosProvidesFunctions::build(
 }
 
 auto AudiosProviderWrapper::name() const -> const std::string & {
-    static auto base_name      = BasePluginWrapper::name();
+    static auto base_name      = '`' + BasePluginWrapper::name() + '`';
     static auto typed_provider = "[AudiosProviderWrapper] " + base_name;
     return typed_provider;
 }

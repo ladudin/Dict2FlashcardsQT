@@ -2,6 +2,7 @@
 #define AUDIOS_PROVIDER_WRAPPER_H
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>

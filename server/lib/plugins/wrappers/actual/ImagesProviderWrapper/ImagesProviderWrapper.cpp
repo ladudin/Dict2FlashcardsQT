@@ -18,7 +18,7 @@ auto ImagesProviderWrapper::ImagesProvidersFunctions::build(
 }
 
 auto ImagesProviderWrapper::name() const -> const std::string & {
-    static auto base_name      = BasePluginWrapper::name();
+    static auto base_name      = '`' + BasePluginWrapper::name() + '`';
     static auto typed_provider = "[ImagesProviderWrapper] " + base_name;
     return typed_provider;
 }

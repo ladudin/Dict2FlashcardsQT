@@ -20,6 +20,12 @@ FormatProcessorWrapper::FormatProcessorWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
 }
 
+auto FormatProcessorWrapper::name() const -> const std::string & {
+    static auto base_name      = '`' + BasePluginWrapper::name() + '`';
+    static auto typed_provider = "[FormatProcessorWrapper] " + base_name;
+    return typed_provider;
+}
+
 FormatProcessorWrapper::FormatProcessorWrapper(
     const FormatProcessorWrapper &other)
     : BasePluginWrapper(other.name(), other.common_),
