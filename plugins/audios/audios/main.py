@@ -79,7 +79,7 @@ def get(word: str):
             )
             audio_batch.append((audio_link, additional_info))
             if len(audio_batch) == batch_size:
-                batch_size = yield audio_batch, ""
+                batch_size = yield {"web": audio_batch, "local": []}, ""
                 audio_batch = []
     return audio_batch, ""
 

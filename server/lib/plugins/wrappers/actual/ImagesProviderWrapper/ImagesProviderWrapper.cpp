@@ -1,4 +1,5 @@
 #include "ImagesProviderWrapper.hpp"
+#include "Media.hpp"
 #include "spdlog/spdlog.h"
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
@@ -126,7 +127,7 @@ auto ImagesProviderWrapper::get(const std::string &word,
                 name(),
                 word);
 
-            auto images_urls   = json_res[0].get<std::vector<std::string>>();
+            auto images_urls   = json_res[0].get<Media>();
             auto error_message = json_res[1].get<std::string>();
 
             SPDLOG_INFO(
@@ -158,6 +159,6 @@ auto ImagesProviderWrapper::get(const std::string &word,
         }
         return py_exc_info;
     }
-    std::vector<std::string> empty(0);
+    Media empty;
     return std::make_pair(empty, "");
 }

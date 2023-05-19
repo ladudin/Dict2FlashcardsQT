@@ -56,45 +56,45 @@ int main(int argc, char *argv[]) {
 
         socket.connect(endpoint);
 
-        // DEFINITIONS
-        request(socket,
-                R"(
-                {
-                    "query_type": "init",
-                    "plugin_name": "definitions",
-                    "plugin_type": "word"
-                })"
-                "\r\n");
-        request(socket,
-                R"(
-{
-    "query_type": "get", 
-    "plugin_type": "word", 
-    "filter": "",
-    "word": "sunshade",
-    "batch_size": 5,
-    "restart": false
-})"
-                "\r\n");
-        // SENTENCES
-        request(socket,
-                R"(
-                        {
-                            "query_type": "init",
-                            "plugin_name": "sentences",
-                            "plugin_type": "sentences"
-                        })"
-                "\r\n");
-        request(socket,
-                R"(
-        {
-            "query_type": "get",
-            "plugin_type": "sentences",
-            "word": "go",
-            "batch_size": 5,
-            "restart": false
-        })"
-                "\r\n");
+        //         // DEFINITIONS
+        //         request(socket,
+        //                 R"(
+        //                 {
+        //                     "query_type": "init",
+        //                     "plugin_name": "definitions",
+        //                     "plugin_type": "word"
+        //                 })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        // {
+        //     "query_type": "get",
+        //     "plugin_type": "word",
+        //     "filter": "",
+        //     "word": "sunshade",
+        //     "batch_size": 5,
+        //     "restart": false
+        // })"
+        //                 "\r\n");
+        //         // SENTENCES
+        //         request(socket,
+        //                 R"(
+        //                         {
+        //                             "query_type": "init",
+        //                             "plugin_name": "sentences",
+        //                             "plugin_type": "sentences"
+        //                         })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        //         {
+        //             "query_type": "get",
+        //             "plugin_type": "sentences",
+        //             "word": "go",
+        //             "batch_size": 5,
+        //             "restart": false
+        //         })"
+        //                 "\r\n");
         // AUDIOS
         request(socket,
                 R"(
