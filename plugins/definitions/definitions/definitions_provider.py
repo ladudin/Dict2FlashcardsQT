@@ -45,8 +45,15 @@ def translate(definitons_data: RESULT_FORMAT):
                     if definition_translation
                     else definition,
                     "examples": examples,
-                    "audio_links": region_audio_links,
-                    "image_links": [image] if image else [],
+                    "audios": {
+                        "web": region_audio_links,
+                        "local": [],
+                    },
+                    "images": {
+                        "web": [image] if image else [],
+                        "local": [],
+                    },
+                    "other": [],
                     "tags": {
                         "domain": domain,
                         "region": region,

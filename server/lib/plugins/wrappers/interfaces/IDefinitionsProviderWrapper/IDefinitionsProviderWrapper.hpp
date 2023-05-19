@@ -1,6 +1,7 @@
 #ifndef I_DEFINITIONS_PROVIDER_WRAPPER_H
 #define I_DEFINITIONS_PROVIDER_WRAPPER_H
 
+#include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
@@ -8,6 +9,11 @@
 #include <vector>
 
 #include "IPluginWrapper.hpp"
+
+struct Media {
+    std::vector<std::string> local;
+    std::vector<std::string> web;
+};
 
 struct Card {
     Card()                                 = default;
@@ -21,22 +27,24 @@ struct Card {
     std::vector<std::string> special;
     std::string              definition;
     std::vector<std::string> examples;
-    std::vector<std::string> image_links;
-    std::vector<std::string> audio_links;
+    Media                    audios;
+    Media                    images;
     nlohmann::json           tags;
     nlohmann::json           other;
 };
 
 // TODO(blackdeer): solve optional keys
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Media, local, web);
+
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Card,
                                    word,
                                    special,
                                    definition,
                                    examples,
-                                   image_links,
-                                   audio_links,
-                                   tags
-                                   /* other */);
+                                   images,
+                                   audios,
+                                   tags,
+                                   other);
 
 class IDefinitionsProviderWrapper : public virtual IPluginWrapper {
  public:
