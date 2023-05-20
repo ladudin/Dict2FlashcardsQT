@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <nlohmann/json.hpp>
 
@@ -12,10 +13,9 @@ ImagePluginWrapper::ImagePluginWrapper(std::shared_ptr<IRequestable> connection)
     : BasicPluginWrapper(std::move(connection), "images") {
 }
 
-std::pair<std::vector<std::string>, std::string>
-ImagePluginWrapper::get(const std::string &word,
-                        size_t             batch_size,
-                        bool               restart) {
+std::pair<Media, std::string> ImagePluginWrapper::get(const std::string &word,
+                                                      size_t batch_size,
+                                                      bool   restart) {
     json request_message = {
         {"query_type",  "get"       },
         {"plugin_type", plugin_type_},
@@ -26,15 +26,15 @@ ImagePluginWrapper::get(const std::string &word,
     std::pair<bool, std::string> response(
         connection_->request(request_message.dump()));
     if (!response.first)
-        return {std::vector<std::string>(), "Server disconnected"};
+        return {{}, "Server disconnected"};
     try {
+        std::cout << response.second << std::endl;
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
-            return {std::vector<std::string>(),
-                    response_message.at("message").get<std::string>()};
-        return {response_message.at("result").get<std::vector<std::string>>(),
+            return {{}, response_message.at("message").get<std::string>()};
+        return {response_message.at("result").get<Media>(),
                 response_message.at("message").get<std::string>()};
     } catch (...) {
-        return {std::vector<std::string>(), "Wrong response format"};
+        return {{}, "Wrong response format"};
     }
 }

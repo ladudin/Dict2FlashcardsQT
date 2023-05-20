@@ -5,9 +5,10 @@
 #include <vector>
 
 #include "IBasicPluginWrapper.h"
+#include "Media.h"
 
 struct IImagePluginWrapper : virtual public IBasicPluginWrapper {
-    virtual std::pair<std::vector<std::string>, std::string>
+    virtual std::pair<Media, std::string>
     get(const std::string &word, size_t batch_size, bool restart) = 0;
 };
 

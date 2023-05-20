@@ -5,11 +5,10 @@
 #include <vector>
 
 #include "IBasicPluginWrapper.h"
-
-using audio_vector = std::vector<std::pair<std::string, std::string>>;
+#include "Media.h"
 
 struct IAudioPluginWrapper : virtual public IBasicPluginWrapper {
-    virtual std::pair<audio_vector, std::string>
+    virtual std::pair<Media, std::string>
     get(const std::string &word, size_t batch_size, bool restart) = 0;
 };
 

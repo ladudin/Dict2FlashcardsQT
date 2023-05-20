@@ -7,12 +7,13 @@
 
 #include "IImagePluginWrapper.h"
 #include "BasicPluginWrapper.h"
+#include "Media.h"
 
 class ImagePluginWrapper : public BasicPluginWrapper,
                            virtual public IImagePluginWrapper {
  public:
     explicit ImagePluginWrapper(std::shared_ptr<IRequestable> connection);
-    std::pair<std::vector<std::string>, std::string>
+    std::pair<Media, std::string>
     get(const std::string &word, size_t batch_size, bool restart) override;
 };
 

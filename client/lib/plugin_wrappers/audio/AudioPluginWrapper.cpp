@@ -12,10 +12,9 @@ AudioPluginWrapper::AudioPluginWrapper(std::shared_ptr<IRequestable> connection)
     : BasicPluginWrapper(std::move(connection), "audios") {
 }
 
-std::pair<audio_vector, std::string>
-AudioPluginWrapper::get(const std::string &word,
-                        size_t             batch_size,
-                        bool               restart) {
+std::pair<Media, std::string> AudioPluginWrapper::get(const std::string &word,
+                                                      size_t batch_size,
+                                                      bool   restart) {
     json request_message = {
         {"query_type",  "get"       },
         {"plugin_type", plugin_type_},
@@ -33,7 +32,7 @@ AudioPluginWrapper::get(const std::string &word,
         if (response_message.at("status").get<int>() != 0) {
             return {{}, response_message.at("message").get<std::string>()};
         }
-        return {response_message.at("result").get<audio_vector>(),
+        return {response_message.at("result").get<Media>(),
                 response_message.at("message").get<std::string>()};
     } catch (...) {
         return {{}, "Wrong response format"};
