@@ -9,12 +9,14 @@
 #include "ImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 #include "SentencesProviderWrapper.hpp"
+#include "querying.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
 
 #include <cstdint>
 #include <nlohmann/detail/exceptions.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
 #include <variant>
@@ -384,7 +386,7 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
         return return_error("\""s + FILTER_QUERY_FIELD +
                             "\" field is expected to be a string");
     }
-    auto filter_query = request[FILTER_QUERY_FIELD].get<std::string>();
+    std::string filter_query = request[FILTER_QUERY_FIELD].get<std::string>();
 
     if (!request.contains(BATCH_SIZE_FIELD)) {
         return return_error("\""s + BATCH_SIZE_FIELD +
@@ -404,32 +406,61 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
         return return_error("\""s + RESTART_FIELD +
                             "\" field is expected to be a boolean");
     }
-    auto restart = request[RESTART_FIELD].get<bool>();
+    auto restart         = request[RESTART_FIELD].get<bool>();
 
-    auto result_or_error =
-        provider->get(word, filter_query, batch_size, restart);
-    if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
-        auto exception_info = std::get<PyExceptionInfo>(result_or_error);
-        return return_error("Exception was thrown during \"" +
-                            provider->name() + "\" definitions request:\n" +
-                            exception_info.stack_trace());
+    auto filter_function = prepare_filter(filter_query);
+    DefinitionsProviderWrapper::type batch;
+    while (batch_size && batch.second.empty()) {
+        auto result_or_error = provider->get(word, batch_size, restart);
+        if (std::holds_alternative<PyExceptionInfo>(result_or_error)) {
+            auto exception_info = std::get<PyExceptionInfo>(result_or_error);
+            return return_error("Exception was thrown during \"" +
+                                provider->name() + "\" definitions request:\n" +
+                                exception_info.stack_trace());
+        }
+        if (std::holds_alternative<DefinitionsProviderWrapper::type>(
+                result_or_error)) {
+            auto result =
+                std::get<DefinitionsProviderWrapper::type>(result_or_error);
+
+            if (result.first.empty()) {
+                batch.second = std::move(result.second);
+                break;
+            }
+
+            auto insertion_res =
+                result.first |
+                std::ranges::views::filter(
+                    [&filter_function](const Card &item) -> bool {
+                        auto filtration_res = filter_function(item);
+                        if (filtration_res.has_value()) {
+                            return filtration_res.value();
+                        }
+                        return false;
+                    });
+
+            batch.first.insert(
+                batch.first.end(), insertion_res.begin(), insertion_res.end());
+            batch.second = std::move(result.second);
+            batch_size   = (batch.first.size() >= batch_size)
+                               ? 0
+                               : batch_size - batch.first.size();
+        } else {
+            auto non_python_error_message =
+                std::get<std::string>(result_or_error);
+
+            auto json_message = R"({"status": 1, "message": ")"s +
+                                non_python_error_message + R"("})";
+
+            return json::parse(json_message);
+        }
     }
-    if (std::holds_alternative<DefinitionsProviderWrapper::type>(
-            result_or_error)) {
-        auto result =
-            std::get<DefinitionsProviderWrapper::type>(result_or_error);
-        json res;
-        res["status"] = 0;
-        res["result"] = result;
-        SPDLOG_INFO("Successfully handled `get` request for definitions");
-        return res;
-    }
-    auto non_python_error_message = std::get<std::string>(result_or_error);
 
-    auto json_message =
-        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
-
-    return json::parse(json_message);
+    json res;
+    res["status"] = !batch.second.empty();
+    res["result"] = batch;
+    SPDLOG_INFO("Successfully handled `get` request for sentences");
+    return res;
 }
 
 auto ResponseGenerator::handle_get_sentences(const nlohmann::json &request)

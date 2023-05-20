@@ -63,7 +63,6 @@ auto DefinitionsProviderWrapper::build(const std::string           &name,
 }
 
 auto DefinitionsProviderWrapper::get(const std::string &word,
-                                     const std::string &filter_query,
                                      uint64_t           batch_size,
                                      bool               restart) -> std::
     variant<DefinitionsProviderWrapper::type, std::string, PyExceptionInfo> {
@@ -147,7 +146,6 @@ auto DefinitionsProviderWrapper::get(const std::string &word,
                 name(),
                 word);
 
-            // TODO(QUERY LANGUAGE): ЗДЕСЬ БУДЕТ ФИЛЬТР ПО ЗАПРОСУ
             return std::make_pair(cards, error_message);
         } catch (const std::exception &error) {
             return error.what();

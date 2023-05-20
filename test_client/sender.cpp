@@ -66,15 +66,15 @@ int main(int argc, char *argv[]) {
                                 })"
                 "\r\n");
         request(socket,
-                R"(
+                R"*(
                 {
                     "query_type": "get",
                     "plugin_type": "word",
-                    "filter": "",
                     "word": "sunshade",
+                    "filter": "\"B2\" in(word)",
                     "batch_size": 5,
                     "restart": false
-                })"
+                })*"
                 "\r\n");
         // SENTENCES
         request(socket,
