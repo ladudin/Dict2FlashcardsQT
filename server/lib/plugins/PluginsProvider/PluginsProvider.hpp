@@ -22,37 +22,55 @@ class IPluginsProvider {
  public:
     virtual ~IPluginsProvider() = default;
 
-    virtual auto get_definitions_provider(const std::string &name)
+    [[nodiscard]] virtual auto
+    get_definitions_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<DefinitionsProviderWrapper,
                             std::function<void(IDefinitionsProviderWrapper *)>>,
             PyExceptionInfo>> = 0;
 
-    virtual auto get_sentences_provider(const std::string &name)
+    [[nodiscard]] virtual auto
+    get_sentences_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<SentencesProviderWrapper,
                             std::function<void(ISentencesProviderWrapper *)>>,
             PyExceptionInfo>> = 0;
 
-    virtual auto get_images_provider(const std::string &name)
+    [[nodiscard]] virtual auto
+    get_images_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<ImagesProviderWrapper,
                             std::function<void(IImagesProviderWrapper *)>>,
             PyExceptionInfo>> = 0;
 
-    virtual auto get_audios_provider(const std::string &name)
+    [[nodiscard]] virtual auto
+    get_audios_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<AudiosProviderWrapper,
                             std::function<void(IAudiosProviderWrapper *)>>,
             PyExceptionInfo>> = 0;
 
-    virtual auto get_format_processor(const std::string &name)
+    [[nodiscard]] virtual auto
+    get_format_processor(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<FormatProcessorWrapper,
                             std::function<void(IFormatProcessorWrapper *)>>,
-            PyExceptionInfo>>               = 0;
+            PyExceptionInfo>>                             = 0;
 
-    virtual auto load_new_plugins() -> void = 0;
+    virtual auto               load_new_plugins() -> void = 0;
+
+    [[nodiscard]] virtual auto list_definitions_providers() const
+        -> PluginsInfo = 0;
+
+    [[nodiscard]] virtual auto list_sentences_providers() const
+        -> PluginsInfo                                                      = 0;
+
+    [[nodiscard]] virtual auto list_images_providers() const -> PluginsInfo = 0;
+
+    [[nodiscard]] virtual auto list_audios_providers() const -> PluginsInfo = 0;
+
+    [[nodiscard]] virtual auto list_format_processors() const
+        -> PluginsInfo = 0;
 };
 
 struct PluginTypesLocationsConfig {
@@ -67,37 +85,48 @@ class PluginsProvider : public IPluginsProvider {
  public:
     explicit PluginsProvider(PluginTypesLocationsConfig &&config);
 
-    auto get_definitions_provider(const std::string &name)
+    [[nodiscard]] auto get_definitions_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<DefinitionsProviderWrapper,
                             std::function<void(IDefinitionsProviderWrapper *)>>,
             PyExceptionInfo>> override;
 
-    auto get_sentences_provider(const std::string &name)
+    [[nodiscard]] auto get_sentences_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<SentencesProviderWrapper,
                             std::function<void(ISentencesProviderWrapper *)>>,
             PyExceptionInfo>> override;
 
-    auto get_images_provider(const std::string &name)
+    [[nodiscard]] auto get_images_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<ImagesProviderWrapper,
                             std::function<void(IImagesProviderWrapper *)>>,
             PyExceptionInfo>> override;
 
-    auto get_audios_provider(const std::string &name)
+    [[nodiscard]] auto get_audios_provider(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<AudiosProviderWrapper,
                             std::function<void(IAudiosProviderWrapper *)>>,
             PyExceptionInfo>> override;
 
-    auto get_format_processor(const std::string &name)
+    [[nodiscard]] auto get_format_processor(const std::string &name) const
         -> std::optional<std::variant<
             std::unique_ptr<FormatProcessorWrapper,
                             std::function<void(IFormatProcessorWrapper *)>>,
             PyExceptionInfo>> override;
 
-    auto load_new_plugins() -> void override;
+    auto               load_new_plugins() -> void override;
+
+    [[nodiscard]] auto list_definitions_providers() const
+        -> PluginsInfo override;
+
+    [[nodiscard]] auto list_sentences_providers() const -> PluginsInfo override;
+
+    [[nodiscard]] auto list_images_providers() const -> PluginsInfo override;
+
+    [[nodiscard]] auto list_audios_providers() const -> PluginsInfo override;
+
+    [[nodiscard]] auto list_format_processors() const -> PluginsInfo override;
 
  private:
     std::unique_ptr<
