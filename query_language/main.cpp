@@ -30,7 +30,7 @@ json card_to_json(Card card){
 
 int main(){
     Card card;
-    card.word = "example aaaa";
+    card.word = "example";
     card.special = { "special1", "special2" };
     card.definition = "This is an example";
     card.examples = { "Example 1", "Example 2" };
@@ -56,7 +56,7 @@ int main(){
             std::cout<<"num"<<std::endl;
         }
     }*/
-    scanner scan("2*2 > 4 and 2 < 4");
+    scanner scan("\"example\" in(word) ");
     std::vector<token> tokens= scan.scan_tokens();
     /*for(int i = 0; i < tokens.size();++i){
         std::cout<<tokens[i].lexeme<<" "<<i<<std::endl;
@@ -74,6 +74,11 @@ int main(){
     } else if (val.val_type == BOOL){
         std::cout<<"это bool "<< std::endl;
         std::cout<<"значение: "<<val.bool_val<< std::endl;
+    } else if (val.val_type == STRING){
+        std::cout<<"это string "<< std::endl;
+        std::cout<<"значение: "<<val.str_val<< std::endl;
+    } else if (val.val_type == EMPTY){
+        std::cout<<"пусто"<< std::endl;
     } 
     delete exp;
     

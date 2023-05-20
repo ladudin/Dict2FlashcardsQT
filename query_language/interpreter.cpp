@@ -102,9 +102,52 @@ void interpreter::visit(binary* expr){
 }
 
 void interpreter::visit(grouping* expr){
-    std::cout<<"grouping"<<std::endl;
     expr->expression->accept(this);
 }	
+
+
+void interpreter::visit(func_in* expr){
+    value left = evaluate(expr->left);
+    value right = evaluate(expr->right);
+    if (left.val_type == STRING && right.val_type == JSON){
+        result = value(find_word_inJson(left.str_val, right.json_val));
+    }
+
+
+}	
+
+bool interpreter::find_word_inJson(std::string word, json jsonValue){
+    if (jsonValue.is_string()) {
+        
+        return jsonValue.get<std::string>().find(word) != std::string::npos;
+    } else if (jsonValue.is_array()) {
+        
+        for (const auto& element : jsonValue) {
+            
+            if (find_word_inJson(element, word)) {
+                return true;
+            }
+        }
+    } else{
+        return false;
+    }
+    return false;
+
+    
+    /*else if (jsonValue.is_object()) {
+        // Если элемент JSON является объектом
+        for (const auto& [key, value] : jsonValue.items()) {
+            // Рекурсивно вызываем функцию для каждого значения объекта
+            if (find_word_inJson(value, word)) {
+                return true;
+            }
+        }*/
+
+    
+    
+}
+
+
 
 void interpreter::visit(unary* expr){
     value right = evaluate(expr->ex);
@@ -181,24 +224,7 @@ json interpreter::find_json_value(const json& card, std::vector<std::string> lev
     return current_json;
 }
 
-/*void interpreter::visit(expr_visitor* expr){
-    value callee = evaluate(expr->callee);
 
-    std::vector<value> arguments;
-    for (auto& a : expr->arguments){
-        arguments.emplace_back(evaluate(a));
-    }
-    if (callee.v_type != CALLABLE_VALUE)
-        throw lox_runtime_error(expr->paren, "Can only call functions and classes.");
-
-    lox_callable* function = callee.callable_value;
-    
-    if (arguments.size() > function->arity()){
-        throw lox_runtime_error(expr->paren, std::string("Expected " + std::to_string(function->arity()) +
-            " arguments, got " + std::to_string(arguments.size()) + " ."));
-    }
-    result = function->call(this, arguments);
-}*/
 
 
 void interpreter::visit(logical_expr* ex){

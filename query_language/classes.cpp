@@ -38,29 +38,14 @@ void logical_expr::accept(expr_visitor* visitor) {
     visitor->visit(this);
 }
 
-/*class func_expr : public expr {
-public:
-    expr* callee;
-    token paren;
-    std::vector<expr*> arguments;
-
-    func_expr(expr* c, token par, std::vector<expr*>& args);
-    virtual ~func_expr();
-    void accept(expr_visitor* visitor);
-};
-
-func_expr::func_expr(expr* c, token par, std::vector<expr*>& args) : callee(c), paren(par), arguments(args) {};
-func_expr::~func_expr() {
-    delete callee;
-    for (auto arg : arguments) {
-        delete arg;
-    }
+func_in::func_in(expr* l, expr* r) : left(l), right(r) {};
+func_in::~func_in() {
+    delete left;
+    delete right;
 }
-void func_expr::accept(expr_visitor* visitor){
+void func_in::accept(expr_visitor* visitor) {
     visitor->visit(this);
-}*/
-
-
+}
 
 grouping::grouping(expr* e) : expression(e) {};
 

@@ -5,7 +5,7 @@ class binary;
 class grouping;
 class unary;
 class logical_expr;
-class func_expr; 
+class func_in; 
 class literal;
 
 //enum value_type{BOOL, JSON, DOUBLE, EMPTY};
@@ -14,11 +14,13 @@ struct value{
     token_type val_type;
     bool bool_val;
     double doub_val;
+    std::string str_val;
     json json_val; 
     value() : val_type(EMPTY){}
     value(bool bool_val_) : val_type(BOOL), bool_val(bool_val_) {}
     value( json json_val_) : val_type(JSON), json_val(json_val_) {}
     value(double doub_val_) : val_type(DOUBLE), doub_val(doub_val_) {}
+    value(std::string str_val_) : val_type(STRING), str_val(str_val_) {}
 };
 
 
@@ -29,7 +31,7 @@ public:
     virtual void visit(unary* expr) = 0;
     virtual void visit(literal* expr) = 0;
     virtual void visit(logical_expr* expr) = 0;
- //   virtual void visit(func_expr* expr) = 0;
+    virtual void visit(func_in* expr) = 0;
     virtual void visit(grouping* expr) = 0;
 };
 
@@ -63,6 +65,18 @@ public:
 
     binary(expr* l, token tok, expr* r);
     virtual ~binary();
+    void accept(expr_visitor* visitor);
+};
+
+
+
+class func_in : public expr {
+public:
+    expr* left;
+    expr* right;
+
+    func_in(expr* l, expr* r);
+    virtual ~func_in();
     void accept(expr_visitor* visitor);
 };
 

@@ -19,7 +19,7 @@ class parser {
     token consume(token_type type, std::string message);
     expr* primary();
     expr* finish_call(expr* callee);
-    expr* call();
+    expr* func_in_class();
     expr* unar();
     expr* multiplication();
     expr* addition();

@@ -77,27 +77,20 @@ std::vector<std::string> parser::read_json_elem(){
 }
 
 
-/*expr* parser::finish_call(expr* callee){
-    std::vector<expr*> arguments;
-    if (!check(tt::RIGHT_PAREN)){
-        do{
-            arguments.emplace_back(expression());
-        } while(match({tt::COMMA}));
-    }
-    token r_paren = consume(tt::RIGHT_PAREN, "Expect ')' after arguments.");
-    return new call_expr(callee, r_paren, arguments);
-}*/
 
-/*expr* parser::call(){
-    expr* call = primary();
-    while (true){
-        if (match({tt::LEFT_PAREN}))
-            call = finish_call(call);
-        else
-            break;
-    };
-    return call;
-}*/
+expr* parser::func_in_class(){
+    expr* left = primary();
+    if(match({tt::IN})){
+        if(match({tt::LEFT_PAREN})){
+            expr* right = primary();
+            if(match({tt::RIGHT_PAREN})){
+                return new func_in(left, right);
+            }
+        }
+    }
+    return primary();
+}
+
 
 expr* parser::unar(){
     if(match({tt::BANG, tt::MINUS})){
@@ -105,7 +98,7 @@ expr* parser::unar(){
         expr* right = unar();
         return new unary(right, oper);
     }
-    return primary();
+    return func_in_class();
 }
 
 expr* parser::multiplication(){
