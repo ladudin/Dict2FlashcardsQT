@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/query_lang_main.dir/main.cpp.o -o query_lang_main  libquery_lang.a 

@@ -1,6 +1,0 @@
-/home/vladislav/Технопарк/progect_git/build/CMakeFiles/edit_cache.dir
-/home/vladislav/Технопарк/progect_git/build/CMakeFiles/rebuild_cache.dir
-/home/vladislav/Технопарк/progect_git/build/query_language/CMakeFiles/query_lang.dir
-/home/vladislav/Технопарк/progect_git/build/query_language/CMakeFiles/query_lang_main.dir
-/home/vladislav/Технопарк/progect_git/build/query_language/CMakeFiles/edit_cache.dir
-/home/vladislav/Технопарк/progect_git/build/query_language/CMakeFiles/rebuild_cache.dir
