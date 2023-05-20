@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "IBasicPluginWrapper.h"
 #include "Card.h"
+#include "IBasicPluginWrapper.h"
 
 class IWordPluginWrapper : virtual public IBasicPluginWrapper {
  public:
@@ -12,7 +12,7 @@ class IWordPluginWrapper : virtual public IBasicPluginWrapper {
                                                 get(const std::string &word,
                                                     const std::string &query_language,
                                                     size_t             batch_size,
-                                                    bool               reload)  = 0;
+                                                    bool               restart) = 0;
     virtual std::pair<std::string, std::string> get_dict_scheme() = 0;
 };
 

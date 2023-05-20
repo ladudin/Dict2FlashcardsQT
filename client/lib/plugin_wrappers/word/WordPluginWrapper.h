@@ -18,7 +18,7 @@ class WordPluginWrapper : public BasicPluginWrapper,
                                         get(const std::string &word,
                                             const std::string &query_language,
                                             size_t             batch_size,
-                                            bool               reload) override;
+                                            bool               restart) override;
     std::pair<std::string, std::string> get_dict_scheme() override;
 };
 

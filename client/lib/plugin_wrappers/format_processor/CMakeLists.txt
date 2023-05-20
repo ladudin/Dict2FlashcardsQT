@@ -2,7 +2,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(format_processor_plugin_wrapper FormatProcessorPluginWrapper.cpp)
 target_link_libraries(format_processor_plugin_wrapper PUBLIC
-        common
+        card
         connection
         basic_plugin_wrapper)
 target_include_directories(format_processor_plugin_wrapper PUBLIC ./)
