@@ -2,10 +2,10 @@
 #include "classes.h"
 
 
-
 literal::literal(std::string v) : val(v) {};
 literal::literal(double d) : val(d) {};
 literal::literal(bool b) : val(b) {};
+literal::literal(std::vector<std::string> json_namevec_) : json_namevec(json_namevec_) {};
 literal::literal() : val() {};
 literal::~literal() {}
 void literal::accept(expr_visitor* visitor) {

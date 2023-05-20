@@ -38,7 +38,7 @@ char scanner::advance(){
 
 bool scanner::match(const std::string& expected){
     if (!has_next(expected.size())) return false;
-    if (source.substr(current, current + expected.size())  != expected) return false;
+    if (source.substr(current, expected.size())  != expected) return false;
     current += expected.size();
     return true;
 }
@@ -69,7 +69,23 @@ void scanner::number(){
     add_token(tt::NUMBER, source.substr(start, current - start));
 }
 
-void scanner::identifier(){
+
+// избавиться от дублирования кода
+void scanner::read_json_keyword(){
+    advance(); // считали $
+    while(isalnum(peek()[0])){
+        advance();
+    } 
+    std::string text = source.substr(start, current - start);
+    if(text == "$ANY" || text == "$SELF"){
+        add_token(tt::IDENTIFIER);
+    }
+    // обработать ошибку, когда команды на $ нет
+}
+
+
+// избавиться от дублирования кода
+void scanner::read_json_level(){
     while(isalnum(peek()[0])){
         advance();
     } 
@@ -77,6 +93,7 @@ void scanner::identifier(){
     auto type = keywords.find(text);
     type == keywords.end() ? add_token(tt::IDENTIFIER) : add_token(type->second);
 }
+
 
 void scanner::string(){
 
@@ -90,14 +107,14 @@ void scanner::string(){
         return;
     }
 
-    advance();
+    advance();  // за "
 
     std::string value = source.substr(start + 1, current - start - 2);
     add_token(tt::STRING, value);
 }
 
 void scanner::scan_token(){
-    char c = advance();
+    const char c = advance();
     switch(c){
         case '(': add_token(tt::LEFT_PAREN); break;
         case ')': add_token(tt::RIGHT_PAREN); break;
@@ -109,14 +126,13 @@ void scanner::scan_token(){
         case '+': add_token(tt::PLUS); break;
         case ';': add_token(tt::SEMICOLON); break;
         case '*': add_token(tt::STAR); break;
+        case '/':add_token(SLASH); break;
         case '?': add_token(tt::QMARK); break;
         case ':': add_token(tt::COLON); break;
         case '!': add_token(match(std::string(1, '=')) ? tt::BANG_EQUAL : tt::BANG); break;
         case '=': add_token(match(std::string("=")) ? tt::EQUAL_EQUAL : tt::EQUAL); break;
         case '<': add_token(match(std::string("=")) ? tt::LESS_EQUAL : tt::LESS); break;
         case '>': add_token(match(std::string("=")) ? tt::GREATER_EQUAL : tt::GREATER); break;
-//        case '$': if(match(std::string("ANY"))) add_token(tt::ANY); break;
-        case '$': 
         case ' ':
         case '\r':
         case '\t': break;
@@ -125,8 +141,10 @@ void scanner::scan_token(){
         default:
             if (is_digit(std::string(1, c)))
                 number();
+            else if (c == '$')
+                read_json_keyword();
             else if (isalpha(c))
-                identifier();
+                read_json_level();
             else
                 std::cout << "Unexpected character "; break;
 
@@ -145,31 +163,3 @@ std::vector<token> scanner::scan_tokens(){
     tokens.emplace_back(EOTF, "","");
     return tokens;
 }
-
-
-
-
-struct Card {
-    std::string word;
-    std::vector<std::string> special;
-    std::string definition;
-    std::vector<std::string> examples;
-    std::vector<std::string> image_links;
-    std::vector<std::string> audio_links;
-    json tags; 
-    json other; 
-};
-
-json card_to_json(Card card){
-    json jsonCard;
-    jsonCard["word"] = card.word;
-    jsonCard["special"] = card.special;
-    jsonCard["definition"] = card.definition;
-    jsonCard["examples"] = card.examples;
-    jsonCard["image_links"] = card.image_links;
-    jsonCard["audio_links"] = card.audio_links;
-    jsonCard["tags"] = card.tags;
-    jsonCard["other"] = card.other;
-    return jsonCard;
-}
-

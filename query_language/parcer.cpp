@@ -34,14 +34,15 @@ bool parser::match(std::vector<token_type> types){
     return false;
 }
 
-
+// потом заманить ifы
 expr* parser::primary(){
     if (match({tt::FALSE}))
-        return new literal("false");
+        return new literal(false);
     if (match({tt::TRUE}))
-        return new literal("true");
-    if (match({tt::NUMBER}))
+        return new literal(true);
+    if (match({tt::NUMBER})){
         return new literal(std::stod(previous().literal));
+    }
     if (match({tt::STRING}))
         return new literal(previous().literal);
     if (match({tt::LEFT_PAREN})){
@@ -49,9 +50,30 @@ expr* parser::primary(){
         // обработать, что нет правой скобки
         return new grouping(expr);
     }
-    /*if (match({tt::IDENTIFIER}))
-        return new var_expr(previous());*/
+    if (match({tt::IDENTIFIER})){
+        std::vector<std::string> json_fields = read_json_elem();
+        if(!json_fields.empty()){
+            return new literal(json_fields);
+        } // обработать ошибку
+    }
     return nullptr;
+}
+
+std::vector<std::string> parser::read_json_elem(){
+    std::vector<std::string> json_fields;
+    json_fields.push_back(previous().lexeme);
+    while(match({{tt::LEFT_BRACKET}})){
+        if (match({tt::IDENTIFIER})){
+            json_fields.push_back(previous().lexeme);
+        }else{
+            return std::vector<std::string>();
+        }
+
+        if (!match({tt::RIGHT_BRACKET})){
+            return std::vector<std::string>();
+        }
+    }
+    return json_fields;
 }
 
 
@@ -99,6 +121,7 @@ expr* parser::multiplication(){
 expr* parser::addition(){
     expr* expression = multiplication();
     while(match({tt::MINUS, tt::PLUS})){
+        std::cout<<"операция + -"<<std::endl;
         token oper = previous();
         expr* right = multiplication();
         expression = new binary(expression, oper, right);
@@ -150,7 +173,7 @@ expr* parser::_or(){
 
 
 expr* parser::expression(){
-    return equality();
+    return _or();
 }
 
 
@@ -169,6 +192,6 @@ expr* parser::expression(){
 
 expr*  parser::parse(){
 
-    return equality();
+    return expression();
   }
 

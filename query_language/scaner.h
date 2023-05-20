@@ -20,7 +20,7 @@ enum token_type {
         LESS, LESS_EQUAL,
 
     // Literals
-        IDENTIFIER, STRING, NUMBER, 
+        IDENTIFIER, STRING, NUMBER, JSON, BOOL, EMPTY, DOUBLE,
 
 // logic 
     NOT,AND, OR,
@@ -61,7 +61,8 @@ class scanner {
     std::string peek();
     std::string peek_next();
     void number();
-    void identifier();
+    void read_json_level();
+    void read_json_keyword();
     void string();
     void scan_token();
 public:

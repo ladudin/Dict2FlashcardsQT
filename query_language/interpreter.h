@@ -4,9 +4,10 @@
 class interpreter : expr_visitor {
     public:
     interpreter();
-    value interpret(expr* expression);
+    value interpret(expr* expression, json card_);
     
     private:
+    json card;
     value result;
     value evaluate(expr* expression);
     bool is_truthy(value val);
@@ -20,4 +21,5 @@ class interpreter : expr_visitor {
     
     void check_number_operand(token oper, value operand);
     void check_number_operands(token oper, value left, value right);
+    json find_json_value(const json& card, std::vector<std::string>);
 };

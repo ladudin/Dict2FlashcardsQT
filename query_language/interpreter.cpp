@@ -2,8 +2,8 @@
 
 interpreter::interpreter() {};
 
-value interpreter::interpret(expr* expression) {
-    
+value interpreter::interpret(expr* expression, json card_) {
+    card = card_;
     value result = evaluate(expression);
     return result;
 }
@@ -52,18 +52,22 @@ void interpreter::visit(binary* expr){
     value right = evaluate(expr->right);
     switch(expr->op.type){
         case PLUS:
-            if (left.val_type == DOUBLE && right.val_type == DOUBLE)
+            if (left.val_type == DOUBLE && right.val_type == DOUBLE){
                 result = value(left.doub_val + right.doub_val);
-            else
+            }
                 // обработать ошибку
             break;
         case MINUS:
             //проверить типы 
-            result = value(left.doub_val - right.doub_val);
+             if (left.val_type == DOUBLE && right.val_type == DOUBLE){
+                result = value(left.doub_val - right.doub_val);
+            }
             break;    
         case STAR:
             //check_number_operands(expr->op, left, right);
-            result = value(left.doub_val * right.doub_val);
+             if (left.val_type == DOUBLE && right.val_type == DOUBLE){
+                result = value(left.doub_val * right.doub_val);
+            }
             break;
         case SLASH:
             //check_number_operands(expr->op, left, right);
@@ -98,7 +102,8 @@ void interpreter::visit(binary* expr){
 }
 
 void interpreter::visit(grouping* expr){
-    expr->accept(this);
+    std::cout<<"grouping"<<std::endl;
+    expr->expression->accept(this);
 }	
 
 void interpreter::visit(unary* expr){
@@ -120,7 +125,60 @@ void interpreter::visit(unary* expr){
 }
 
 void interpreter::visit(literal* expr){
+    if (!expr->json_namevec.empty()){
+
+       /* for (int i = 0; i < expr->json_namevec.size(); ++i ){
+            std::cout << expr->json_namevec[i] <<" "<< i << std::endl;
+        }*/
+
+        json json_val= find_json_value(card, expr->json_namevec);
+        if (!json_val.empty()){
+            expr->val.val_type = JSON;
+            expr->val.json_val = json_val;
+        }
+    }
     result = expr->val; 
+}
+
+// разбить на мелкие функции
+json interpreter::find_json_value(const json& card, std::vector<std::string> levels_vec){
+    json current_json = card;
+
+    for (size_t i = 0; i < levels_vec.size(); ++i) {
+        std::string key = levels_vec[i];
+
+            if (current_json.is_object()){
+                 if(current_json.contains(key)) {
+                    current_json = current_json[key];
+                } else if (key == "$ANY"){
+                    json any_values;
+                     for (auto it = current_json.begin(); it != current_json.end(); ++it) {
+                        const auto& result = find_json_value(it.value(), std::vector<std::string>(levels_vec.begin() + i + 1, levels_vec.end()));
+                        if (!result.is_null()) {
+                            any_values.push_back(result);
+                        }
+                     }
+
+                     if(any_values.size() == 1){
+                        return any_values[0];
+                     } else {
+                        return any_values;
+                     }
+
+                } else if (key == "$SELF"){
+                    json self_keys;
+                    for (auto it = current_json.begin(); it != current_json.end(); ++it) {
+                        self_keys.push_back(it.key());
+                    }
+                    return self_keys;
+                } else {
+                    return json();
+                }
+        } else {
+            return json();
+        }
+    }
+    return current_json;
 }
 
 /*void interpreter::visit(expr_visitor* expr){

@@ -8,17 +8,17 @@ class logical_expr;
 class func_expr; 
 class literal;
 
-enum value_type{BOOL, JSON, DOUBLE, EMPTY};
+//enum value_type{BOOL, JSON, DOUBLE, EMPTY};
 
 struct value{
-    value_type val_type;
+    token_type val_type;
     bool bool_val;
     double doub_val;
     json json_val; 
     value() : val_type(EMPTY){}
     value(bool bool_val_) : val_type(BOOL), bool_val(bool_val_) {}
-    value(const json& json_val_) : val_type(JSON), json_val(json_val_) {}
-    value(double doub_val_) : val_type(JSON), doub_val(doub_val_) {}
+    value( json json_val_) : val_type(JSON), json_val(json_val_) {}
+    value(double doub_val_) : val_type(DOUBLE), doub_val(doub_val_) {}
 };
 
 
@@ -38,6 +38,22 @@ public:
     virtual ~expr() = default;
     virtual void accept(expr_visitor* visitor) = 0; 
 };
+
+
+class literal : public expr { 
+public:
+    std::vector<std::string> json_namevec;
+	value val;
+	literal(std::string v);
+    literal(double d);
+    literal(bool b);
+    literal(std::vector<std::string> json_namevec) ;
+    literal();
+    virtual ~literal();
+    void accept(expr_visitor* visitor);
+};
+
+
 
 class binary : public expr {
 public:
@@ -63,17 +79,6 @@ public:
 };
 
 
-
-class literal : public expr { 
-public:
-	value val;
-	literal(std::string v);
-    literal(double d);
-    literal(bool b);
-    literal();
-    virtual ~literal();
-    void accept(expr_visitor* visitor);
-};
 
 class logical_expr : public expr {
 public:

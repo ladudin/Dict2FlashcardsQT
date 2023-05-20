@@ -4,10 +4,11 @@
 class parser {
     public:
     parser(std::vector<token>& t);
-        expr* parse();
+    expr* parse();
     
     private:
     std::vector<token> tokens;
+    std::vector<std::string> read_json_elem();
     int current = 0;
     bool is_at_end();
     token peek();
