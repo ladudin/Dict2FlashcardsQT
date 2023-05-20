@@ -35,8 +35,12 @@ def save(deck_path: str):
         tags = item["tags"]
         other = item["other"]
 
-        images = " ".join([get_card_image_name(name) for name in web_images])
-        audios = " ".join([get_card_audio_name(name) for name in web_audios])
+        images = " ".join(
+            [get_card_image_name(name) for name, info in web_images]
+        )
+        audios = " ".join(
+            [get_card_audio_name(name) for name, info in web_audios]
+        )
 
         sentence_example = " |<br><br>".join(examples)
         note = genanki.Note(
