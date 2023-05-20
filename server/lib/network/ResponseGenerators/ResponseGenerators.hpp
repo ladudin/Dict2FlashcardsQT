@@ -81,7 +81,6 @@ class ResponseGenerator : public IResponceGenerator {
 
     auto handle_get_definitions(const nlohmann::json &request)
         -> nlohmann::json;
-
     auto handle_get_sentences(const nlohmann::json &request) -> nlohmann::json;
     auto handle_get_images(const nlohmann::json &request) -> nlohmann::json;
     auto handle_get_audios(const nlohmann::json &request) -> nlohmann::json;

@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <nlohmann/detail/macro_scope.hpp>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -18,9 +19,17 @@
 #include <unordered_map>
 #include <utility>
 #include <variant>
+#include <vector>
 
 #include "IPluginWrapper.hpp"
 #include "PyExceptionInfo.hpp"
+
+struct PluginsInfo {
+    std::vector<std::string> success;
+    std::vector<std::string> failed;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PluginsInfo, success, failed);
 
 template <typename Wrapper, typename IWrapper>
     requires is_plugin_wrapper<Wrapper>
@@ -30,8 +39,11 @@ class IPluginsLoader {
 
     virtual auto get(const std::string &plugin_name) -> std::optional<
         std::variant<std::unique_ptr<Wrapper, std::function<void(IWrapper *)>>,
-                     PyExceptionInfo>>      = 0;
-    virtual auto load_new_plugins() -> void = 0;
+                     PyExceptionInfo>>                             = 0;
+
+    virtual auto               load_new_plugins() -> void          = 0;
+
+    [[nodiscard]] virtual auto list_plugins() const -> PluginsInfo = 0;
 };
 
 // #include "DefinitionsProviderWrapper.hpp"
@@ -140,6 +152,23 @@ class PluginsLoader : public IPluginsLoader<Wrapper, IWrapper> {
 
     auto load_new_plugins() -> void override {
         throw std::runtime_error("load_new_plugins() is not implemented");
+    }
+
+    [[nodiscard]] auto list_plugins() const -> PluginsInfo override {
+        std::vector<std::string> loaded_plugins_names{};
+        loaded_plugins_names.reserve(loaded_plugins_names.size());
+        for (const auto &item : loaded_containers_) {
+            loaded_plugins_names.push_back(item.first);
+        }
+
+        std::vector<std::string> failed_plugins_names{};
+        failed_plugins_names.reserve(failed_containers_.size());
+        for (const auto &item : failed_containers_) {
+            failed_plugins_names.push_back(item.first);
+        }
+
+        return {.success = std::move(loaded_plugins_names),
+                .failed  = std::move(failed_plugins_names)};
     }
 
  private:

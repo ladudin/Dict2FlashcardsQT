@@ -34,7 +34,8 @@ PluginsProvider::PluginsProvider(PluginTypesLocationsConfig &&confg)
               std::move(confg.format_processors_dir))) {
 }
 
-auto PluginsProvider::get_definitions_provider(const std::string &name)
+[[nodiscard]] auto
+PluginsProvider::get_definitions_provider(const std::string &name) const
     -> std::optional<std::variant<
         std::unique_ptr<DefinitionsProviderWrapper,
                         std::function<void(IDefinitionsProviderWrapper *)>>,
@@ -42,7 +43,8 @@ auto PluginsProvider::get_definitions_provider(const std::string &name)
     return definitions_providers_->get(name);
 }
 
-auto PluginsProvider::get_sentences_provider(const std::string &name)
+[[nodiscard]] auto
+PluginsProvider::get_sentences_provider(const std::string &name) const
     -> std::optional<std::variant<
         std::unique_ptr<SentencesProviderWrapper,
                         std::function<void(ISentencesProviderWrapper *)>>,
@@ -50,7 +52,8 @@ auto PluginsProvider::get_sentences_provider(const std::string &name)
     return sentences_providers_->get(name);
 }
 
-auto PluginsProvider::get_audios_provider(const std::string &name)
+[[nodiscard]] auto
+PluginsProvider::get_audios_provider(const std::string &name) const
     -> std::optional<std::variant<
         std::unique_ptr<AudiosProviderWrapper,
                         std::function<void(IAudiosProviderWrapper *)>>,
@@ -58,7 +61,8 @@ auto PluginsProvider::get_audios_provider(const std::string &name)
     return audios_providers_->get(name);
 }
 
-auto PluginsProvider::get_images_provider(const std::string &name)
+[[nodiscard]] auto
+PluginsProvider::get_images_provider(const std::string &name) const
     -> std::optional<std::variant<
         std::unique_ptr<ImagesProviderWrapper,
                         std::function<void(IImagesProviderWrapper *)>>,
@@ -66,7 +70,8 @@ auto PluginsProvider::get_images_provider(const std::string &name)
     return images_providers_->get(name);
 }
 
-auto PluginsProvider::get_format_processor(const std::string &name)
+[[nodiscard]] auto
+PluginsProvider::get_format_processor(const std::string &name) const
     -> std::optional<std::variant<
         std::unique_ptr<FormatProcessorWrapper,
                         std::function<void(IFormatProcessorWrapper *)>>,
@@ -76,4 +81,29 @@ auto PluginsProvider::get_format_processor(const std::string &name)
 
 auto PluginsProvider::load_new_plugins() -> void {
     SPDLOG_THROW("load_new_plugins() is not implemented");
+}
+
+[[nodiscard]] auto PluginsProvider::list_definitions_providers() const
+    -> PluginsInfo {
+    return definitions_providers_->list_plugins();
+}
+
+[[nodiscard]] auto PluginsProvider::list_sentences_providers() const
+    -> PluginsInfo {
+    return sentences_providers_->list_plugins();
+}
+
+[[nodiscard]] auto PluginsProvider::list_images_providers() const
+    -> PluginsInfo {
+    return images_providers_->list_plugins();
+}
+
+[[nodiscard]] auto PluginsProvider::list_audios_providers() const
+    -> PluginsInfo {
+    return audios_providers_->list_plugins();
+}
+
+[[nodiscard]] auto PluginsProvider::list_format_processors() const
+    -> PluginsInfo {
+    return format_processors_->list_plugins();
 }

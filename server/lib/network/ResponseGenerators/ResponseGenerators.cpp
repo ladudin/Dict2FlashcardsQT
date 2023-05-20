@@ -278,32 +278,55 @@ auto ResponseGenerator::handle_init(const nlohmann::json &request)
 
 auto ResponseGenerator::handle_get_default_config(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_get_default_config() is not implemented");
-    return {};
+    return return_error("handle_get_default_config() is not implemented");
 }
 
 auto ResponseGenerator::handle_get_config_scheme(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_get_config_scheme() is not implemented");
-    return {};
+    return return_error("handle_get_config_scheme() is not implemented");
 }
 
 auto ResponseGenerator::handle_set_config(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_set_config() is not implemented");
-    return {};
+    return return_error("handle_set_config() is not implemented");
 }
 
 auto ResponseGenerator::handle_list_plugins(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_list_plugins() is not implemented");
-    return {};
+    if (!request.contains(PLUGIN_TYPE_FIELD)) {
+        return return_error("\""s + PLUGIN_TYPE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[PLUGIN_TYPE_FIELD].is_string()) {
+        return return_error("\""s + PLUGIN_TYPE_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto        plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
+
+    PluginsInfo listings;
+    if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
+        listings = plugins_provider_->list_definitions_providers();
+    } else if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
+        listings = plugins_provider_->list_sentences_providers();
+    } else if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
+        listings = plugins_provider_->list_images_providers();
+    } else if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
+        listings = plugins_provider_->list_audios_providers();
+    } else if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
+        listings = plugins_provider_->list_format_processors();
+    } else {
+        return return_error(
+            "Unknown plugin type for `list_plugins` request: "s + plugin_type);
+    }
+    json res;
+    res["status"] = 0;
+    res["result"] = listings;
+    return res;
 }
 
 auto ResponseGenerator::handle_load_new_plugins(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_load_new_plugins() is not implemented");
-    return {};
+    return return_error("handle_load_new_plugins() is not implemented");
 }
 
 auto ResponseGenerator::handle_get(const nlohmann::json &request)
@@ -395,14 +418,17 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
             result_or_error)) {
         auto result =
             std::get<DefinitionsProviderWrapper::type>(result_or_error);
-        return result;
+        json res;
+        res["status"] = 0;
+        res["result"] = result;
+        SPDLOG_INFO("Successfully handled `get` request for definitions");
+        return res;
     }
     auto non_python_error_message = std::get<std::string>(result_or_error);
 
     auto json_message =
         R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
 
-    SPDLOG_INFO("Successfully handled `get` request for definitions");
     return json::parse(json_message);
 }
 
@@ -455,14 +481,17 @@ auto ResponseGenerator::handle_get_sentences(const nlohmann::json &request)
     if (std::holds_alternative<SentencesProviderWrapper::type>(
             result_or_error)) {
         auto result = std::get<SentencesProviderWrapper::type>(result_or_error);
-        return result;
+        json res;
+        res["status"] = 0;
+        res["result"] = result;
+        SPDLOG_INFO("Successfully handled `get` request for sentences");
+        return res;
     }
     auto non_python_error_message = std::get<std::string>(result_or_error);
 
     auto json_message =
         R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
 
-    SPDLOG_INFO("Successfully handled `get` request for sentences");
     return json::parse(json_message);
 }
 
@@ -514,14 +543,17 @@ auto ResponseGenerator::handle_get_images(const nlohmann::json &request)
     }
     if (std::holds_alternative<ImagesProviderWrapper::type>(result_or_error)) {
         auto result = std::get<ImagesProviderWrapper::type>(result_or_error);
-        return result;
+        json res;
+        res["status"] = 0;
+        res["result"] = result;
+        SPDLOG_INFO("Successfully handled `get` request for images");
+        return res;
     }
     auto non_python_error_message = std::get<std::string>(result_or_error);
 
     auto json_message =
         R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
 
-    SPDLOG_INFO("Successfully handled `get` request for images");
     return json::parse(json_message);
 }
 
@@ -573,11 +605,14 @@ auto ResponseGenerator::handle_get_audios(const nlohmann::json &request)
     }
     if (std::holds_alternative<AudiosProviderWrapper::type>(result_or_error)) {
         auto result = std::get<AudiosProviderWrapper::type>(result_or_error);
-        return result;
+        json res;
+        res["status"] = 0;
+        res["result"] = result;
+        SPDLOG_INFO("Successfully handled `get` request for audios");
+        return res;
     }
     auto non_python_error_message = std::get<std::string>(result_or_error);
 
-    SPDLOG_INFO("Successfully handled `get` request for audios");
     return return_error(non_python_error_message);
 }
 
@@ -605,8 +640,8 @@ auto ResponseGenerator::handle_save(const nlohmann::json &request)
         return return_error(py_exception_info.stack_trace());
     }
     auto string_error = std::get<std::string>(string_error_or_py_exception);
-    SPDLOG_INFO("Successfully handled `save` request");
     if (string_error.empty()) {
+        SPDLOG_INFO("Successfully handled `save` request");
         return R"({"status": 0, "message": ""})";
     }
     return return_error(string_error);
@@ -614,6 +649,5 @@ auto ResponseGenerator::handle_save(const nlohmann::json &request)
 
 auto ResponseGenerator::handle_get_dict_scheme(const nlohmann::json &request)
     -> nlohmann::json {
-    SPDLOG_THROW("handle_get_dict_scheme() is not implemented");
-    return {};
+    return return_error("handle_get_dict_scheme() is not implemented");
 }
