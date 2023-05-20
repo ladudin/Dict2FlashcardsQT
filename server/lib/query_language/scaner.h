@@ -1,13 +1,10 @@
 #pragma once
-#include "json.hpp"
 #include <cctype>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
-
-using json = nlohmann::json;
 
 enum token_type {
     LEFT_PAREN,

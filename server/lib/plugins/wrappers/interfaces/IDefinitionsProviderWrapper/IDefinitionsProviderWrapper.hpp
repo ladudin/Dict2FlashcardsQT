@@ -48,10 +48,7 @@ class IDefinitionsProviderWrapper : public virtual IPluginWrapper {
     virtual auto get_dictionary_scheme()
         -> std::variant<nlohmann::json, PyExceptionInfo> = 0;
 
-    virtual auto get(const std::string &word,
-                     const std::string &filter_query,
-                     uint64_t           batch_size,
-                     bool               restart)
+    virtual auto get(const std::string &word, uint64_t batch_size, bool restart)
         -> std::variant<type, std::string, PyExceptionInfo> = 0;
 };
 

@@ -6,6 +6,8 @@ target_include_directories(response_generators
     ./
 )
 target_link_libraries(response_generators
+    querying
+    # query_lang
     plugins_bundle
     plugins_provider
 )

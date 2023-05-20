@@ -8,12 +8,12 @@ struct Card {
     std::vector<std::string> examples;
     std::vector<std::string> image_links;
     std::vector<std::string> audio_links;
-    json                     tags;
-    json                     other;
+    nlohmann::json           tags;
+    nlohmann::json           other;
 };
 
-json card_to_json(Card card) {
-    json jsonCard;
+nlohmann::json card_to_json(Card card) {
+    nlohmann::json jsonCard;
     jsonCard["word"]        = card.word;
     jsonCard["special"]     = card.special;
     jsonCard["definition"]  = card.definition;
@@ -42,7 +42,7 @@ int main() {
         {"key2", "value2"}
     };
 
-    json               jsonCard = card_to_json(card);
+    nlohmann::json     jsonCard = card_to_json(card);
 
     /*std::string jsonString = jsonCard.dump();
     std::cout << jsonString << std::endl;*/

@@ -1,6 +1,9 @@
 #pragma once
 #include "scaner.h"
 
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
+
 class binary;
 class grouping;
 class unary;
@@ -11,11 +14,11 @@ class literal;
 // enum value_type{BOOL, JSON, DOUBLE, EMPTY};
 
 struct value {
-    token_type  val_type;
-    bool        bool_val;
-    double      doub_val;
-    std::string str_val;
-    json        json_val;
+    token_type     val_type;
+    bool           bool_val;
+    double         doub_val;
+    std::string    str_val;
+    nlohmann::json json_val;
 
     value() : val_type(EMPTY) {
     }
@@ -23,7 +26,7 @@ struct value {
     value(bool bool_val_) : val_type(BOOL), bool_val(bool_val_) {
     }
 
-    value(json json_val_) : val_type(JSON), json_val(json_val_) {
+    value(nlohmann::json json_val_) : val_type(JSON), json_val(json_val_) {
     }
 
     value(double doub_val_) : val_type(DOUBLE), doub_val(doub_val_) {
