@@ -56,94 +56,111 @@ int main(int argc, char *argv[]) {
 
         socket.connect(endpoint);
 
-        // DEFINITIONS
-        request(socket,
-                R"(
-                        {
-                            "query_type": "init",
-                            "plugin_name": "definitions",
-                            "plugin_type": "word"
-                        })"
-                "\r\n");
-        request(socket,
-                R"(
-        {
-            "query_type": "get",
-            "plugin_type": "word",
-            "filter": "",
-            "word": "sunshade",
-            "batch_size": 5,
-            "restart": false
-        })"
-                "\r\n");
-        // SENTENCES
-        request(socket,
-                R"(
-                                {
-                                    "query_type": "init",
-                                    "plugin_name": "sentences",
-                                    "plugin_type": "sentences"
-                                })"
-                "\r\n");
-        request(socket,
-                R"(
-                {
-                    "query_type": "get",
-                    "plugin_type": "sentences",
-                    "word": "go",
-                    "batch_size": 5,
-                    "restart": false
-                })"
-                "\r\n");
-        // AUDIOS
-        request(socket,
-                R"(
-                        {
-                            "query_type": "init",
-                            "plugin_name": "audios",
-                            "plugin_type": "audios"
-                        })"
-                "\r\n");
-        request(socket,
-                R"(
-        {
-            "query_type": "get",
-            "plugin_type": "audios",
-            "word": "go",
-            "batch_size": 5,
-            "restart": false
-        })"
-                "\r\n");
-        // IMAGES
-        request(socket,
-                R"(
-                        {
-                            "query_type": "init",
-                            "plugin_name": "images",
-                            "plugin_type": "images"
-                        })"
-                "\r\n");
-        request(socket,
-                R"(
-        {
-            "query_type": "get",
-            "plugin_type": "images",
-            "word": "go",
-            "batch_size": 5,
-            "restart": false
-        })"
-                "\r\n");
+        //         // DEFINITIONS
+        //         request(socket,
+        //                 R"(
+        //                         {
+        //                             "query_type": "init",
+        //                             "plugin_name": "definitions",
+        //                             "plugin_type": "word"
+        //                         })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        //         {
+        //             "query_type": "get",
+        //             "plugin_type": "word",
+        //             "filter": "",
+        //             "word": "sunshade",
+        //             "batch_size": 5,
+        //             "restart": false
+        //         })"
+        //                 "\r\n");
+        //         // SENTENCES
+        //         request(socket,
+        //                 R"(
+        //                                 {
+        //                                     "query_type": "init",
+        //                                     "plugin_name": "sentences",
+        //                                     "plugin_type": "sentences"
+        //                                 })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        //                 {
+        //                     "query_type": "get",
+        //                     "plugin_type": "sentences",
+        //                     "word": "go",
+        //                     "batch_size": 5,
+        //                     "restart": false
+        //                 })"
+        //                 "\r\n");
+        //         // AUDIOS
+        //         request(socket,
+        //                 R"(
+        //                         {
+        //                             "query_type": "init",
+        //                             "plugin_name": "audios",
+        //                             "plugin_type": "audios"
+        //                         })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        //         {
+        //             "query_type": "get",
+        //             "plugin_type": "audios",
+        //             "word": "go",
+        //             "batch_size": 5,
+        //             "restart": false
+        //         })"
+        //                 "\r\n");
+        //         // IMAGES
+        //         request(socket,
+        //                 R"(
+        //                         {
+        //                             "query_type": "init",
+        //                             "plugin_name": "images",
+        //                             "plugin_type": "images"
+        //                         })"
+        //                 "\r\n");
+        //         request(socket,
+        //                 R"(
+        //         {
+        //             "query_type": "get",
+        //             "plugin_type": "images",
+        //             "word": "go",
+        //             "batch_size": 5,
+        //             "restart": false
+        //         })"
+        //                 "\r\n");
+        //
+        //         // DEFINITIONS
+        //         request(socket,
+        //                 R"(
+        // {
+        //     "query_type": "get",
+        //     "plugin_type": "word",
+        //     "filter": "",
+        //     "word": "go",
+        //     "batch_size": 5,
+        //     "restart": false
+        // })"
+        //                 "\r\n");
 
-        // DEFINITIONS
+        // Format Processor
         request(socket,
                 R"(
 {
-    "query_type": "get", 
-    "plugin_type": "word", 
-    "filter": "",
-    "word": "go",
-    "batch_size": 5,
-    "restart": false
+    "query_type": "init", 
+    "plugin_type": "format", 
+    "plugin_name": "processor"
+})"
+                "\r\n");
+        request(socket,
+                R"(
+{
+    "query_type": "save", 
+    "cards_path": "/home/blackdeer/projects/cpp/technopark/test_client/deck.json"
 })"
                 "\r\n");
 

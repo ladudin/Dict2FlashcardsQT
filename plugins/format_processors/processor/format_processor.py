@@ -11,7 +11,7 @@ def save(deck_path: str):
     if not os.path.exists(deck_path):
         return f"given deck path {deck_path} does not exitst"
 
-    with open(deck_path, "r", encoding="utf-16") as f:
+    with open(deck_path, "r", encoding="utf-8") as f:
         res = json.load(f)
 
     anki_deck_name = os.path.basename(deck_path).split(".", 1)[0]
@@ -60,7 +60,7 @@ def save(deck_path: str):
     my_package = genanki.Package(anki_deck)
     saving_path = deck_path[: deck_path.find(".")]
     my_package.write_to_file(f"{saving_path}.apkg")
-    return
+    return ""
 
 
 def load():

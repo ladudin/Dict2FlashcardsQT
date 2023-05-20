@@ -92,6 +92,10 @@ auto ResponseGenerator::handle(const std::string &request) -> json {
                     GET_DICT_SCHEME_QUERY_TYPE);
         return handle_get_dict_scheme(parsed_request);
     }
+    if (query_type == SAVE_QUERY_TYPE) {
+        SPDLOG_INFO("Started handling `{}` request", SAVE_QUERY_TYPE);
+        return handle_save(parsed_request);
+    }
     return return_error("Unknown query type: "s + query_type);
 }
 
@@ -326,10 +330,8 @@ auto ResponseGenerator::handle_get(const nlohmann::json &request)
     if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
         return handle_get_audios(request);
     }
-    if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
-        return return_error("Requests to format processor is not implemented");
-    }
-    return return_error("Unknown plugin type: "s + plugin_type);
+    return return_error("Unknown plugin type for `get` request: "s +
+                        plugin_type);
 }
 
 auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
@@ -575,11 +577,39 @@ auto ResponseGenerator::handle_get_audios(const nlohmann::json &request)
     }
     auto non_python_error_message = std::get<std::string>(result_or_error);
 
-    auto json_message =
-        R"({"status": 1, "message": ")"s + non_python_error_message + R"("})";
-
     SPDLOG_INFO("Successfully handled `get` request for audios");
-    return json::parse(json_message);
+    return return_error(non_python_error_message);
+}
+
+auto ResponseGenerator::handle_save(const nlohmann::json &request)
+    -> nlohmann::json {
+    auto *provider = plugins_bundle_.format_processor();
+    if (provider == nullptr) {
+        return return_error("Format Processor is not initialized");
+    }
+
+    if (!request.contains(CARDS_PATH_FIELD)) {
+        return return_error("\""s + CARDS_PATH_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[CARDS_PATH_FIELD].is_string()) {
+        return return_error("\""s + CARDS_PATH_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto cards_path_field = request[CARDS_PATH_FIELD].get<std::string>();
+    auto string_error_or_py_exception = provider->save({cards_path_field});
+
+    if (std::holds_alternative<PyExceptionInfo>(string_error_or_py_exception)) {
+        auto py_exception_info =
+            std::get<PyExceptionInfo>(string_error_or_py_exception);
+        return return_error(py_exception_info.stack_trace());
+    }
+    auto string_error = std::get<std::string>(string_error_or_py_exception);
+    SPDLOG_INFO("Successfully handled `save` request");
+    if (string_error.empty()) {
+        return R"({"status": 0, "message": ""})";
+    }
+    return return_error(string_error);
 }
 
 auto ResponseGenerator::handle_get_dict_scheme(const nlohmann::json &request)
