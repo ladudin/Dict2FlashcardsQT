@@ -2,14 +2,14 @@
 
 interpreter::interpreter() {};
 
-value interpreter::interpret(expr* expression, json card_) {
+value interpreter::interpret(std::unique_ptr<expr> expression, json card_) {
     card = card_;
     value result = evaluate(expression);
     return result;
 }
 
 
-value interpreter::evaluate(expr* expression){
+value interpreter::evaluate( const std::unique_ptr<expr>& expression){
     expression->accept(this);
     return result;
 }
@@ -112,8 +112,6 @@ void interpreter::visit(func_in* expr){
     if (left.val_type == STRING && right.val_type == JSON){
         result = value(find_word_inJson(left.str_val, right.json_val));
     }
-
-
 }	
 
 bool interpreter::find_word_inJson(std::string word, json jsonValue){
@@ -149,7 +147,7 @@ bool interpreter::find_word_inJson(std::string word, json jsonValue){
 
 
 
-void interpreter::visit(unary* expr){
+void interpreter::visit( unary* expr){
     value right = evaluate(expr->ex);
 
     switch(expr->op.type){

@@ -35,29 +35,25 @@ bool parser::match(std::vector<token_type> types){
 }
 
 // потом заманить ifы
-expr* parser::primary(){
+std::unique_ptr<expr> parser::primary(){
     if (match({tt::FALSE}))
-        return new literal(false);
+        return std::make_unique<literal>(false);
     if (match({tt::TRUE}))
-        return new literal(true);
+        return std::make_unique<literal>(true);
     if (match({tt::NUMBER})){
-        return new literal(std::stod(previous().literal));
+        return std::make_unique<literal>(std::stod(previous().literal));
     }
     if (match({tt::STRING}))
-        return new literal(previous().literal);
+        return std::make_unique<literal>(previous().literal);
     if (match({tt::LEFT_PAREN})){
-        expr* expr = expression();
+        std::unique_ptr<expr> expr = expression();
         // обработать, что нет правой скобки
-        return new grouping(expr);
+        return std::make_unique<grouping>(std::move(expr));
     }
     if (match({tt::IDENTIFIER})){
-        std::cout<<"индентифайер"<< std::endl;
         std::vector<std::string> json_fields = read_json_elem();
         if(!json_fields.empty()){
-            for(int i = 0; i < json_fields.size(); ++i){
-                std::cout<<json_fields[i]<< std::endl;
-            }
-            return new literal(json_fields);
+            return std::make_unique<literal>(json_fields);
         } // обработать ошибку
     }
     return nullptr;
@@ -82,13 +78,13 @@ std::vector<std::string> parser::read_json_elem(){
 
 
 
-expr* parser::func_in_class(){
-    expr* left = primary();
+std::unique_ptr<expr> parser::func_in_class(){
+    std::unique_ptr<expr>  left = primary();
     if(match({tt::IN})){
         if(match({tt::LEFT_PAREN})){
-            expr* right = primary();
+            std::unique_ptr<expr>  right = primary();
             if(match({tt::RIGHT_PAREN})){
-                return new func_in(left, right);
+                return std::make_unique<func_in>(std::move(left), std::move(right));
             }
         }
     }
@@ -96,99 +92,89 @@ expr* parser::func_in_class(){
 }
 
 
-expr* parser::unar(){
+std::unique_ptr<expr> parser::unar(){
     if(match({tt::BANG, tt::MINUS})){
         token oper = previous();
-        expr* right = unar();
-        return new unary(right, oper);
+        std::unique_ptr<expr> right = unar();
+        return std::make_unique<unary>(std::move(right),oper);
     }
     return func_in_class();
 }
 
-expr* parser::multiplication(){
-    expr* expression = unar();
+std::unique_ptr<expr> parser::multiplication(){
+    std::unique_ptr<expr> expression = unar();
     while(match({tt::SLASH, tt::STAR})){
         token oper = previous();
-        expr* right = unar();
-        expression = new binary(expression, oper, right);
+        std::unique_ptr<expr> right = unar();
+        expression = std::make_unique<binary>(std::move(expression), oper, std::move(right));
     }
     return expression;
 }
 
-expr* parser::addition(){
-    expr* expression = multiplication();
+std::unique_ptr<expr> parser::addition(){
+    std::unique_ptr<expr> expression = multiplication();
     while(match({tt::MINUS, tt::PLUS})){
         std::cout<<"операция + -"<<std::endl;
         token oper = previous();
-        expr* right = multiplication();
-        expression = new binary(expression, oper, right);
+        std::unique_ptr<expr> right = multiplication();
+        expression = std::make_unique<binary>(std::move(expression), oper, std::move(right));
     }
     return expression;
 }
 
-expr* parser::comparison(){
-    expr* expression = addition();
+std::unique_ptr<expr> parser::comparison(){
+     std::unique_ptr<expr> expression = addition();
     while(match({tt::LESS, tt::LESS_EQUAL, tt::GREATER, tt::GREATER_EQUAL})){
         token oper = previous();
-        expr* right = addition();
-        expression = new binary(expression, oper, right);
+         std::unique_ptr<expr> right = addition();
+        expression = std::make_unique<binary>(std::move(expression), oper, std::move(right));
     }
     return expression;
 }
 
-expr* parser::equality(){
-    expr* expression = comparison();
+std::unique_ptr<expr> parser::equality(){
+    std::unique_ptr<expr> expression = comparison();
     while(match({tt::BANG_EQUAL,tt::EQUAL_EQUAL})){
         token oper = previous();
-        expr* right = comparison();
-        expression = new binary(expression, oper, right);
+        std::unique_ptr<expr> right = comparison();
+        expression = std::make_unique<binary>(std::move(expression), oper, std::move(right));
     }
     return expression;
 }
 
-expr* parser::_and(){
-    expr* left = equality();
+std::unique_ptr<expr>  parser::_and(){
+    std::unique_ptr<expr>  left = equality();
 
     while(match({tt::AND})){
         token oper = previous();
-        expr* right = equality();
-        left = new logical_expr(left, oper, right);
+        std::unique_ptr<expr>  right = equality();
+         left = std::make_unique<logical_expr>(std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-expr* parser::_or(){
-    expr* left = _and();
-    literal* l = reinterpret_cast<literal*>(left);
+std::unique_ptr<expr> parser::_or(){
+    std::unique_ptr<expr> left = _and();
+//    literal* l = reinterpret_cast<literal*>(left);
     while(match({tt::OR})){
         token oper = previous();
-        expr* right = _and();
-        left = new logical_expr(left, oper, right);
+        std::unique_ptr<expr> right = _and();
+        left = std::make_unique<logical_expr>(std::move(left), oper, std::move(right));
     } 
     return left;
 }
 
 
-expr* parser::expression(){
+std::unique_ptr<expr> parser::expression(){
     return _or();
 }
 
-
-
-/*expr* parser::function(std::string kind){
-    token name = consume(FUN, std::string("Expect " + kind + " name."));
-    consume(tt::LEFT_PAREN, std::string("Expected '(' after" + kind + " declaration."));
-    std::vector<token> parameters;
-
-   
-    consume(tt::RIGHT_PAREN, std::string("Expected ')' after " + kind + " declaration"));
-    return new fun_stmt(name, parameters);
-}*/
-
-
-
-expr*  parser::parse(){
+std::unique_ptr<expr>  parser::parse(){
 
     return expression();
   }
+
+
+
+
 

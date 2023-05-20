@@ -12,46 +12,38 @@ void literal::accept(expr_visitor* visitor) {
     visitor->visit(this);
 }
 
-binary::binary(expr* l, token tok, expr* r) : left(l), op(tok), right(r) {};
-binary::~binary() {
-    delete left;
-    delete right;
-}
+binary::binary(std::unique_ptr<expr> l, token tok, std::unique_ptr<expr> r) :
+ left(std::move(l)), op(tok), right(std::move(r)) {};
+binary::~binary() {}
 void binary::accept(expr_visitor* visitor){
     visitor->visit(this);
 }
 
-unary::unary(expr* e, token t) : ex(e), op(t) {};
-unary::~unary() {
-    delete ex;
-}
+unary::unary(std::unique_ptr<expr> expr_, token t) : ex(std::move(expr_)), op(t) {};
+unary::~unary() {}
+
 void unary::accept(expr_visitor* visitor){
     visitor->visit(this);
 }
 
-logical_expr::logical_expr(expr* l, token t, expr* r) : left(l), oper(t), right(r) {};
-logical_expr::~logical_expr() {
-    delete left;
-    delete right;
-}
+logical_expr::logical_expr(std::unique_ptr<expr> left_, token t, std::unique_ptr<expr> right_) :
+left(std::move(left_)), oper(t), right(std::move(right_)) {};
+logical_expr::~logical_expr() {}
+
 void logical_expr::accept(expr_visitor* visitor) {
     visitor->visit(this);
 }
 
-func_in::func_in(expr* l, expr* r) : left(l), right(r) {};
-func_in::~func_in() {
-    delete left;
-    delete right;
-}
+func_in::func_in(std::unique_ptr<expr> left_, std::unique_ptr<expr> right_) :
+ left(std::move(left_)), right(std::move(right_)) {};
+func_in::~func_in() {}
+
 void func_in::accept(expr_visitor* visitor) {
     visitor->visit(this);
 }
 
-grouping::grouping(expr* e) : expression(e) {};
-
-grouping::~grouping() {
-    delete expression;
-}
+grouping::grouping(std::unique_ptr<expr> expr_) : expression(std::move(expr_)) {};
+grouping::~grouping() {};
 
 void grouping::accept(expr_visitor* visitor){
     visitor->visit(this);

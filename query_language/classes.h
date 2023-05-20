@@ -8,7 +8,7 @@ class logical_expr;
 class func_in; 
 class literal;
 
-//enum value_type{BOOL, JSON, DOUBLE, EMPTY};
+
 
 struct value{
     token_type val_type;
@@ -59,11 +59,11 @@ public:
 
 class binary : public expr {
 public:
-    expr* left;
+    std::unique_ptr<expr> left;
     token op;
-    expr* right;
+    std::unique_ptr<expr> right;
 
-    binary(expr* l, token tok, expr* r);
+    binary(std::unique_ptr<expr> l, token tok, std::unique_ptr<expr> r);
     virtual ~binary();
     void accept(expr_visitor* visitor);
 };
@@ -72,10 +72,10 @@ public:
 
 class func_in : public expr {
 public:
-    expr* left;
-    expr* right;
+    std::unique_ptr<expr> left;
+    std::unique_ptr<expr> right;
 
-    func_in(expr* l, expr* r);
+    func_in(std::unique_ptr<expr> l, std::unique_ptr<expr> r);
     virtual ~func_in();
     void accept(expr_visitor* visitor);
 };
@@ -84,10 +84,10 @@ public:
 
 class unary : public expr {
 public:
-    expr* ex;
+    std::unique_ptr<expr> ex;
     token op;
 
-    unary(expr* e, token t);
+    unary(std::unique_ptr<expr> e, token t);
     virtual ~unary();
     void accept(expr_visitor* visitor);
 };
@@ -96,20 +96,20 @@ public:
 
 class logical_expr : public expr {
 public:
-    expr* left;
+    std::unique_ptr<expr> left;
     token oper;
-    expr* right;
+    std::unique_ptr<expr> right;
 
-    logical_expr(expr* l, token t, expr* r);
+    logical_expr(std::unique_ptr<expr> left_, token t, std::unique_ptr<expr> right_);
     virtual ~logical_expr();
     void accept(expr_visitor* visitor);
 };
 
 class grouping : public expr {
 public:
-    expr* expression;
+    std::unique_ptr<expr> expression;
 
-    grouping(expr* e);
+    grouping(std::unique_ptr<expr> e);
     virtual ~grouping();
     void accept(expr_visitor* visitor);
 };

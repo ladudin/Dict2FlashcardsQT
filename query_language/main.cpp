@@ -41,31 +41,16 @@ int main(){
 
     json jsonCard = card_to_json(card);
    
-    /*std::string jsonString = jsonCard.dump();
-    std::cout << jsonString << std::endl;*/
-
-    /*scanner scan("(pos[$SELF][data][256]!");
-    std::vector<token> vec= scan.scan_tokens();
-    for(int i = 0; i < vec.size();++i){
-        std::cout<<vec[i].lexeme<<std::endl;
-        if (vec[i].type == tt::ANY){
-            std::cout<<"ANYYYYYY"<<std::endl;
-        }else if(vec[i].type == tt::IDENTIFIER){
-            std::cout<<"indent"<<std::endl;
-        }else if(vec[i].type == tt::NUMBER){
-            std::cout<<"num"<<std::endl;
-        }
-    }*/
-    scanner scan("\"audio1.mp3\" in (audio_links)");
+    scanner scan("\"audio1.mp3\" in (audio_links) and (23<19+5)");
     std::vector<token> tokens= scan.scan_tokens();
     /*for(int i = 0; i < tokens.size();++i){
         std::cout<<tokens[i].lexeme<<" "<<i<<std::endl;
     }*/
 
     parser p(tokens);
-    expr* exp = p.parse();
+    std::unique_ptr<expr> exp = p.parse();
     interpreter inter;
-    value val = inter.interpret(exp, jsonCard);
+    value val = inter.interpret(std::move(exp), jsonCard);
     if (val.val_type == DOUBLE){
         std::cout<<"значение: "<<val.doub_val<< std::endl;
     } else if (val.val_type == JSON){
@@ -79,8 +64,6 @@ int main(){
         std::cout<<"значение: "<<val.str_val<< std::endl;
     } else if (val.val_type == EMPTY){
         std::cout<<"пусто"<< std::endl;
-    } 
-    delete exp;
-    
+    }   
     return 0;
 }
