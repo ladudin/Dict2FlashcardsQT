@@ -7,7 +7,7 @@ SRCS = \
 	   main.cpp
 
 OBJS = $(SRCS:.cpp=.o)
-CC = g++-10
+CC = clang 
 
 .PHONY: all clean memcheck
 
