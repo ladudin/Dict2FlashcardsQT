@@ -56,7 +56,7 @@ int main(){
             std::cout<<"num"<<std::endl;
         }
     }*/
-    scanner scan("\"example\" in(word) ");
+    scanner scan("\"audio1.mp3\" in (audio_links)");
     std::vector<token> tokens= scan.scan_tokens();
     /*for(int i = 0; i < tokens.size();++i){
         std::cout<<tokens[i].lexeme<<" "<<i<<std::endl;

@@ -6,6 +6,8 @@
 #include <sstream>
 #include <map>
 #include <cctype>
+#include <memory>
+
 #include "json.hpp"
 
 using json = nlohmann::json;

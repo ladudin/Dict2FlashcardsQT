@@ -51,8 +51,12 @@ expr* parser::primary(){
         return new grouping(expr);
     }
     if (match({tt::IDENTIFIER})){
+        std::cout<<"индентифайер"<< std::endl;
         std::vector<std::string> json_fields = read_json_elem();
         if(!json_fields.empty()){
+            for(int i = 0; i < json_fields.size(); ++i){
+                std::cout<<json_fields[i]<< std::endl;
+            }
             return new literal(json_fields);
         } // обработать ошибку
     }
@@ -88,7 +92,7 @@ expr* parser::func_in_class(){
             }
         }
     }
-    return primary();
+    return left;
 }
 
 

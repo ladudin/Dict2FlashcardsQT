@@ -73,7 +73,7 @@ void scanner::number(){
 // избавиться от дублирования кода
 void scanner::read_json_keyword(){
     advance(); // считали $
-    while(isalnum(peek()[0])){
+    while(isalnum(peek()[0]) || peek()[0] == '_'){
         advance();
     } 
     std::string text = source.substr(start, current - start);
@@ -86,7 +86,7 @@ void scanner::read_json_keyword(){
 
 // избавиться от дублирования кода
 void scanner::read_json_level(){
-    while(isalnum(peek()[0])){
+    while(isalnum(peek()[0]) || peek()[0] == '_'){
         advance();
     } 
     std::string text = source.substr(start, current - start);

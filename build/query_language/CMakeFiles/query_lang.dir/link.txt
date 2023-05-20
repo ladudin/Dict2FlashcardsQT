@@ -1,0 +1,2 @@
+/usr/bin/ar qc libquery_lang.a CMakeFiles/query_lang.dir/scaner.cpp.o CMakeFiles/query_lang.dir/parcer.cpp.o CMakeFiles/query_lang.dir/interpreter.cpp.o CMakeFiles/query_lang.dir/classes.cpp.o
+/usr/bin/ranlib libquery_lang.a
