@@ -1,5 +1,6 @@
 #include "FormatProcessorWrapper.hpp"
 #include "BasePluginWrapper.hpp"
+#include "PyExceptionInfo.hpp"
 #include <boost/python/errors.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/import.hpp>
@@ -18,6 +19,12 @@ auto FormatProcessorWrapper::FormatProcessorsFunctions::build(
 
 FormatProcessorWrapper::FormatProcessorWrapper(BasePluginWrapper &&base)
     : BasePluginWrapper(std::move(base)) {
+}
+
+auto FormatProcessorWrapper::name() const -> const std::string & {
+    static auto base_name      = '`' + BasePluginWrapper::name() + '`';
+    static auto typed_provider = "[FormatProcessorWrapper] " + base_name;
+    return typed_provider;
 }
 
 FormatProcessorWrapper::FormatProcessorWrapper(
@@ -48,10 +55,12 @@ auto FormatProcessorWrapper::build(const std::string           &name,
 
 auto FormatProcessorWrapper::save(const ResultFilesPaths &paths)
     -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo> {
+    std::string res;
     try {
-        specifics_.save(
-            paths.cards.string(), paths.audios.string(), paths.images.string());
+        boost::python::object py_res = specifics_.save(paths.cards.string());
+        res = boost::python::extract<std::string>(py_res);
     } catch (const boost::python::error_already_set &) {
+        return PyExceptionInfo::build().value();
     }
-    return {};
+    return res;
 }

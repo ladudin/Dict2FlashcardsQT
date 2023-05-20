@@ -28,6 +28,8 @@ class FormatProcessorWrapper : public IFormatProcessorWrapper,
     auto save(const ResultFilesPaths &paths)
         -> std::variant<FormatProcessorWrapper::type, PyExceptionInfo> override;
 
+    [[nodiscard]] auto name() const -> const std::string & override;
+
  protected:
     struct FormatProcessorsFunctions {
         static auto build(const boost::python::object &module)

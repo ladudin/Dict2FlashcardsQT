@@ -11,8 +11,7 @@ PLUGIN_NAME = os.path.split(os.path.dirname(__file__))[-1]
 def get(word: str):
     link = f"https://www.google.com/search?tbm=isch&q={word}"
     user_agent = (
-        "Mozilla/5.0 (Windows NT 6.1; Win64; x64) ApplewebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/70.0.3538.67 Safari/537.36"
+        "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
     )
     headers = {"User-Agent": user_agent}
     try:
@@ -40,7 +39,13 @@ def get(word: str):
                     try:
                         results.append(d[1][3][0])
                         if not len(results) % batch_size:
-                            batch_size = yield {"web": results, "local": []}, ""
+                            batch_size = (
+                                yield {
+                                    "web": [(link, "") for link in results],
+                                    "local": [],
+                                },
+                                "",
+                            )
                             results = []
                     except Exception as exception:
                         pass
@@ -51,7 +56,10 @@ def get(word: str):
                             results.append(d[0][0]["444383007"][1][3][0])
                             if not len(results) % batch_size:
                                 batch_size = (
-                                    yield {"web": results, "local": []},
+                                    yield {
+                                        "web": [(link, "") for link in results],
+                                        "local": [],
+                                    },
                                     "",
                                 )
                                 results = []
@@ -80,3 +88,11 @@ def get_default_config():
 
 def set_config(new_config: dict) -> dict:
     return {}
+
+
+if __name__ == "__main__":
+    a = get("word")
+    next(a)
+    while True:
+        res = a.send(1)
+        print(res)
