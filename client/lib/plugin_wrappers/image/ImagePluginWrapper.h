@@ -13,7 +13,7 @@ class ImagePluginWrapper : public BasicPluginWrapper,
  public:
     explicit ImagePluginWrapper(std::shared_ptr<IRequestable> connection);
     std::pair<std::vector<std::string>, std::string>
-    get(const std::string &word, size_t batch_size) override;
+    get(const std::string &word, size_t batch_size, bool restart) override;
 };
 
 #endif  // IMAGEPLUGINWRAPPER_H

@@ -24,7 +24,7 @@ TEST(BasicPWInitTest, Output) {
 }
 
 TEST(BasicPWInit, Success) {
-    std::string        answer       = R"({ "status" : 0, "error" : "null"})";
+    std::string        answer       = R"({ "status" : 0, "message" : "null"})";
     auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
     BasicPluginWrapper wrapper(fixed_answer, "tests");
 
@@ -32,7 +32,7 @@ TEST(BasicPWInit, Success) {
 }
 
 TEST(BasicPWInit, Error) {
-    std::string        answer = R"({ "status" : 1, "error" : "something" })";
+    std::string        answer = R"({ "status" : 1, "message" : "something" })";
     auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
     BasicPluginWrapper wrapper(fixed_answer, "tests");
 
@@ -43,7 +43,7 @@ TEST(BasicPWInit, Error) {
 }
 
 TEST(BasicPWInit, WrongResponseFormat) {
-    std::string        answer = R"({ "status" : "ok", "error" : "something" })";
+    std::string        answer = R"({ "status" : "ok", "message" : "something" })";
     auto               fixed_answer = std::make_shared<FixedAnswer>(answer);
     BasicPluginWrapper wrapper(fixed_answer, "tests");
 
@@ -54,7 +54,7 @@ TEST(BasicPWInit, WrongResponseFormat) {
 }
 
 TEST(BasicPWInit, Disconnect) {
-    std::string answer       = R"({ "status" : "0", "error" : "something" })";
+    std::string answer       = R"({ "status" : "0", "message" : "something" })";
     auto        fixed_answer = std::make_shared<FixedAnswer>(answer, false);
     BasicPluginWrapper wrapper(fixed_answer, "tests");
 

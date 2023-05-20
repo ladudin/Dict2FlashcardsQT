@@ -16,10 +16,6 @@ ServerConnection::ServerConnection(unsigned short port, const std::string &host)
     is_connected_ = !error;
 }
 
-ServerConnection::~ServerConnection() {
-    socket_.close();
-}
-
 bool ServerConnection::is_connected() {
     return is_connected_;
 }
@@ -31,14 +27,14 @@ ServerConnection::request(const std::string &message) {
 
     boost::asio::write(socket_, boost::asio::buffer(request_message), error);
     if (error) {
-        return std::make_pair(false, error.message());
         is_connected_ = false;
+        return std::make_pair(false, error.message());
     }
 
-    size_t bytes = boost::asio::read_until(socket_, buffer_, "\r\n", error);
+    boost::asio::read_until(socket_, buffer_, "\r\n", error);
     if (error) {
-        return std::make_pair(false, error.message());
         is_connected_ = false;
+        return std::make_pair(false, error.message());
     }
 
     std::string  response;

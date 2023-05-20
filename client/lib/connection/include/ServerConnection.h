@@ -11,7 +11,6 @@ class ServerConnection : public IRequestable {
  public:
     ServerConnection(unsigned short     port,
                      const std::string &host = "127.0.0.1");
-    ~ServerConnection() override;
     bool        is_connected();
     std::pair<bool, std::string> request(const std::string &message) override;
 
