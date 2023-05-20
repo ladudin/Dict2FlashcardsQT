@@ -46,6 +46,7 @@ class ResponseGenerator : public IResponceGenerator {
     static constexpr auto WORD_FIELD                      = "word";
     static constexpr auto BATCH_SIZE_FIELD                = "batch_size";
     static constexpr auto RESTART_FIELD                   = "restart";
+    static constexpr auto CARDS_PATH_FIELD                = "cards_path";
 
     static constexpr auto DEFINITION_PROVIDER_PLUGIN_TYPE = "word";
     static constexpr auto SENTENCES_PROVIDER_PLUGIN_TYPE  = "sentences";
@@ -60,6 +61,7 @@ class ResponseGenerator : public IResponceGenerator {
     static constexpr auto SET_CONFIG_QUERY_TYPE         = "set_config";
     static constexpr auto LOAD_NEW_PLUGINS_QUERY_TYPE   = "load_new_plugins";
     static constexpr auto GET_QUERY_TYPE                = "get";
+    static constexpr auto SAVE_QUERY_TYPE               = "save";
     static constexpr auto GET_DICT_SCHEME_QUERY_TYPE    = "get_dict_scheme";
 
     auto handle_init(const nlohmann::json &request) -> nlohmann::json override;
@@ -83,6 +85,7 @@ class ResponseGenerator : public IResponceGenerator {
     auto handle_get_sentences(const nlohmann::json &request) -> nlohmann::json;
     auto handle_get_images(const nlohmann::json &request) -> nlohmann::json;
     auto handle_get_audios(const nlohmann::json &request) -> nlohmann::json;
+    auto handle_save(const nlohmann::json &request) -> nlohmann::json;
 
  private:
     PluginsBundle                          plugins_bundle_;
