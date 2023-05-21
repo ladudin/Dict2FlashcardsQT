@@ -52,11 +52,11 @@ QModelIndex DeckModel::index(int row, int column, const QModelIndex &parent) con
     return createIndex(row, 0);
 }
 
-void DeckModel::load(const QString &word)
+void DeckModel::load(const QString &word, QString query)
 {
     beginResetModel();
     std::cout << int(deck_.get() != nullptr) << std::endl;
-    deck_->load(word.toStdString(), "");
+    deck_->load(word.toStdString(), query.toStdString());
     endResetModel();
 }
 

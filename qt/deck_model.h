@@ -27,7 +27,7 @@ public:
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
 
 public slots:
-    void load(const QString& word);
+    void load(const QString& word, QString query);
     void next(const QModelIndex& index);
     void prev(const QModelIndex& index);
 

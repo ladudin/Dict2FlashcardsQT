@@ -12,6 +12,7 @@
 #include <memory>
 #include <QBoxLayout>
 #include <iostream>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -52,7 +53,7 @@ void MainWindow::onSearchReturned()
     int int_idx = deckModel->indexOfWord(word);
     if (int_idx == -1)
     {
-        deckModel->load(ui->searchLine->text());
+        deckModel->load(ui->searchLine->text(), ui->filterEdit->toPlainText());
         QModelIndex qm_idx = deckModel->index(deckModel->rowCount() - 1);
         ui->deckView->setCurrentIndex(qm_idx);
         emit ui->deckView->clicked(qm_idx);
@@ -71,6 +72,7 @@ void MainWindow::updateCardFields()
     updateWord(card);
     updateDefinition(card);
     updateExamples(card);
+    updateAudio(card);
     updateImages(card);
 }
 
@@ -110,6 +112,7 @@ void MainWindow::updateAudio(const Card *card)
     if (!card) {
         return;
     }
+    std::cout << card->audios.web[0].src << std::endl;
     audioWidget->set(card->audios);
 }
 
