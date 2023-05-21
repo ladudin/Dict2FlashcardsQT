@@ -505,7 +505,7 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
     json res;
     res["status"] = static_cast<int>(!batch.second.empty());
     res["result"] = batch;
-    SPDLOG_INFO("Successfully handled `get` request for sentences");
+    SPDLOG_INFO("Successfully handled `get` request for definitions");
     return res;
 }
 
