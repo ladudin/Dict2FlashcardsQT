@@ -6,7 +6,7 @@ WordCards::WordCards(const std::string& word)
 {
 }
 
-size_t WordCards::size()
+size_t WordCards::size() const
 {
     return cards.size();
 }
@@ -16,13 +16,13 @@ std::string WordCards::get_word() const
     return word;
 }
 
-Card *WordCards::get_card()
+const Card* WordCards::get_card() const
 {
     if (pos < 0 || pos >= size())
     {
         return nullptr;
     }
-    return cards[pos];
+    return &cards[pos];
 }
 
 void WordCards::next()
@@ -43,7 +43,7 @@ void WordCards::prev()
     --pos;
 }
 
-void WordCards::addCard(Card* card)
+void WordCards::addCard(Card card)
 {
     cards.push_back(card);
 }

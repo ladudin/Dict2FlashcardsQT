@@ -3,21 +3,21 @@
 
 #include <string>
 #include <vector>
-#include "card.h"
+#include "Card.h"
 
 class WordCards {
 public:
     explicit WordCards(const std::string& name);
-    size_t size();
+    size_t size() const;
     std::string get_word() const;
-    Card* get_card();
+    const Card* get_card() const;
     void next();
     void prev();
-    void addCard(Card* card);
+    void addCard(Card card);
 
 private:
     std::string word;
-    std::vector<Card*> cards;
+    std::vector<Card> cards;
     size_t pos;
 };
 
