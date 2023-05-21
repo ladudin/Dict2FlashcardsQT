@@ -5,6 +5,7 @@
 #include "IAudiosProviderWrapper.hpp"
 #include "IFormatProcessorWrapper.hpp"
 #include "IImagesProviderWrapper.hpp"
+#include "IPluginWrapper.hpp"
 #include "ISentencesProviderWrapper.hpp"
 #include "ImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
@@ -291,6 +292,8 @@ auto ResponseGenerator::handle_get_config_scheme(const nlohmann::json &request)
 
 auto ResponseGenerator::handle_validate_config(const nlohmann::json &request)
     -> nlohmann::json {
+    using std::string_literals::operator""s;
+
     if (!request.contains(PLUGIN_TYPE_FIELD)) {
         return return_error("\""s + PLUGIN_TYPE_FIELD +
                             "\" filed was not found in request");
@@ -305,29 +308,41 @@ auto ResponseGenerator::handle_validate_config(const nlohmann::json &request)
         return return_error("\""s + CONFIG_FIELD +
                             "\" filed was not found in request");
     }
-    auto config = request[CONFIG_FIELD];
+    auto            config = request[CONFIG_FIELD];
 
-    std::variant<PyExceptionInfo, nlohmann::json> res_or_error =
-        nlohmann::json();
+    IPluginWrapper *provider;
     if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
-        res_or_error = plugins_bundle_.definitions_provider()->validate_config(
-            std::move(config));
+        provider = plugins_bundle_.definitions_provider();
+        if (provider == nullptr) {
+            return return_error("Definitions provider is not initialized");
+        }
     } else if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
-        res_or_error = plugins_bundle_.sentences_provider()->validate_config(
-            std::move(config));
+        provider = plugins_bundle_.sentences_provider();
+        if (provider == nullptr) {
+            return return_error("Sentences provider is not initialized");
+        }
     } else if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
-        res_or_error = plugins_bundle_.images_provider()->validate_config(
-            std::move(config));
+        provider = plugins_bundle_.images_provider();
+        if (provider == nullptr) {
+            return return_error("Images provider is not initialized");
+        }
     } else if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
-        res_or_error = plugins_bundle_.audios_provider()->validate_config(
-            std::move(config));
+        provider = plugins_bundle_.audios_provider();
+        if (provider == nullptr) {
+            return return_error("Audios provider is not initialized");
+        }
     } else if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
-        res_or_error = plugins_bundle_.format_processor()->validate_config(
-            std::move(config));
+        provider = plugins_bundle_.format_processor();
+        if (provider == nullptr) {
+            return return_error("Format processor is not initialized");
+        }
     } else {
         return return_error("Unknown plugin type for `validate_config`: " +
                             plugin_type);
     }
+
+    auto res_or_error = provider->validate_config(std::move(config));
+
     if (std::holds_alternative<PyExceptionInfo>(res_or_error)) {
         auto error = std::get<PyExceptionInfo>(res_or_error);
         return return_error(error.stack_trace());
@@ -335,7 +350,7 @@ auto ResponseGenerator::handle_validate_config(const nlohmann::json &request)
     auto res           = std::get<nlohmann::json>(res_or_error);
     auto response      = nlohmann::json();
     response["status"] = 0;
-    response["result"] = nlohmann::json::object();
+    response["result"] = res;
     return response;
 }
 
