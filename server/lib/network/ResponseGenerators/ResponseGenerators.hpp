@@ -19,7 +19,7 @@ class IResponceGenerator {
         -> nlohmann::json = 0;
     virtual auto handle_get_config_scheme(const nlohmann::json &)
         -> nlohmann::json = 0;
-    virtual auto handle_set_config(const nlohmann::json &)
+    virtual auto handle_validate_config(const nlohmann::json &)
         -> nlohmann::json = 0;
     virtual auto handle_list_plugins(const nlohmann::json &)
         -> nlohmann::json = 0;
@@ -58,7 +58,7 @@ class ResponseGenerator : public IResponceGenerator {
     static constexpr auto LIST_PLUGINS_QUERY_TYPE         = "list_plugins";
     static constexpr auto GET_DEFAULT_CONFIG_QUERY_TYPE = "get_default_config";
     static constexpr auto GET_CONFIG_SCHEME_QUERY_TYPE  = "get_confit_scheme";
-    static constexpr auto SET_CONFIG_QUERY_TYPE         = "set_config";
+    static constexpr auto VALIDATE_CONFIG_QUERY_TYPE    = "validate_config";
     static constexpr auto LOAD_NEW_PLUGINS_QUERY_TYPE   = "load_new_plugins";
     static constexpr auto GET_QUERY_TYPE                = "get";
     static constexpr auto SAVE_QUERY_TYPE               = "save";
@@ -69,7 +69,7 @@ class ResponseGenerator : public IResponceGenerator {
         -> nlohmann::json override;
     auto handle_get_config_scheme(const nlohmann::json &request)
         -> nlohmann::json override;
-    auto handle_set_config(const nlohmann::json &request)
+    auto handle_validate_config(const nlohmann::json &request)
         -> nlohmann::json override;
     auto handle_list_plugins(const nlohmann::json &request)
         -> nlohmann::json override;

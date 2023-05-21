@@ -16,6 +16,9 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+enable_testing()
+include(GoogleTest)
+
 # Logger
 add_subdirectory(spdlog)
 link_libraries(spdlog::spdlog_header_only)
@@ -24,3 +27,4 @@ add_subdirectory(client)
 add_subdirectory(server)
 add_subdirectory(test_client)
 add_subdirectory(qt)
+
