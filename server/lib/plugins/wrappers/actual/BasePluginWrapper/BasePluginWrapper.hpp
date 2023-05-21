@@ -33,7 +33,7 @@ class BasePluginWrapper : public virtual IPluginWrapper {
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
     auto get_default_config()
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
-    auto set_config(nlohmann::json &&new_config)
+    auto validate_config(nlohmann::json &&new_config)
         -> std::variant<PyExceptionInfo, nlohmann::json> override;
 
  protected:
@@ -43,7 +43,7 @@ class BasePluginWrapper : public virtual IPluginWrapper {
 
         boost::python::object load;
         boost::python::object get_config_description;
-        boost::python::object set_config;
+        boost::python::object validate_config;
         boost::python::object get_default_config;
         boost::python::object unload;
     };

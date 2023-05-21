@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Literal, TypedDict, Union
 
 import genanki
 
@@ -79,5 +80,22 @@ def get_default_config():
     return {}
 
 
-def set_config(new_config: dict) -> dict:
-    return {}
+class ErrorSummary(TypedDict):
+    error_type: Literal[
+        "invalid_type", "invalid_value", "empty", "unknown_field"
+    ]
+    description: str
+
+
+SetConfigError = dict[str, Union[ErrorSummary, "SetConfigError"]]
+
+
+def validate_config(new_config: dict) -> SetConfigError:
+    res: SetConfigError = {}
+    for key in new_config:
+        res[key] = {
+            "error_type": "unknown_field",
+            "description": f"Unknown field: `{key}`",
+        }
+
+    return res

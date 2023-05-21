@@ -1,2 +1,2 @@
-add_executable(test_sender sender.cpp)
-
+add_subdirectory(Sender)
+add_subdirectory(tests)
