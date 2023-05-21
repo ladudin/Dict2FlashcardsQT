@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from typing import Any, Literal, TypedDict, Union
 
 import bs4
 import requests
@@ -78,16 +79,71 @@ def unload():
     return
 
 
-def get_config_description():
-    return {}
+ConfigKeys = Literal["timeout"]
+TIMEOUT = "timeout"
 
 
-def get_default_config():
-    return {}
+class ConfigFieldInfo(TypedDict):
+    docs: str
+    type: str
 
 
-def set_config(new_config: dict) -> dict:
-    return {}
+ConfigDescription = dict[
+    ConfigKeys, Union[ConfigFieldInfo, "ConfigDescription"]
+]
+
+
+def get_config_description() -> ConfigDescription:
+    return {
+        TIMEOUT: {"docs": "Request timeout", "type": "number"},
+    }
+
+
+def get_default_config() -> dict[ConfigKeys, Any]:
+    return {TIMEOUT: 3}
+
+
+class ErrorSummary(TypedDict):
+    error_type: Literal[
+        "invalid_type", "invalid_value", "empty", "unknown_field"
+    ]
+    description: str
+
+
+SetConfigError = dict[str, Union[ErrorSummary, "SetConfigError"]]
+
+
+def validate_config(new_config: dict) -> SetConfigError:
+    res: SetConfigError = {}
+
+    if (new_timeout := new_config.get(TIMEOUT)) is not None:
+        if type(new_timeout) not in [float, int]:
+            res[TIMEOUT] = {
+                "error_type": "invalid_type",
+                "description": f"`{TIMEOUT}` is expected to be a number. Got `{new_timeout}`",
+            }
+        elif new_timeout < 0:
+            res[TIMEOUT] = {
+                "error_type": "invalid_value",
+                "description": f"`{TIMEOUT}` is expected to be non negative",
+            }
+
+    else:
+        res[TIMEOUT] = {
+            "error_type": "empty",
+            "description": "`timeout` was left empty",
+        }
+
+    conf_keys = [TIMEOUT]
+    for key in new_config:
+        if key in conf_keys:
+            continue
+        res[key] = {
+            "error_type": "unknown_field",
+            "description": f"Unknown field: `{key}`",
+        }
+
+    return res
 
 
 if __name__ == "__main__":

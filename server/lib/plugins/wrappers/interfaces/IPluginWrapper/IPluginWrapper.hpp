@@ -22,7 +22,7 @@ class IPluginWrapper {
         -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
     virtual auto get_default_config()
         -> std::variant<PyExceptionInfo, nlohmann::json> = 0;
-    virtual auto set_config(nlohmann::json &&new_config)
+    virtual auto validate_config(nlohmann::json &&new_config)
         -> std::variant<PyExceptionInfo, nlohmann::json>    = 0;
     virtual auto unload() -> std::optional<PyExceptionInfo> = 0;
 };

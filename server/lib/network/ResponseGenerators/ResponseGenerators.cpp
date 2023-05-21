@@ -72,9 +72,10 @@ auto ResponseGenerator::handle(const std::string &request) -> json {
                     GET_CONFIG_SCHEME_QUERY_TYPE);
         return handle_get_config_scheme(parsed_request);
     }
-    if (query_type == SET_CONFIG_QUERY_TYPE) {
-        SPDLOG_INFO("Started handling `{}` request", SET_CONFIG_QUERY_TYPE);
-        return handle_set_config(parsed_request);
+    if (query_type == VALIDATE_CONFIG_QUERY_TYPE) {
+        SPDLOG_INFO("Started handling `{}` request",
+                    VALIDATE_CONFIG_QUERY_TYPE);
+        return handle_validate_config(parsed_request);
     }
     if (query_type == LIST_PLUGINS_QUERY_TYPE) {
         SPDLOG_INFO("Started handling `{}` request", LIST_PLUGINS_QUERY_TYPE);
@@ -288,9 +289,54 @@ auto ResponseGenerator::handle_get_config_scheme(const nlohmann::json &request)
     return return_error("handle_get_config_scheme() is not implemented");
 }
 
-auto ResponseGenerator::handle_set_config(const nlohmann::json &request)
+auto ResponseGenerator::handle_validate_config(const nlohmann::json &request)
     -> nlohmann::json {
-    return return_error("handle_set_config() is not implemented");
+    if (!request.contains(PLUGIN_TYPE_FIELD)) {
+        return return_error("\""s + PLUGIN_TYPE_FIELD +
+                            "\" filed was not found in request");
+    }
+    if (!request[PLUGIN_TYPE_FIELD].is_string()) {
+        return return_error("\""s + PLUGIN_TYPE_FIELD +
+                            "\" field is expected to be a string");
+    }
+    auto plugin_type = request[PLUGIN_TYPE_FIELD].get<std::string>();
+
+    if (!request.contains(CONFIG_FIELD)) {
+        return return_error("\""s + CONFIG_FIELD +
+                            "\" filed was not found in request");
+    }
+    auto config = request[CONFIG_FIELD];
+
+    std::variant<PyExceptionInfo, nlohmann::json> res_or_error =
+        nlohmann::json();
+    if (plugin_type == DEFINITION_PROVIDER_PLUGIN_TYPE) {
+        res_or_error = plugins_bundle_.definitions_provider()->validate_config(
+            std::move(config));
+    } else if (plugin_type == SENTENCES_PROVIDER_PLUGIN_TYPE) {
+        res_or_error = plugins_bundle_.sentences_provider()->validate_config(
+            std::move(config));
+    } else if (plugin_type == IMAGES_PROVIDER_PLUGIN_TYPE) {
+        res_or_error = plugins_bundle_.images_provider()->validate_config(
+            std::move(config));
+    } else if (plugin_type == AUDIOS_PROVIDER_PLUGIN_TYPE) {
+        res_or_error = plugins_bundle_.audios_provider()->validate_config(
+            std::move(config));
+    } else if (plugin_type == FORMAT_PROCESSOR_PLUGIN_TYPE) {
+        res_or_error = plugins_bundle_.format_processor()->validate_config(
+            std::move(config));
+    } else {
+        return return_error("Unknown plugin type for `validate_config`: " +
+                            plugin_type);
+    }
+    if (std::holds_alternative<PyExceptionInfo>(res_or_error)) {
+        auto error = std::get<PyExceptionInfo>(res_or_error);
+        return return_error(error.stack_trace());
+    }
+    auto res           = std::get<nlohmann::json>(res_or_error);
+    auto response      = nlohmann::json();
+    response["status"] = 0;
+    response["result"] = nlohmann::json::object();
+    return response;
 }
 
 auto ResponseGenerator::handle_list_plugins(const nlohmann::json &request)
@@ -457,7 +503,7 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
     }
 
     json res;
-    res["status"] = !batch.second.empty();
+    res["status"] = static_cast<int>(!batch.second.empty());
     res["result"] = batch;
     SPDLOG_INFO("Successfully handled `get` request for sentences");
     return res;
@@ -673,7 +719,7 @@ auto ResponseGenerator::handle_save(const nlohmann::json &request)
     auto string_error = std::get<std::string>(string_error_or_py_exception);
     if (string_error.empty()) {
         SPDLOG_INFO("Successfully handled `save` request");
-        return R"({"status": 0, "message": ""})";
+        return R"({"status": 0, "message": ""})"_json;
     }
     return return_error(string_error);
 }

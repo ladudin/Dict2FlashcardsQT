@@ -5,6 +5,7 @@ Credits:
 
 
 import re
+from typing import Any, Literal, TypedDict, Union
 
 import requests.utils
 
@@ -92,13 +93,90 @@ def unload():
     return
 
 
-def get_config_description():
-    return {}
+ConfigKeys = Literal["audio region", "timeout"]
+AUDIO_REGION = "audio region"
+TIMEOUT = "timeout"
 
 
-def get_default_config():
-    return {}
+class ConfigFieldInfo(TypedDict):
+    docs: str
+    type: str
 
 
-def set_config(new_config: dict) -> dict:
-    return {}
+ConfigDescription = dict[
+    ConfigKeys, Union[ConfigFieldInfo, "ConfigDescription"]
+]
+
+
+def get_config_description() -> ConfigDescription:
+    return {
+        AUDIO_REGION: {
+            "docs": "Current audio region",
+            "type": "string",
+        },
+        TIMEOUT: {"docs": "Request timeout", "type": "number"},
+    }
+
+
+def get_default_config() -> dict[ConfigKeys, Any]:
+    return {AUDIO_REGION: "us", TIMEOUT: 3}
+
+
+class ErrorSummary(TypedDict):
+    error_type: Literal[
+        "invalid_type", "invalid_value", "empty", "unknown_field"
+    ]
+    description: str
+
+
+SetConfigError = dict[str, Union[ErrorSummary, "SetConfigError"]]
+
+
+def validate_config(new_config: dict) -> SetConfigError:
+    res: SetConfigError = {}
+
+    if (new_audio_region := new_config.get(AUDIO_REGION)) is not None:
+        if type(new_audio_region) != str:
+            res[AUDIO_REGION] = {
+                "error_type": "invalid_type",
+                "description": f"`{AUDIO_REGION}` is expected to be a string",
+            }
+        elif new_audio_region not in ["uk", "us"]:
+            res[AUDIO_REGION] = {
+                "error_type": "invalid_value",
+                "description": f'`{AUDIO_REGION}` is expected to be one of: ["uk", "us"]',
+            }
+    else:
+        res[AUDIO_REGION] = {
+            "error_type": "empty",
+            "description": f"`{AUDIO_REGION}` was left empty",
+        }
+
+    if (new_timeout := new_config.get(TIMEOUT)) is not None:
+        if type(new_timeout) not in [float, int]:
+            res[TIMEOUT] = {
+                "error_type": "invalid_type",
+                "description": f"`{TIMEOUT}` is expected to be a number. Got `{new_timeout}`",
+            }
+        elif new_timeout < 0:
+            res[TIMEOUT] = {
+                "error_type": "invalid_value",
+                "description": f"`{TIMEOUT}` is expected to be non negative",
+            }
+
+    else:
+        res[TIMEOUT] = {
+            "error_type": "empty",
+            "description": "`timeout` was left empty",
+        }
+
+    conf_keys = [AUDIO_REGION, TIMEOUT]
+    for key in new_config:
+        if key in conf_keys:
+            continue
+        res[key] = {
+            "error_type": "unknown_field",
+            "description": f"Unknown field: `{key}`",
+        }
+
+    return res

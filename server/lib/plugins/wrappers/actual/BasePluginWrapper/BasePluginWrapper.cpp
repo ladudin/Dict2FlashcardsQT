@@ -12,7 +12,7 @@ auto BasePluginWrapper::CommonFunctions::build(
         plugin_container.load = module.attr("load");
         plugin_container.get_config_description =
             module.attr("get_config_description");
-        plugin_container.set_config         = module.attr("set_config");
+        plugin_container.validate_config    = module.attr("validate_config");
         plugin_container.get_default_config = module.attr("get_default_config");
         plugin_container.unload             = module.attr("unload");
     } catch (const boost::python::error_already_set &) {
@@ -106,7 +106,7 @@ auto BasePluginWrapper::get_default_config()
     return default_config;
 }
 
-auto BasePluginWrapper::set_config(nlohmann::json &&new_config)
+auto BasePluginWrapper::validate_config(nlohmann::json &&new_config)
     -> std::variant<PyExceptionInfo, nlohmann::json> {
     nlohmann::json diagnostics;
     try {
@@ -115,9 +115,9 @@ auto BasePluginWrapper::set_config(nlohmann::json &&new_config)
         boost::python::object py_json_dumps = py_json.attr("dumps");
 
         std::string           new_conf_str  = new_config.dump();
-        boost::python::object py_new_conf   = py_json_loads(py_json_loads);
+        boost::python::object py_new_conf   = py_json_loads(new_conf_str);
         boost::python::object py_conf_diagnostics =
-            common_.set_config(py_new_conf);
+            common_.validate_config(py_new_conf);
         boost::python::object py_conf_diagnostics_str =
             py_json_dumps(py_conf_diagnostics);
         std::string cpp_conf_diagnostics_str =
