@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     std::shared_ptr<IRequestable> connection = std::make_shared<ServerConnection>(8888);
     std::unique_ptr<IWordPluginWrapper> wordPlugin = std::make_unique<WordPluginWrapper>(connection);
+    wordPlugin->init("definitions");
     std::unique_ptr<IDeck> deck = std::make_unique<Deck>(std::move(wordPlugin));
     std::cout << "deck: " << int(deck != nullptr) << std::endl;
     deckModel = new DeckModel(std::move(deck), this);
@@ -43,17 +44,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::onSearchReturned()
 {
-    std::cout << "in searchreturned " << (deckModel->deck_ != nullptr) << std::endl;
     QString word = ui->searchLine->text();
     if (word == "")
     {
         return;
     }
     int int_idx = deckModel->indexOfWord(word);
-    std::cout << "after indexofword " << (deckModel->deck_ != nullptr) << std::endl;
     if (int_idx == -1)
     {
-        std::cout << "before load " << (deckModel->deck_ != nullptr) << std::endl;
         deckModel->load(ui->searchLine->text());
         QModelIndex qm_idx = deckModel->index(deckModel->rowCount() - 1);
         ui->deckView->setCurrentIndex(qm_idx);

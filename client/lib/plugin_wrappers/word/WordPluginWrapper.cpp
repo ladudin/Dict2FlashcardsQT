@@ -33,11 +33,14 @@ WordPluginWrapper::get(const std::string &word,
         return {std::vector<Card>(), "Server disconnected"};
     try {
         json response_message = json::parse(response.second);
-        if (response_message.at("status").get<int>() != 0)
+        if (response_message.at("status").get<int>() != 0) {
             return {std::vector<Card>(),
                     response_message.at("message").get<std::string>()};
-        return {response_message.at("result").get<std::vector<Card>>(),
-                response_message.at("message").get<std::string>()};
+        }
+        json cards_with_error = response_message["result"];
+        std::vector<Card> cards = cards_with_error[0];
+
+        return {cards, cards_with_error[1]};
     } catch (...) {
         return {std::vector<Card>(), "Wrong response format"};
     }
