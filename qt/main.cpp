@@ -1,16 +1,17 @@
-// #include "MainWindow.hpp"
+#include "mainwindow.h"
 
-// #include <QApplication>
-// #include <QPushButton>
-// #include <QLabel>
-// #include <QPixmap>
-// #include <QTableWidget>
-// #include <ImagesWidget.hpp>
-// #include <memory>
-// #include "AudioPlayer.hpp"
-// #include "Media.hpp"
-// #include "AudioWidget.hpp"
-// #include "ExamplesWidget.hpp"
+#include <QApplication>
+#include <QPushButton>
+#include <QLabel>
+#include <QPixmap>
+#include <QTableWidget>
+#include <ImagesWidget.hpp>
+#include <memory>
+#include <qapplication.h>
+#include "AudioPlayer.hpp"
+#include "Media.hpp"
+#include "AudioWidget.hpp"
+#include "ExamplesWidget.hpp"
 // #include "test.h"
 
 // int main(int argc, char *argv[])
@@ -51,6 +52,10 @@
 //     return a.exec();
 // }
 
-int main() {
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.show();
+    app.exec();
     return 0;
 }

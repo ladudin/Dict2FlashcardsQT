@@ -1,17 +1,20 @@
 #include "deck_model.h"
 #include <QString>
+#include <iostream>
 
-DeckModel::DeckModel(std::shared_ptr<IDeck> deck, QObject *parent)
+DeckModel::DeckModel(std::unique_ptr<IDeck> deck, QObject *parent)
     : QAbstractListModel(parent)
-    , deck(deck)
 {
+    std::cout << "do: " << (deck != nullptr) << std::endl;
+    deck_ = std::move(deck);
+    std::cout << "posle: " << (deck_ != nullptr) << std::endl;
 }
 
 int DeckModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return deck->size();
+    return deck_->size();
 }
 
 QVariant DeckModel::data(const QModelIndex &index, int role) const
@@ -22,9 +25,13 @@ QVariant DeckModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
     case Qt::DisplayRole:
-        return QString::fromStdString(deck->getWord(index.row()));
+        return QString::fromStdString(deck_->getWord(index.row()));
     case CardRole:
-        return QVariant::fromValue(deck->getCard(index.row()));
+    {
+        Card* card = const_cast<Card*>(deck_->getCard(index.row()));
+        void* card_void = static_cast<void*>(card);
+        return QVariant::fromValue(card_void);
+    }
     default:
         return QVariant();
     }
@@ -33,7 +40,7 @@ QVariant DeckModel::data(const QModelIndex &index, int role) const
 
 int DeckModel::indexOfWord(const QString &word)
 {
-    return deck->indexOfWord(word.toStdString());
+    return deck_->indexOfWord(word.toStdString());
 }
 
 QModelIndex DeckModel::index(int row, int column, const QModelIndex &parent) const
@@ -48,16 +55,17 @@ QModelIndex DeckModel::index(int row, int column, const QModelIndex &parent) con
 void DeckModel::load(const QString &word)
 {
     beginResetModel();
-    deck->load(word.toStdString());
+    std::cout << int(deck_.get() != nullptr) << std::endl;
+    deck_->load(word.toStdString(), "");
     endResetModel();
 }
 
 void DeckModel::next(const QModelIndex &index)
 {
-    deck->next(index.row());
+    deck_->next(index.row());
 }
 
 void DeckModel::prev(const QModelIndex &index)
 {
-    deck->prev(index.row());
+    deck_->prev(index.row());
 }

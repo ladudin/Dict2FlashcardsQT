@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>509</width>
-    <height>500</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -548,19 +548,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="tagsLine">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>100</horstretch>
-          <verstretch>10</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="placeholderText">
-         <string>tags</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QPushButton" name="prevButton">
@@ -593,7 +580,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="examplesTab">
            <attribute name="title">
@@ -601,7 +588,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QListView" name="examplesView"/>
+             <layout class="QVBoxLayout" name="examplesLayout"/>
             </item>
            </layout>
           </widget>
@@ -611,17 +598,17 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QListView" name="audioView"/>
+             <layout class="QVBoxLayout" name="audioLayout"/>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="ImagesTab">
+          <widget class="QWidget" name="imagesTab">
            <attribute name="title">
             <string>Images</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QListView" name="ImagesView"/>
+             <layout class="QVBoxLayout" name="ImagesLayout"/>
             </item>
            </layout>
           </widget>
@@ -639,7 +626,7 @@
      <x>0</x>
      <y>0</y>
      <width>509</width>
-     <height>26</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

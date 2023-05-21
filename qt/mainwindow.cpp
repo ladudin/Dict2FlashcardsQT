@@ -1,24 +1,37 @@
 #include "mainwindow.h"
+#include "AudioWidget.hpp"
+#include "ExamplesWidget.hpp"
+#include "IRequestable.h"
+#include "IWordPluginWrapper.h"
+#include "ImagesWidget.hpp"
 #include "ui_mainwindow.h"
 #include "deck_model.h"
-#include "deckmock.h"
+#include "Deck.hpp"
+#include "WordPluginWrapper.h"
+#include "ServerConnection.h"
 #include <memory>
 #include <QBoxLayout>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    auto deck = std::make_shared<DeckMock>();
-    examples_model = new ExamplesModel;
-    ui->examplesView->setModel(examples_model);
-    audio_model = new AudioModel;
-    ui->audioView->setModel(audio_model);
-    images_model = new ImagesModel;
-    ui->ImagesView->setModel(images_model);
-    deck_model = new DeckModel(deck, ui->deckView);
-    ui->deckView->setModel(deck_model);
+    std::shared_ptr<IRequestable> connection = std::make_shared<ServerConnection>(8888);
+    std::unique_ptr<IWordPluginWrapper> wordPlugin = std::make_unique<WordPluginWrapper>(connection);
+    std::unique_ptr<IDeck> deck = std::make_unique<Deck>(std::move(wordPlugin));
+    std::cout << "deck: " << int(deck != nullptr) << std::endl;
+    deckModel = new DeckModel(std::move(deck), this);
+    examplesWidget = new ExamplesWidget;
+    ui->examplesTab->layout()->addWidget(examplesWidget);
+    audioWidget = new AudioWidget;
+    ui->audioTab->layout()->addWidget(audioWidget);
+    imagesWidget = new IMagesWidget;
+    ui->imagesTab->layout()->addWidget(imagesWidget);
+    ui->deckView->setModel(deckModel);
+    std::cout << "affadfadsf " << (deckModel->deck_ != nullptr) << std::endl;
+    std::cout << ui->deckView << " " << deckModel->parent() << std::endl;
     connect(ui->searchLine, SIGNAL(returnPressed()), this, SLOT(onSearchReturned()));
     connect(ui->deckView, SIGNAL(clicked(QModelIndex)), this, SLOT(setCurrentIndex(QModelIndex)));
 }
@@ -30,36 +43,40 @@ MainWindow::~MainWindow()
 
 void MainWindow::onSearchReturned()
 {
-    qDebug() << deck_model->rowCount();
+    std::cout << "in searchreturned " << (deckModel->deck_ != nullptr) << std::endl;
     QString word = ui->searchLine->text();
     if (word == "")
     {
         return;
     }
-    int int_idx = deck_model->indexOfWord(word);
+    int int_idx = deckModel->indexOfWord(word);
+    std::cout << "after indexofword " << (deckModel->deck_ != nullptr) << std::endl;
     if (int_idx == -1)
     {
-        deck_model->load(ui->searchLine->text());
-        QModelIndex qm_idx = deck_model->index(deck_model->rowCount() - 1);
+        std::cout << "before load " << (deckModel->deck_ != nullptr) << std::endl;
+        deckModel->load(ui->searchLine->text());
+        QModelIndex qm_idx = deckModel->index(deckModel->rowCount() - 1);
         ui->deckView->setCurrentIndex(qm_idx);
         emit ui->deckView->clicked(qm_idx);
         return;
     }
-    QModelIndex qm_idx = deck_model->index(int_idx);
+    QModelIndex qm_idx = deckModel->index(int_idx);
     ui->deckView->setCurrentIndex(qm_idx);
     emit ui->deckView->clicked(qm_idx);
 }
 
 void MainWindow::updateCardFields()
 {
-    QVariant qvar = deck_model->data(current_index, DeckModel::CardRole);
-    Card* card = qvar.value<Card*>();
+    QVariant qvar = deckModel->data(current_index, DeckModel::CardRole);
+    void* void_card = qvar.value<void*>();
+    const Card* card = static_cast<const Card*>(void_card);
     updateWord(card);
     updateDefinition(card);
     updateExamples(card);
+    updateImages(card);
 }
 
-void MainWindow::updateWord(Card *card)
+void MainWindow::updateWord(const Card *card)
 {
     if (!card)
     {
@@ -68,7 +85,7 @@ void MainWindow::updateWord(Card *card)
     ui->wordLine->setText(QString::fromStdString(card->word));
 }
 
-void MainWindow::updateDefinition(Card *card)
+void MainWindow::updateDefinition(const Card *card)
 {
     if (!card)
     {
@@ -77,24 +94,33 @@ void MainWindow::updateDefinition(Card *card)
     ui->definitionEdit->setText(QString::fromStdString(card->definition));
 }
 
-void MainWindow::updateTags(Card *)
+void MainWindow::updateTags(const Card *)
 {
 
 }
 
-void MainWindow::updateExamples(Card *card)
+void MainWindow::updateExamples(const Card *card)
 {
-    examples_model->setExamples(card->exaples);
+    if (!card) {
+        return;
+    }
+    examplesWidget->set(&card->examples);
 }
 
-void MainWindow::updateAudio(Card *card)
+void MainWindow::updateAudio(const Card *card)
 {
-    audio_model->setAudio(card->audio_links);
+    if (!card) {
+        return;
+    }
+    audioWidget->set(card->audios);
 }
 
-void MainWindow::updateImages(Card *card)
+void MainWindow::updateImages(const Card *card)
 {
-    images_model->setImages(card->image_links);
+    if (!card) {
+        return;
+    }
+    imagesWidget->set(card->images);
 }
 
 void MainWindow::setCurrentIndex(QModelIndex index)
@@ -108,7 +134,7 @@ void MainWindow::onNextClicked()
     if (!current_index.isValid()) {
         return;
     }
-    deck_model->next(current_index);
+    deckModel->next(current_index);
     updateCardFields();
 }
 
@@ -117,7 +143,7 @@ void MainWindow::onPrevClicked()
     if (!current_index.isValid()) {
         return;
     }
-    deck_model->prev(current_index);
+    deckModel->prev(current_index);
     updateCardFields();
 }
 

@@ -23,14 +23,14 @@ auto main(int argc, char *argv[]) -> int {
     Py_Initialize();
     auto plugins_dirs = PluginTypesLocationsConfig{
         .definitions_providers_dir =
-            "/home/blackdeer/projects/cpp/technopark/plugins/definitions/",
+            "/home/vlad/park/cpp/Dict2FlashcardsQT/plugins/definitions/",
         .sentences_providers_dir =
-            "/home/blackdeer/projects/cpp/technopark/plugins/sentences/",
+            "//home/vlad/park/cpp/Dict2FlashcardsQT/plugins/sentences/",
         .images_providers_dir =
-            "/home/blackdeer/projects/cpp/technopark/plugins/images/",
+            "/home/vlad/park/cpp/Dict2FlashcardsQT/plugins/images/",
         .audios_providers_dir =
-            "/home/blackdeer/projects/cpp/technopark/plugins/audios/",
-        .format_processors_dir = "/home/blackdeer/projects/cpp/technopark/"
+            "/home/vlad/park/cpp/Dict2FlashcardsQT/plugins/audios/",
+        .format_processors_dir = "/home/vlad/park/cpp/Dict2FlashcardsQT/"
                                  "plugins/format_processors/"};
 
     boost::asio::io_context io_context;
