@@ -22,8 +22,8 @@ auto prepare_filter(const std::string &query)
     std::vector<token> tokens = scan.scan_tokens();
 
     SPDLOG_INFO("Parsing query: `{}`", query);
-    auto  p   = parser(tokens);
-    expr *exp = p.parse();
+    auto                  p   = parser(tokens);
+    std::shared_ptr<expr> exp = p.parse();
     if (exp == nullptr) {
         SPDLOG_WARN("Parsing query `{}` resulted in empty expression, "
                     "returning a constant false function",
@@ -35,11 +35,10 @@ auto prepare_filter(const std::string &query)
     interpreter inter;
     return [i = std::move(inter), e = std::move(exp)](
                const nlohmann::json &json_card) mutable -> std::optional<bool> {
-        value val = i.interpret(e, json_card);
+        value val = i.interpret(e.get(), json_card);
         if (val.val_type == BOOL) {
             return val.bool_val;
         }
         return std::nullopt;
-        // delete exp;
     };
 }
