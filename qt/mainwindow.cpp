@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "AudioWidget.hpp"
+#include "Card.h"
 #include "ExamplesWidget.hpp"
 #include "IRequestable.h"
 #include "IWordPluginWrapper.h"
@@ -8,7 +9,9 @@
 #include "deck_model.h"
 #include "Deck.hpp"
 #include "WordPluginWrapper.h"
+#include "FormatProcessorPluginWrapper.h"
 #include "ServerConnection.h"
+#include <filesystem>
 #include <memory>
 #include <QBoxLayout>
 #include <iostream>
@@ -19,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    std::shared_ptr<IRequestable> connection = std::make_shared<ServerConnection>(8888);
+    connection = std::make_shared<ServerConnection>(8888);
     std::unique_ptr<IWordPluginWrapper> wordPlugin = std::make_unique<WordPluginWrapper>(connection);
     wordPlugin->init("definitions");
     std::unique_ptr<IDeck> deck = std::make_unique<Deck>(std::move(wordPlugin));
@@ -148,3 +151,20 @@ void MainWindow::onPrevClicked()
     updateCardFields();
 }
 
+void MainWindow::onAddClicked() {
+    Card card;
+    card.word = ui->wordLine->text().toStdString();
+    card.definition = ui->definitionEdit->toPlainText().toStdString();
+    card.examples = examplesWidget->extract();
+    card.audios = audioWidget->extract();
+    card.images = imagesWidget->extract();
+    savedDeck.push_back(card);
+}
+
+void MainWindow::save() {
+    std::string relative_path = "./savedDeck.json";
+    auto absolute_path = std::filesystem::absolute(relative_path).string();
+    save_cards(savedDeck, absolute_path);
+    FormatProcessorPluginWrapper savingPlugin(connection);
+    savingPlugin.save(absolute_path);
+}

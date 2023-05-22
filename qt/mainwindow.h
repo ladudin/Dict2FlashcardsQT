@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <IRequestable.h>
 #include "deck_model.h"
 #include "Card.h"
 #include "AudioWidget.hpp"
@@ -33,11 +34,14 @@ private slots:
     void setCurrentIndex(QModelIndex);
     void onNextClicked();
     void onPrevClicked();
+    void onAddClicked();
+    void save();
 
 private:
     Ui::MainWindow *ui;
     DeckModel* deckModel;
-
+    std::vector<Card> savedDeck;
+    std::shared_ptr<IRequestable> connection;
     ExamplesWidget* examplesWidget;
     AudioWidget* audioWidget;
     IMagesWidget* imagesWidget;
