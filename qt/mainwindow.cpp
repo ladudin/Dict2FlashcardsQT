@@ -69,6 +69,7 @@ void MainWindow::onSearchReturned()
 
 void MainWindow::updateCardFields()
 {
+    ui->tabWidget->setCurrentIndex(0);
     QVariant qvar = deckModel->data(current_index, DeckModel::CardRole);
     void* void_card = qvar.value<void*>();
     const Card* card = static_cast<const Card*>(void_card);
@@ -159,6 +160,7 @@ void MainWindow::onAddClicked() {
     card.audios = audioWidget->extract();
     card.images = imagesWidget->extract();
     savedDeck.push_back(card);
+    onNextClicked();
 }
 
 void MainWindow::save() {
