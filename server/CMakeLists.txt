@@ -15,3 +15,4 @@ target_link_libraries(server_main
     plugin_server
     plugins_provider
 )
+add_subdirectory(test_client)
