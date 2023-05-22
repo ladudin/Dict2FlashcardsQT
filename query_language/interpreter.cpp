@@ -129,6 +129,7 @@ bool interpreter::find_word_inJson(std::string word, json jsonValue){
     } else {
         return false;
     }
+    return false;
 }
 
 
