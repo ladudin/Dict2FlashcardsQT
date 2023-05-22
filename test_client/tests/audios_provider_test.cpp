@@ -3,7 +3,9 @@
 #include <iostream>
 #include <math.h>
 #include <nlohmann/json.hpp>
+#include <string>
 
+#include "Media.hpp"
 #include "Sender.hpp"
 
 #define SetUp()                                                                \
@@ -38,7 +40,7 @@ TEST(AudiosProvider, ValidateConfig) {
         {
             "query_type": "validate_config",
             "plugin_type": "audios",
-            "config": {"timeout": 1}
+            "config": {"audio region": "uk", "timeout": 1}
         })"
                            "\r\n";
 
@@ -66,6 +68,28 @@ TEST(AudiosProvider, blankGet) {
         R"*({"result": [{"local": [], "web": []}, ""], "status": 0})*"_json;
     auto actual = sender.request(request);
     ASSERT_EQ(expected, actual);
+}
+
+TEST(AudiosProvider, Get) {
+    SetUp();
+    Init(sender);
+
+    const auto *request = R"*(
+        {
+            "query_type": "get",
+            "plugin_type": "audios",
+            "word": "sunshade",
+            "filter": "",
+            "batch_size": 5,
+            "restart": false
+        })*"
+                          "\r\n";
+
+    auto        actual  = sender.request(request);
+    ASSERT_EQ(actual["status"], 0);
+    ASSERT_FALSE(actual["result"][1].empty());
+    Media links = actual["result"][0];
+    ASSERT_LE(links.web.size(), 5);
 }
 
 TEST(AudiosProvider, ListPlugins) {
