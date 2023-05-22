@@ -166,5 +166,6 @@ void MainWindow::save() {
     auto absolute_path = std::filesystem::absolute(relative_path).string();
     save_cards(savedDeck, absolute_path);
     FormatProcessorPluginWrapper savingPlugin(connection);
+    savingPlugin.init("processor");
     savingPlugin.save(absolute_path);
 }
