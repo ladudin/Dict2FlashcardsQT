@@ -34,7 +34,7 @@ bool parser::match(std::vector<token_type> types){
     return false;
 }
 
-// потом заманить ifы
+// потом заменить ifы
 std::unique_ptr<expr> parser::primary(){
     if (match({tt::FALSE}))
         return std::make_unique<literal>(false);
@@ -93,7 +93,7 @@ std::unique_ptr<expr> parser::func_in_class(){
 
 
 std::unique_ptr<expr> parser::unar(){
-    if(match({tt::BANG, tt::MINUS})){
+    if(match({tt::NOT, tt::MINUS, tt::LEN, tt::SPLIT, tt::UPPER, tt::LOWER, tt::REDUCE})){
         token oper = previous();
         std::unique_ptr<expr> right = unar();
         return std::make_unique<unary>(std::move(right),oper);

@@ -2,14 +2,14 @@
 
 interpreter::interpreter() {};
 
-value interpreter::interpret(std::unique_ptr<expr> expression, json card_) {
+value interpreter::interpret(expr* expression, json card_) {
     card = card_;
     value result = evaluate(expression);
     return result;
 }
 
 
-value interpreter::evaluate( const std::unique_ptr<expr>& expression){
+value interpreter::evaluate( expr*  expression){
     expression->accept(this);
     return result;
 }
@@ -48,12 +48,15 @@ bool interpreter::is_equal(value left, value right){
 }*/
 
 void interpreter::visit(binary* expr){
-    value left = evaluate(expr->left);
-    value right = evaluate(expr->right);
+    value left = evaluate(expr->left.get());
+    value right = evaluate(expr->right.get());
     switch(expr->op.type){
         case PLUS:
             if (left.val_type == DOUBLE && right.val_type == DOUBLE){
                 result = value(left.doub_val + right.doub_val);
+            } else if (left.val_type == DOUBLE && right.val_type == DOUBLE){
+                result = value(mergeJson(left.json_val, right.json_val));
+
             }
                 // обработать ошибку
             break;
@@ -107,8 +110,8 @@ void interpreter::visit(grouping* expr){
 
 
 void interpreter::visit(func_in* expr){
-    value left = evaluate(expr->left);
-    value right = evaluate(expr->right);
+    value left = evaluate(expr->left.get());
+    value right = evaluate(expr->right.get());
     if (left.val_type == STRING && right.val_type == JSON){
         result = value(find_word_inJson(left.str_val, right.json_val));
     }
@@ -116,54 +119,151 @@ void interpreter::visit(func_in* expr){
 
 bool interpreter::find_word_inJson(std::string word, json jsonValue){
     if (jsonValue.is_string()) {
-        
-        return jsonValue.get<std::string>().find(word) != std::string::npos;
+        return jsonValue.get<std::string>() == word;
     } else if (jsonValue.is_array()) {
-        
         for (const auto& element : jsonValue) {
-            
-            if (find_word_inJson(element, word)) {
+            if (find_word_inJson(word, element)) {
                 return true;
             }
         }
-    } else{
+    } else {
         return false;
     }
-    return false;
-
-    
-    /*else if (jsonValue.is_object()) {
-        // Если элемент JSON является объектом
-        for (const auto& [key, value] : jsonValue.items()) {
-            // Рекурсивно вызываем функцию для каждого значения объекта
-            if (find_word_inJson(value, word)) {
-                return true;
-            }
-        }*/
-
-    
-    
 }
 
 
 
 void interpreter::visit( unary* expr){
-    value right = evaluate(expr->ex);
-
+    value right = evaluate(expr->ex.get());
+    
     switch(expr->op.type){
-        case MINUS: 
+        case tt::MINUS: 
             //check_number_operand(expr->op, right);
             result = value(-right.doub_val);
             break;
-        case BANG:
-            if (is_truthy(right))
+        case tt::NOT:
                 result = value(!is_truthy(right));
+            break;
+        case tt::LEN:
+            if (right.val_type == tt::JSON){
+                
+                result = value(json_length(right.json_val));
+            } // обработать
+            break;
+        case tt::SPLIT:
+            if (right.val_type == tt::JSON){
+
+                result = value(splitJson(right.json_val));
+            } // обработать
+            break;
+        case tt::UPPER:
+            if (right.val_type == tt::JSON){
+
+                result = value(upperJsonString(right.json_val));
+            } // обработать
+            break;
+        case tt::LOWER:
+            if (right.val_type == tt::JSON){
+
+                result = value(lowerJsonString(right.json_val));
+            } // обработать
+            break;
+        case tt::REDUCE:
+            if (right.val_type == tt::JSON){
+
+                result = value(reduceJson(right.json_val));
+            } // обработать
             break;
         default:
             result = value();
             break;
     }
 }
+
+// нужно добавить русские символы 
+json interpreter::upperJsonString(const json& data)
+{
+    if (data.is_array()) {
+        json result = json::array();
+        
+        for (const auto& item : data) {
+            result.push_back(upperJsonString(item));  
+        }
+        
+        return result;
+    } else if (data.is_string()) {
+        std::string str = data.get<std::string>();
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        return str;
+    } else {
+        return json();  
+    }
+}
+
+json interpreter::lowerJsonString(const json& data)
+{
+    if (data.is_array()) {
+        json result = json::array();
+        
+        for (const auto& item : data) {
+            result.push_back(lowerJsonString(item));  
+        }
+        
+        return result;
+    } else if (data.is_string()) {
+        std::string str = data.get<std::string>();
+        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+        return str;
+    } else {
+        return json();  
+    }
+}
+
+
+
+std::vector<std::string> interpreter::splitString(const std::string& str) {
+    std::vector<std::string> words;
+    std::string word;
+    std::istringstream iss(str);
+    while (iss >> word) {
+        words.push_back(word);
+    }
+    return words;
+}
+
+// Рекурсивная функция для разделения JSON элемента
+json interpreter::splitJson(const json& jsonValue) {
+    if (jsonValue.is_null()) {
+        return json::array();
+    } else if (jsonValue.is_string()) {
+        std::string str = jsonValue.get<std::string>();
+        return splitString(str);
+    } else if (jsonValue.is_array()) {
+        json result = json::array();
+        for (const auto& item : jsonValue) {
+            if (item.is_string()) {
+                std::string str = item.get<std::string>();
+                result.push_back(splitString(str));
+            }
+        }
+        return result;
+    } else {
+        return json::array();
+    }
+}
+
+
+double interpreter::json_length(const json& jsonValue){
+    if (jsonValue.is_null()) {
+        return 0;
+    } else if (jsonValue.is_array() || jsonValue.is_object()) {
+        return jsonValue.size();
+    } else {
+        return 1; // объект неитерируемый
+    }
+
+}
+
 
 void interpreter::visit(literal* expr){
     if (!expr->json_namevec.empty()){
@@ -226,7 +326,7 @@ json interpreter::find_json_value(const json& card, std::vector<std::string> lev
 
 
 void interpreter::visit(logical_expr* ex){
-    value left = evaluate(ex->left);
+    value left = evaluate(ex->left.get());
     if (ex->oper.type == OR){
         if (is_truthy(left)){
             result = left;
@@ -239,5 +339,39 @@ void interpreter::visit(logical_expr* ex){
             return;
         }
     }
-    result = evaluate(ex->right);
+    result = evaluate(ex->right.get());
+}
+
+json interpreter::reduceJson(const json& jsonElem) {
+    if (jsonElem.is_null()) {
+        return json();  
+    }
+    
+    json result;
+    
+    for (const auto& item : jsonElem) {
+        if (item.is_array()) {
+            for (const auto& nestedItem : item) {
+                result.push_back(nestedItem);
+            }
+        } else {
+            result.push_back(item);
+        }
+    }
+    
+    return result;
+}
+
+
+json interpreter:: mergeJson(const json& json1, const json& json2)
+{
+    json mergedJson = json::object();
+
+    for (json::const_iterator it = json1.begin(); it != json1.end(); ++it) {
+        mergedJson[it.key()] = it.value();
+    }
+    for (json::const_iterator it = json2.begin(); it != json2.end(); ++it) {
+        mergedJson[it.key()] = it.value();
+    }
+    return mergedJson;
 }

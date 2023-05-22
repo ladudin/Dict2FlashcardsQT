@@ -4,12 +4,12 @@
 class interpreter : expr_visitor {
     public:
     interpreter();
-    value interpret(std::unique_ptr<expr> expression, json card_);
+    value interpret(expr*  expression, json card_);
     
     private:
     json card;
     value result;
-    value evaluate(const std::unique_ptr<expr>& expression);
+    value evaluate(expr*  expression);
     bool is_truthy(value val);
     bool is_equal(value left, value right);
     void visit( binary* expr);
@@ -22,4 +22,11 @@ class interpreter : expr_visitor {
     void check_number_operand(token oper, value operand);
     void check_number_operands(token oper, value left, value right);
     json find_json_value(const json& card, std::vector<std::string>);
+    double json_length(const json& jsonValue);
+    std::vector<std::string> splitString(const std::string& str);
+    json splitJson(const json& jsonValue);
+    json upperJsonString(const json& data);
+    json lowerJsonString(const json& data);
+    json reduceJson(const json& jsonElem);
+    json mergeJson(const json& json1, const json& json2);
 };

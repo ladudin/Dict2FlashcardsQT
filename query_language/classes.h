@@ -9,7 +9,8 @@ class func_in;
 class literal;
 
 
-
+// элемент этой структуры является результатом действия 
+// функций аст дерева
 struct value{
     token_type val_type;
     bool bool_val;
@@ -24,6 +25,8 @@ struct value{
 };
 
 
+// интерпретатор аст дерева обязан определить 
+// все функции для посещения его вершин
 class expr_visitor{
 public:
     virtual ~expr_visitor() = default;
@@ -35,6 +38,8 @@ public:
     virtual void visit(grouping* expr) = 0;
 };
 
+
+// базовый класс аст дерева
 class expr {
 public:
     virtual ~expr() = default;
@@ -42,6 +47,7 @@ public:
 };
 
 
+// 
 class literal : public expr { 
 public:
     std::vector<std::string> json_namevec;
@@ -51,12 +57,12 @@ public:
     literal(bool b);
     literal(std::vector<std::string> json_namevec) ;
     literal();
-    virtual ~literal();
+    virtual ~literal(){};
     void accept(expr_visitor* visitor);
 };
 
 
-
+// класс бинарных операций
 class binary : public expr {
 public:
     std::unique_ptr<expr> left;
@@ -64,7 +70,7 @@ public:
     std::unique_ptr<expr> right;
 
     binary(std::unique_ptr<expr> l, token tok, std::unique_ptr<expr> r);
-    virtual ~binary();
+    virtual ~binary(){};
     void accept(expr_visitor* visitor);
 };
 
@@ -76,19 +82,19 @@ public:
     std::unique_ptr<expr> right;
 
     func_in(std::unique_ptr<expr> l, std::unique_ptr<expr> r);
-    virtual ~func_in();
+    virtual ~func_in(){};
     void accept(expr_visitor* visitor);
 };
 
 
-
+// элементарный класс унарных операций
 class unary : public expr {
 public:
     std::unique_ptr<expr> ex;
     token op;
 
     unary(std::unique_ptr<expr> e, token t);
-    virtual ~unary();
+    virtual ~unary(){};
     void accept(expr_visitor* visitor);
 };
 
@@ -101,15 +107,17 @@ public:
     std::unique_ptr<expr> right;
 
     logical_expr(std::unique_ptr<expr> left_, token t, std::unique_ptr<expr> right_);
-    virtual ~logical_expr();
+    virtual ~logical_expr(){};
     void accept(expr_visitor* visitor);
 };
 
+
+// класс для выражений в скобках
 class grouping : public expr {
 public:
     std::unique_ptr<expr> expression;
 
     grouping(std::unique_ptr<expr> e);
-    virtual ~grouping();
+    virtual ~grouping(){};
     void accept(expr_visitor* visitor);
 };

@@ -37,20 +37,20 @@ int main(){
     card.image_links = { "image1.jpg", "image2.jpg" };
     card.audio_links = { "audio1.mp3", "audio2.mp3" };
     card.tags = { { "tag1", {"value1","moscow"} }, { "tag2", {"value2","stp"} }};
-    card.other = { { "key1", "value1" }, { "key2", "value2" } };
+    card.other = { { "key1", "value1 слово pnfvinv 345" }, { "key2", "value2" },{ "key3", "value3" } };
 
     json jsonCard = card_to_json(card);
    
-    scanner scan("\"audio1.mp3\" in (audio_links) and (23<19+5)");
+    scanner scan("reduce(split(other[key1])+tags[tag1]))");
     std::vector<token> tokens= scan.scan_tokens();
-    /*for(int i = 0; i < tokens.size();++i){
-        std::cout<<tokens[i].lexeme<<" "<<i<<std::endl;
-    }*/
-
+    for (int i =0 ; i< tokens.size();++i) {
+        std::cout<<tokens[i].lexeme<<" " <<tokens[i].type << std::endl;
+    }
+    
     parser p(tokens);
     std::unique_ptr<expr> exp = p.parse();
     interpreter inter;
-    value val = inter.interpret(std::move(exp), jsonCard);
+    value val = inter.interpret(exp.get(), jsonCard);
     if (val.val_type == DOUBLE){
         std::cout<<"значение: "<<val.doub_val<< std::endl;
     } else if (val.val_type == JSON){

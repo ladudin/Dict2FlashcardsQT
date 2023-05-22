@@ -11,7 +11,7 @@ void scanner::init_keywords(){
     keywords["and"] = tt::AND;
     keywords["or"] = tt::OR;
     keywords["not"] = tt::NOT;
-
+    keywords["reduce"] = tt::REDUCE;
 }
 
 bool scanner::has_next(size_t i){

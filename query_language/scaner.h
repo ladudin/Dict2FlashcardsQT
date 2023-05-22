@@ -30,7 +30,7 @@ enum token_type {
     FALSE, TRUE,
 
 // func
-    IN, LEN, SPLIT, LOWER, UPPER,
+    IN, LEN, SPLIT, LOWER, UPPER, REDUCE,
     EOTF,
     NUL
 };
