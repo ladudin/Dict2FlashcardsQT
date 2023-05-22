@@ -6,14 +6,25 @@
 
 #include "Sender.hpp"
 
-#define SetUp()                                                                \
-    boost::asio::io_service        ios;                                        \
-    boost::asio::ip::tcp::socket   socket(ios);                                \
-    boost::asio::ip::tcp::endpoint endpoint(                                   \
-        boost::asio::ip::address::from_string("127.0.0.1"), 8888);             \
-    socket.connect(endpoint);                                                  \
-    auto sender = Sender(std::move(socket));
+class SentencesProvider : public ::testing::Test {
+ protected:
+    static constexpr auto HOST = "127.0.0.1";
+    static constexpr auto PORT = 8888;
 
+    auto                  SetUp() -> void override {
+        boost::asio::io_service      ios;
+        boost::asio::ip::tcp::socket socket(ios);
+        std::construct_at<Sender>(&sender_, HOST, PORT);
+    }
+
+    Sender sender_;
+
+ public:
+    SentencesProvider() : sender_(HOST, PORT) {
+    }
+};
+
+// Макро потому что возможно буду тестить код без него
 #define Init(sender)                                                           \
     do {                                                                       \
         const auto *request =                                                  \
@@ -25,14 +36,14 @@
         ASSERT_EQ(expected, actual);                                           \
     } while (0)
 
-TEST(SentencesProvider, Init) {
+TEST_F(SentencesProvider, Init) {
     SetUp();
-    Init(sender);
+    Init(sender_);
 }
 
-TEST(SentencesProvider, ValidateConfig) {
+TEST_F(SentencesProvider, ValidateConfig) {
     SetUp();
-    Init(sender);
+    Init(sender_);
 
     const auto *request  = R"(
         {
@@ -43,13 +54,13 @@ TEST(SentencesProvider, ValidateConfig) {
                            "\r\n";
 
     auto        expected = R"*({"status": 0, "result": {}})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(SentencesProvider, blankGet) {
+TEST_F(SentencesProvider, blankGet) {
     SetUp();
-    Init(sender);
+    Init(sender_);
 
     const auto *request  = R"*(
         {
@@ -62,13 +73,13 @@ TEST(SentencesProvider, blankGet) {
                            "\r\n";
 
     auto        expected = R"*({"result": [[], ""], "status": 0})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(SentencesProvider, ListPlugins) {
+TEST_F(SentencesProvider, ListPlugins) {
     SetUp();
-    Init(sender);
+    Init(sender_);
 
     const auto *request = R"(
         {
@@ -79,6 +90,6 @@ TEST(SentencesProvider, ListPlugins) {
 
     auto        expected =
         R"*({"result": {"success": ["sentences"], "failed": []}, "status": 0})*"_json;
-    auto actual = sender.request(request);
+    auto actual = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }

@@ -3,13 +3,17 @@
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string.h>
+#include <string>
 
-Sender::Sender(boost::asio::ip::tcp::socket &&socket)
-    : socket_(std::move(socket)) {
+Sender::Sender(const std::string &hostname, uint16_t port) : socket_(ios_) {
+    boost::asio::ip::tcp::endpoint endpoint(
+        boost::asio::ip::address::from_string(hostname), port);
+    socket_.connect(endpoint);
 }
 
 auto Sender::request(const std::string &str_request) -> nlohmann::json {

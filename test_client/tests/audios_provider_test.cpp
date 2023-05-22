@@ -1,4 +1,5 @@
 #include <boost/asio/io_service.hpp>
+#include <deque>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <math.h>
@@ -8,14 +9,25 @@
 #include "Media.hpp"
 #include "Sender.hpp"
 
-#define SetUp()                                                                \
-    boost::asio::io_service        ios;                                        \
-    boost::asio::ip::tcp::socket   socket(ios);                                \
-    boost::asio::ip::tcp::endpoint endpoint(                                   \
-        boost::asio::ip::address::from_string("127.0.0.1"), 8888);             \
-    socket.connect(endpoint);                                                  \
-    auto sender = Sender(std::move(socket));
+class AudiosProvider : public ::testing::Test {
+ protected:
+    static constexpr auto HOST = "127.0.0.1";
+    static constexpr auto PORT = 8888;
 
+    auto                  SetUp() -> void override {
+        boost::asio::io_service      ios;
+        boost::asio::ip::tcp::socket socket(ios);
+        std::construct_at<Sender>(&sender_, HOST, PORT);
+    }
+
+    Sender sender_;
+
+ public:
+    AudiosProvider() : sender_(HOST, PORT) {
+    }
+};
+
+// Макро потому что возможно буду тестить код без него
 #define Init(sender)                                                           \
     do {                                                                       \
         const auto *request =                                                  \
@@ -23,18 +35,16 @@
             R"("plugin_name": "audios", "plugin_type": "audios" })"            \
             "\r\n";                                                            \
         auto expected = R"*({"status": 0, "message": ""})*"_json;              \
-        auto actual   = sender.request(request);                               \
+        auto actual   = (sender).request(request);                             \
         ASSERT_EQ(expected, actual);                                           \
     } while (0)
 
-TEST(AudiosProvider, Init) {
-    SetUp();
-    Init(sender);
+TEST_F(AudiosProvider, Init) {
+    Init(sender_);
 }
 
-TEST(AudiosProvider, ValidateConfig) {
-    SetUp();
-    Init(sender);
+TEST_F(AudiosProvider, ValidateConfig) {
+    Init(sender_);
 
     const auto *request  = R"(
         {
@@ -45,13 +55,12 @@ TEST(AudiosProvider, ValidateConfig) {
                            "\r\n";
 
     auto        expected = R"*({"status": 0, "result": {}})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(AudiosProvider, blankGet) {
-    SetUp();
-    Init(sender);
+TEST_F(AudiosProvider, blankGet) {
+    Init(sender_);
 
     const auto *request = R"*(
         {
@@ -66,13 +75,12 @@ TEST(AudiosProvider, blankGet) {
 
     auto        expected =
         R"*({"result": [{"local": [], "web": []}, ""], "status": 0})*"_json;
-    auto actual = sender.request(request);
+    auto actual = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(AudiosProvider, Get) {
-    SetUp();
-    Init(sender);
+TEST_F(AudiosProvider, Get) {
+    Init(sender_);
 
     const auto *request = R"*(
         {
@@ -85,16 +93,15 @@ TEST(AudiosProvider, Get) {
         })*"
                           "\r\n";
 
-    auto        actual  = sender.request(request);
+    auto        actual  = sender_.request(request);
     ASSERT_EQ(actual["status"], 0);
     ASSERT_FALSE(actual["result"][1].empty());
     Media links = actual["result"][0];
     ASSERT_LE(links.web.size(), 5);
 }
 
-TEST(AudiosProvider, ListPlugins) {
-    SetUp();
-    Init(sender);
+TEST_F(AudiosProvider, ListPlugins) {
+    Init(sender_);
 
     const auto *request = R"(
         {
@@ -105,6 +112,6 @@ TEST(AudiosProvider, ListPlugins) {
 
     auto        expected =
         R"*({"result": {"success": ["audios"], "failed": []}, "status": 0})*"_json;
-    auto actual = sender.request(request);
+    auto actual = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
