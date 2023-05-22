@@ -1,9 +1,6 @@
 #pragma once
 #include "scaner.h"
 
-#include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
-
 class binary;
 class grouping;
 class unary;
@@ -11,8 +8,8 @@ class logical_expr;
 class func_in;
 class literal;
 
-// enum value_type{BOOL, JSON, DOUBLE, EMPTY};
-
+// элемент этой структуры является результатом действия
+// функций аст дерева
 struct value {
     token_type     val_type;
     bool           bool_val;
@@ -36,6 +33,8 @@ struct value {
     }
 };
 
+// интерпретатор аст дерева обязан определить
+// все функции для посещения его вершин
 class expr_visitor {
  public:
     virtual ~expr_visitor()                = default;
@@ -47,12 +46,14 @@ class expr_visitor {
     virtual void visit(grouping *expr)     = 0;
 };
 
+// базовый класс аст дерева
 class expr {
  public:
     virtual ~expr()                            = default;
     virtual void accept(expr_visitor *visitor) = 0;
 };
 
+//
 class literal : public expr {
  public:
     std::vector<std::string> json_namevec;
@@ -62,57 +63,62 @@ class literal : public expr {
     literal(bool b);
     literal(std::vector<std::string> json_namevec);
     literal();
-    virtual ~literal();
+    virtual ~literal(){};
     void accept(expr_visitor *visitor);
 };
 
+// класс бинарных операций
 class binary : public expr {
  public:
-    expr *left;
-    token op;
-    expr *right;
+    std::unique_ptr<expr> left;
+    token                 op;
+    std::unique_ptr<expr> right;
 
-    binary(expr *l, token tok, expr *r);
-    virtual ~binary();
+    binary(std::unique_ptr<expr> l, token tok, std::unique_ptr<expr> r);
+    virtual ~binary(){};
     void accept(expr_visitor *visitor);
 };
 
 class func_in : public expr {
  public:
-    expr *left;
-    expr *right;
+    std::unique_ptr<expr> left;
+    std::unique_ptr<expr> right;
 
-    func_in(expr *l, expr *r);
-    virtual ~func_in();
+    func_in(std::unique_ptr<expr> l, std::unique_ptr<expr> r);
+    virtual ~func_in(){};
     void accept(expr_visitor *visitor);
 };
 
+// элементарный класс унарных операций
 class unary : public expr {
  public:
-    expr *ex;
-    token op;
+    std::unique_ptr<expr> ex;
+    token                 op;
 
-    unary(expr *e, token t);
-    virtual ~unary();
+    unary(std::unique_ptr<expr> e, token t);
+    virtual ~unary(){};
     void accept(expr_visitor *visitor);
 };
 
 class logical_expr : public expr {
  public:
-    expr *left;
-    token oper;
-    expr *right;
+    std::unique_ptr<expr> left;
+    token                 oper;
+    std::unique_ptr<expr> right;
 
-    logical_expr(expr *l, token t, expr *r);
-    virtual ~logical_expr();
+    logical_expr(std::unique_ptr<expr> left_,
+                 token                 t,
+                 std::unique_ptr<expr> right_);
+    virtual ~logical_expr(){};
     void accept(expr_visitor *visitor);
 };
 
+// класс для выражений в скобках
 class grouping : public expr {
  public:
-    expr *expression;
+    std::unique_ptr<expr> expression;
 
-    grouping(expr *e);
-    virtual ~grouping();
+    grouping(std::unique_ptr<expr> e);
+    virtual ~grouping(){};
     void accept(expr_visitor *visitor);
 };

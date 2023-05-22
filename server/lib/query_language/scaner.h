@@ -1,10 +1,12 @@
 #pragma once
 #include <cctype>
 #include <iostream>
-#include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include <nlohmann/json.hpp>
 
 enum token_type {
     LEFT_PAREN,
@@ -54,6 +56,7 @@ enum token_type {
     SPLIT,
     LOWER,
     UPPER,
+    REDUCE,
     EOTF,
     NUL
 };
