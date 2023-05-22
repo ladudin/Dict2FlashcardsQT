@@ -23,3 +23,7 @@ include(GoogleTest)
 add_subdirectory(spdlog)
 link_libraries(spdlog::spdlog_header_only)
 add_subdirectory(server)
+
+target_include_directories(server_main
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/argparse/include/argparse)
