@@ -16,7 +16,8 @@ public:
       CardRole = Qt::UserRole + 1
     };
 
-    explicit DeckModel(std::shared_ptr<IDeck> deck, QObject *parent = nullptr);
+    explicit DeckModel(std::unique_ptr<IDeck> deck, QObject *parent = nullptr);
+    DeckModel(const DeckModel& other) = delete;
 
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -26,12 +27,12 @@ public:
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
 
 public slots:
-    void load(const QString& word);
+    void load(const QString& word, QString query);
     void next(const QModelIndex& index);
     void prev(const QModelIndex& index);
 
-private:
-    std::shared_ptr<IDeck> deck;
+public:
+    std::unique_ptr<IDeck> deck_;
 };
 
 #endif // DECKMODEL_H
