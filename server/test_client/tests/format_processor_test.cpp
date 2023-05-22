@@ -63,7 +63,7 @@ TEST_F(FormatProcessor, Save) {
     {
         "query_type": "save",
         "cards_path":
-        "/home/blackdeer/projects/cpp/technopark/test_client/deck.json"
+        "/home/blackdeer/projects/cpp/technopark/server/test_client/deck.json"
     })"
                            "\r\n";
 

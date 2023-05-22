@@ -25,4 +25,3 @@ link_libraries(spdlog::spdlog_header_only)
 
 add_subdirectory(client)
 add_subdirectory(server)
-add_subdirectory(test_client)
