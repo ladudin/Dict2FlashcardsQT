@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>509</width>
-    <height>500</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,13 @@
         </property>
         <property name="placeholderText">
          <string>filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveButton">
+        <property name="text">
+         <string>Save</string>
         </property>
        </widget>
       </item>
@@ -535,6 +542,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QLineEdit" name="tagsLine">
+        <property name="placeholderText">
+         <string>tags</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QTextEdit" name="definitionEdit">
         <property name="maximumSize">
          <size>
@@ -544,19 +558,6 @@
         </property>
         <property name="placeholderText">
          <string>definition</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="tagsLine">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>100</horstretch>
-          <verstretch>10</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="placeholderText">
-         <string>tags</string>
         </property>
        </widget>
       </item>
@@ -592,6 +593,12 @@
         </property>
         <item>
          <widget class="QTabWidget" name="tabWidget">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>500</height>
+           </size>
+          </property>
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -601,7 +608,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QListView" name="examplesView"/>
+             <layout class="QVBoxLayout" name="examplesLayout"/>
             </item>
            </layout>
           </widget>
@@ -611,17 +618,17 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QListView" name="audioView"/>
+             <layout class="QVBoxLayout" name="audioLayout"/>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="ImagesTab">
+          <widget class="QWidget" name="imagesTab">
            <attribute name="title">
             <string>Images</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QListView" name="ImagesView"/>
+             <layout class="QVBoxLayout" name="ImagesLayout"/>
             </item>
            </layout>
           </widget>
@@ -639,7 +646,7 @@
      <x>0</x>
      <y>0</y>
      <width>509</width>
-     <height>26</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
@@ -655,7 +662,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>300</y>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>141</x>
@@ -671,7 +678,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>287</x>
-     <y>306</y>
+     <y>347</y>
     </hint>
     <hint type="destinationlabel">
      <x>277</x>
@@ -679,9 +686,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onAddClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>344</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>533</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>save()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>388</x>
+     <y>158</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>502</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onPrevClicked()</slot>
   <slot>onNextClicked()</slot>
+  <slot>onAddClicked()</slot>
+  <slot>save()</slot>
  </slots>
 </ui>

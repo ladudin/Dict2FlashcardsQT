@@ -1,49 +1,62 @@
 #include "word_cards.h"
 
 WordCards::WordCards(const std::string& word)
-    : word(word)
-    , pos(0)
+    : word_(word)
+    , pos_(0)
 {
 }
 
-size_t WordCards::size()
+WordCards::WordCards(const std::string& word, std::vector<Card> cards) 
+    : word_(word)
+    , pos_(0)
+    , cards_(cards)
 {
-    return cards.size();
+}
+
+size_t WordCards::size() const
+{
+    return cards_.size();
 }
 
 std::string WordCards::get_word() const
 {
-    return word;
+    return word_;
 }
 
-Card *WordCards::get_card()
+const Card* WordCards::get_card() const
 {
-    if (pos < 0 || pos >= size())
+    if (pos_ < 0 || pos_ >= size())
     {
         return nullptr;
     }
-    return cards[pos];
+    return &cards_[pos_];
 }
 
 void WordCards::next()
 {
-    if (pos == size() - 1)
+    if (pos_ == size() - 1)
     {
         return;
     }
-    ++pos;
+    ++pos_;
 }
 
 void WordCards::prev()
 {
-    if (pos == 0)
+    if (pos_ == 0)
     {
         return;
     }
-    --pos;
+    --pos_;
 }
 
-void WordCards::addCard(Card* card)
+void WordCards::addCard(Card card)
 {
-    cards.push_back(card);
+    cards_.push_back(card);
+}
+
+void WordCards::addCards(std::vector<Card> cards) {
+    for (const Card& card: cards) {
+        addCard(card);
+    }
 }

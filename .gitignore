@@ -1,3 +1,4 @@
+build/
 *
 !*/
 !.gitignore
@@ -7,5 +8,6 @@
 !./README.md
 !/img/**
 !/server/**
+!/qt/**
 !/test_client/**
 !/plugins/**/*.py
