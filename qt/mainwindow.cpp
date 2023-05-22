@@ -78,6 +78,7 @@ void MainWindow::updateCardFields()
     updateExamples(card);
     updateAudio(card);
     updateImages(card);
+    updateTags(card);
 }
 
 void MainWindow::updateWord(const Card *card)
@@ -98,9 +99,12 @@ void MainWindow::updateDefinition(const Card *card)
     ui->definitionEdit->setText(QString::fromStdString(card->definition));
 }
 
-void MainWindow::updateTags(const Card *)
+void MainWindow::updateTags(const Card *card)
 {
-
+    if (!card) {
+        return;
+    }
+    ui->tagsLine->setText(QString::fromStdString(parse_tags(card->tags)));
 }
 
 void MainWindow::updateExamples(const Card *card)
@@ -155,6 +159,7 @@ void MainWindow::onPrevClicked()
 void MainWindow::onAddClicked() {
     Card card;
     card.word = ui->wordLine->text().toStdString();
+    // card.tags = ui->tagsLine->text().toStdString();
     card.definition = ui->definitionEdit->toPlainText().toStdString();
     card.examples = examplesWidget->extract();
     card.audios = audioWidget->extract();
