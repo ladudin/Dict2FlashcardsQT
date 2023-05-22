@@ -7,14 +7,25 @@
 
 #include "Sender.hpp"
 
-#define SetUp()                                                                \
-    boost::asio::io_service        ios;                                        \
-    boost::asio::ip::tcp::socket   socket(ios);                                \
-    boost::asio::ip::tcp::endpoint endpoint(                                   \
-        boost::asio::ip::address::from_string("127.0.0.1"), 8888);             \
-    socket.connect(endpoint);                                                  \
-    auto sender = Sender(std::move(socket));
+class DefinitionsProvider : public ::testing::Test {
+ protected:
+    static constexpr auto HOST = "127.0.0.1";
+    static constexpr auto PORT = 8888;
 
+    auto                  SetUp() -> void override {
+        boost::asio::io_service      ios;
+        boost::asio::ip::tcp::socket socket(ios);
+        std::construct_at<Sender>(&sender_, HOST, PORT);
+    }
+
+    Sender sender_;
+
+ public:
+    DefinitionsProvider() : sender_(HOST, PORT) {
+    }
+};
+
+// Макро потому что возможно буду тестить код без него
 #define Init(sender)                                                           \
     do {                                                                       \
         const auto *request =                                                  \
@@ -22,18 +33,16 @@
             R"("plugin_name": "definitions", "plugin_type": "word" })"         \
             "\r\n";                                                            \
         auto expected = R"*({"status": 0, "message": ""})*"_json;              \
-        auto actual   = sender.request(request);                               \
+        auto actual   = (sender).request(request);                             \
         ASSERT_EQ(expected, actual);                                           \
     } while (0)
 
-TEST(DefinitionsProvider, Init) {
-    SetUp();
-    Init(sender);
+TEST_F(DefinitionsProvider, Init) {
+    Init(sender_);
 }
 
-TEST(DefinitionsProvider, ValidateConfig) {
-    SetUp();
-    Init(sender);
+TEST_F(DefinitionsProvider, ValidateConfig) {
+    Init(sender_);
 
     const auto *request  = R"(
         {
@@ -44,13 +53,12 @@ TEST(DefinitionsProvider, ValidateConfig) {
                            "\r\n";
 
     auto        expected = R"*({"status": 0, "result": {}})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(DefinitionsProvider, get) {
-    SetUp();
-    Init(sender);
+TEST_F(DefinitionsProvider, get) {
+    Init(sender_);
 
     const auto *request  = R"*(
         {
@@ -140,13 +148,12 @@ TEST(DefinitionsProvider, get) {
   "status": 0
 })*"_json;
 
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(DefinitionsProvider, blankGet) {
-    SetUp();
-    Init(sender);
+TEST_F(DefinitionsProvider, blankGet) {
+    Init(sender_);
 
     const auto *request  = R"*(
         {
@@ -160,13 +167,12 @@ TEST(DefinitionsProvider, blankGet) {
                            "\r\n";
 
     auto        expected = R"*({"result": [[], ""], "status": 0})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(DefinitionsProvider, ListPlugins) {
-    SetUp();
-    Init(sender);
+TEST_F(DefinitionsProvider, ListPlugins) {
+    Init(sender_);
 
     const auto *request = R"(
         {
@@ -177,6 +183,6 @@ TEST(DefinitionsProvider, ListPlugins) {
 
     auto        expected =
         R"*({"result": {"success": ["definitions"], "failed": []}, "status": 0})*"_json;
-    auto actual = sender.request(request);
+    auto actual = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }

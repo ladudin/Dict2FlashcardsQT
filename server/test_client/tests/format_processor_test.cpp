@@ -6,14 +6,25 @@
 
 #include "Sender.hpp"
 
-#define SetUp()                                                                \
-    boost::asio::io_service        ios;                                        \
-    boost::asio::ip::tcp::socket   socket(ios);                                \
-    boost::asio::ip::tcp::endpoint endpoint(                                   \
-        boost::asio::ip::address::from_string("127.0.0.1"), 8888);             \
-    socket.connect(endpoint);                                                  \
-    auto sender = Sender(std::move(socket));
+class FormatProcessor : public ::testing::Test {
+ protected:
+    static constexpr auto HOST = "127.0.0.1";
+    static constexpr auto PORT = 8888;
 
+    auto                  SetUp() -> void override {
+        boost::asio::io_service      ios;
+        boost::asio::ip::tcp::socket socket(ios);
+        std::construct_at<Sender>(&sender_, HOST, PORT);
+    }
+
+    Sender sender_;
+
+ public:
+    FormatProcessor() : sender_(HOST, PORT) {
+    }
+};
+
+// Макро потому что возможно буду тестить код без него
 #define Init(sender)                                                           \
     do {                                                                       \
         const auto *request =                                                  \
@@ -25,14 +36,12 @@
         ASSERT_EQ(expected, actual);                                           \
     } while (0)
 
-TEST(FormatProcessor, Init) {
-    SetUp();
-    Init(sender);
+TEST_F(FormatProcessor, Init) {
+    Init(sender_);
 }
 
-TEST(FormatProcessor, ValidateConfig) {
-    SetUp();
-    Init(sender);
+TEST_F(FormatProcessor, ValidateConfig) {
+    Init(sender_);
 
     const auto *request  = R"(
         {
@@ -43,13 +52,12 @@ TEST(FormatProcessor, ValidateConfig) {
                            "\r\n";
 
     auto        expected = R"*({"status": 0, "result": {}})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(FormatProcessor, Save) {
-    SetUp();
-    Init(sender);
+TEST_F(FormatProcessor, Save) {
+    Init(sender_);
 
     const auto *request  = R"(
     {
@@ -60,13 +68,12 @@ TEST(FormatProcessor, Save) {
                            "\r\n";
 
     auto        expected = R"*({"message": "", "status": 0})*"_json;
-    auto        actual   = sender.request(request);
+    auto        actual   = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
 
-TEST(FormatProcessor, ListPlugins) {
-    SetUp();
-    Init(sender);
+TEST_F(FormatProcessor, ListPlugins) {
+    Init(sender_);
 
     const auto *request = R"(
         {
@@ -77,6 +84,6 @@ TEST(FormatProcessor, ListPlugins) {
 
     auto        expected =
         R"*({"result": {"success": ["processor"], "failed": []}, "status": 0})*"_json;
-    auto actual = sender.request(request);
+    auto actual = sender_.request(request);
     ASSERT_EQ(expected, actual);
 }
