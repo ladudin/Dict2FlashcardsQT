@@ -115,20 +115,23 @@ void interpreter::visit(func_in *expr) {
     value right = evaluate(expr->right.get());
     if (left.val_type == STRING && right.val_type == JSON) {
         result = value(find_word_inJson(left.str_val, right.json_val));
+    } else {
+        result = value(false);
     }
 }
 
 bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
     if (jsonValue.is_string()) {
         return jsonValue.get<std::string>() == word;
-    } else if (jsonValue.is_array()) {
-        for (const auto &element : jsonValue) {
-            if (find_word_inJson(word, element)) {
-                return true;
-            }
-        }
-    } else {
+    }
+
+    if (!jsonValue.is_array()) {
         return false;
+    }
+    for (const auto &element : jsonValue) {
+        if (find_word_inJson(word, element)) {
+            return true;
+        }  
     }
     return false;
 }
@@ -180,7 +183,7 @@ void interpreter::visit(unary *expr) {
     }
 }
 
-// нужно добавить русские символы
+
 nlohmann::json interpreter::upperJsonString(const nlohmann::json &data) {
     if (data.is_array()) {
         nlohmann::json result = nlohmann::json::array();

@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.22)
 project(Dict2FlashcardsQT)
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Copyright(c) 2019 spdlog authors Distributed under the MIT License (http://opensource.org/licenses/MIT)
 cmake_minimum_required(VERSION 3.10)
 project(spdlog_examples CXX)

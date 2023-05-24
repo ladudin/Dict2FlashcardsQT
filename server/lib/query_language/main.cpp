@@ -46,11 +46,11 @@ int main() {
 
     json               jsonCard = card_to_json(card);
 
-    scanner            scan("reduce(split(other[key1])+tags[tag1]))");
+    scanner            scan("\"value2\" in(other[key4])");
     std::vector<token> tokens = scan.scan_tokens();
-    for (int i = 0; i < tokens.size(); ++i) {
+    /*for (int i = 0; i < tokens.size(); ++i) {
         std::cout << tokens[i].lexeme << " " << tokens[i].type << std::endl;
-    }
+    }*/
 
     parser                p(tokens);
     std::unique_ptr<expr> exp = p.parse();
