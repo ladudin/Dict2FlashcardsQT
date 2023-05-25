@@ -6,7 +6,7 @@
 #include <string>
 #include <QFormLayout>
 #include <QPushButton>
-#include "Media.hpp"
+#include "Media.h"
 // #include "DefinitionsProviderWrapper.h"
 
 namespace Ui {

@@ -5,7 +5,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QNetworkAccessManager>
-#include "Media.hpp"
+#include "Media.h"
 
 namespace Ui {
 class IMagesWidget;
