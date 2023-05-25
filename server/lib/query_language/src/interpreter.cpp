@@ -1,4 +1,4 @@
-#include "interpreter.h"
+#include "interpreter.hpp"
 
 interpreter::interpreter(){};
 
@@ -35,73 +35,81 @@ bool interpreter::is_equal(value left, value right) {
     return false;
 }
 
-/*void interpreter::check_number_operand(token oper, value operand){
-    if (operand.val_type == DOUBLE)
-        return;
-    // обработать ошибку
-}*/
 
-/*void interpreter::check_number_operands(token oper, value left, value right){
-    if (left.val_type == DOUBLE && right.val_type == DOUBLE){
-        if (right.doub_val == 0 && oper.type == SLASH)
-        //   обработать ошибку
-        return;
-        }
-    // обработать ошибку
-}*/
+void interpreter::check_number_operand(value operand) {
+    if (operand.val_type != tt::DOUBLE) {
+        throw ComponentException("Invalid operand type");
+    }
+}
+
+void interpreter::check_json_operand( value operand) {
+    if (operand.val_type != tt::JSON) {
+        throw ComponentException("Expected JSON");
+    }
+}
+
+void interpreter::check_number_operands(token oper, value left, value right) {
+    if (left.val_type != tt::DOUBLE || right.val_type != tt::DOUBLE) {
+        throw ComponentException("Invalid operand type");
+    }
+    if (right.doub_val == 0 && oper.type == tt::SLASH) {
+        throw ComponentException("Division by zero");
+    }
+}
+
+
 
 void interpreter::visit(binary *expr) {
     value left  = evaluate(expr->left.get());
     value right = evaluate(expr->right.get());
     switch (expr->op.type) {
         case PLUS:
-            if (left.val_type == DOUBLE && right.val_type == DOUBLE) {
+            if (left.val_type == tt::DOUBLE && right.val_type == tt::DOUBLE) {
                 result = value(left.doub_val + right.doub_val);
-            } else if (left.val_type == DOUBLE && right.val_type == DOUBLE) {
+            } else if (left.val_type == tt::JSON && right.val_type == tt::JSON) {
                 result = value(mergeJson(left.json_val, right.json_val));
+            } else {
+                throw ComponentException("Invalid operand type");
             }
-            // обработать ошибку
             break;
         case MINUS:
-            // проверить типы
-            if (left.val_type == DOUBLE && right.val_type == DOUBLE) {
-                result = value(left.doub_val - right.doub_val);
-            }
+            check_number_operands(expr->op, left, right);
+            result = value(left.doub_val - right.doub_val);
             break;
         case STAR:
-            // check_number_operands(expr->op, left, right);
-            if (left.val_type == DOUBLE && right.val_type == DOUBLE) {
-                result = value(left.doub_val * right.doub_val);
-            }
+            check_number_operands(expr->op, left, right);
+            result = value(left.doub_val * right.doub_val);
             break;
         case SLASH:
-            // check_number_operands(expr->op, left, right);
+            check_number_operands(expr->op, left, right);
             result = value(left.doub_val / right.doub_val);
             break;
         case LESS:
-            // check_number_operands(expr->op, left, right);
+            check_number_operands(expr->op, left, right);
             result = value(left.doub_val < right.doub_val);
             break;
         case LESS_EQUAL:
-            // check_number_operands(expr->op, left, right);
+            check_number_operands(expr->op, left, right);
             result = value(left.doub_val <= right.doub_val);
             break;
         case GREATER:
-            // check_number_operands(expr->op, left, right);
+            check_number_operands(expr->op, left, right);
             result = value(left.doub_val > right.doub_val);
             break;
         case GREATER_EQUAL:
-            // check_number_operands(expr->op, left, right);
+            check_number_operands(expr->op, left, right);
             result = value(left.doub_val >= right.doub_val);
             break;
         case BANG_EQUAL:
+            check_number_operands(expr->op, left, right);
             result = value(!is_equal(left, right));
             break;
         case EQUAL_EQUAL:
+            check_number_operands(expr->op, left, right);
             result = value(is_equal(left, right));
             break;
         default:
-            result = value();
+            throw ComponentException("Invalid operand type");
             break;
     }
 }
@@ -120,104 +128,84 @@ void interpreter::visit(func_in *expr) {
     }
 }
 
-bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
-    if (jsonValue.is_string()) {
-        return jsonValue.get<std::string>() == word;
-    }
-
-    if (!jsonValue.is_array()) {
-        return false;
-    }
-    for (const auto &element : jsonValue) {
-        if (find_word_inJson(word, element)) {
-            return true;
-        }  
-    }
-    return false;
-}
 
 void interpreter::visit(unary *expr) {
-    value right = evaluate(expr->ex.get());
+    value right = evaluate(expr->expression.get());
 
-    switch (expr->op.type) {
+    switch (expr->oper.type) {
         case tt::MINUS:
-            // check_number_operand(expr->op, right);
+            check_number_operand(right);
             result = value(-right.doub_val);
             break;
         case tt::NOT:
             result = value(!is_truthy(right));
             break;
         case tt::LEN:
-            if (right.val_type == tt::JSON) {
-
-                result = value(json_length(right.json_val));
-            }  // обработать
+            check_json_operand(right);
+            result = value(json_length(right.json_val));
             break;
         case tt::SPLIT:
-            if (right.val_type == tt::JSON) {
-
-                result = value(splitJson(right.json_val));
-            }  // обработать
+            check_json_operand(right);
+            result = value(splitJson(right.json_val));
             break;
         case tt::UPPER:
-            if (right.val_type == tt::JSON) {
-
-                result = value(upperJsonString(right.json_val));
-            }  // обработать
+            check_json_operand(right);
+            result = value(upperJsonString(right.json_val));
             break;
         case tt::LOWER:
-            if (right.val_type == tt::JSON) {
-
-                result = value(lowerJsonString(right.json_val));
-            }  // обработать
+            check_json_operand(right);
+            result = value(lowerJsonString(right.json_val));
             break;
         case tt::REDUCE:
-            if (right.val_type == tt::JSON) {
-
-                result = value(reduceJson(right.json_val));
-            }  // обработать
+            check_json_operand(right);
+            result = value(reduceJson(right.json_val));
             break;
         default:
-            result = value();
+            ComponentException("Invalid operand type");
             break;
     }
 }
 
 
 nlohmann::json interpreter::upperJsonString(const nlohmann::json &data) {
-    if (data.is_array()) {
-        nlohmann::json result = nlohmann::json::array();
-
-        for (const auto &item : data) {
-            result.push_back(upperJsonString(item));
-        }
-
-        return result;
-    } else if (data.is_string()) {
+    
+    if (data.is_string()) {
         std::string str = data.get<std::string>();
         std::transform(str.begin(), str.end(), str.begin(), ::toupper);
         return str;
-    } else {
-        return nlohmann::json();
     }
-}
 
-nlohmann::json interpreter::lowerJsonString(const nlohmann::json &data) {
     if (data.is_array()) {
         nlohmann::json result = nlohmann::json::array();
-
         for (const auto &item : data) {
-            result.push_back(lowerJsonString(item));
+            result.push_back(upperJsonString(item));
         }
-
         return result;
-    } else if (data.is_string()) {
+    }
+
+    return nlohmann::json();
+    // exeption?
+}
+
+
+nlohmann::json interpreter::lowerJsonString(const nlohmann::json &data) {
+    
+    if (data.is_string()) {
         std::string str = data.get<std::string>();
         std::transform(str.begin(), str.end(), str.begin(), ::tolower);
         return str;
-    } else {
-        return nlohmann::json();
     }
+    
+    if (data.is_array()) {
+        nlohmann::json result = nlohmann::json::array();
+        for (const auto &item : data) {
+            result.push_back(lowerJsonString(item));
+        }
+        return result;
+    }
+
+    return nlohmann::json();
+    
 }
 
 std::vector<std::string> interpreter::splitString(const std::string &str) {
@@ -234,10 +222,14 @@ std::vector<std::string> interpreter::splitString(const std::string &str) {
 nlohmann::json interpreter::splitJson(const nlohmann::json &jsonValue) {
     if (jsonValue.is_null()) {
         return nlohmann::json::array();
-    } else if (jsonValue.is_string()) {
+    }
+
+    if (jsonValue.is_string()) {
         std::string str = jsonValue.get<std::string>();
         return splitString(str);
-    } else if (jsonValue.is_array()) {
+    }
+
+    if (jsonValue.is_array()) {
         nlohmann::json result = nlohmann::json::array();
         for (const auto &item : jsonValue) {
             if (item.is_string()) {
@@ -246,27 +238,25 @@ nlohmann::json interpreter::splitJson(const nlohmann::json &jsonValue) {
             }
         }
         return result;
-    } else {
-        return nlohmann::json::array();
     }
+
+    return nlohmann::json::array();
 }
 
 double interpreter::json_length(const nlohmann::json &jsonValue) {
     if (jsonValue.is_null()) {
         return 0;
-    } else if (jsonValue.is_array() || jsonValue.is_object()) {
-        return jsonValue.size();
-    } else {
-        return 1;  // объект неитерируемый
     }
+
+    if (jsonValue.is_array() || jsonValue.is_object()) {
+        return jsonValue.size();
+    }
+
+    return 1; // неитерируемый объект, например число или строка
 }
 
 void interpreter::visit(literal *expr) {
     if (!expr->json_namevec.empty()) {
-
-        /* for (int i = 0; i < expr->json_namevec.size(); ++i ){
-             std::cout << expr->json_namevec[i] <<" "<< i << std::endl;
-         }*/
 
         nlohmann::json json_val = find_json_value(card, expr->json_namevec);
         if (!json_val.empty()) {
@@ -277,10 +267,28 @@ void interpreter::visit(literal *expr) {
     result = expr->val;
 }
 
-// разбить на мелкие функции
-nlohmann::json
-interpreter::find_json_value(const nlohmann::json    &card,
-                             std::vector<std::string> levels_vec) {
+
+bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
+    if (jsonValue.is_string()) {
+        return jsonValue.get<std::string>() == word;
+    }
+
+    if (!jsonValue.is_array()) {
+        return false;
+    }
+    for (const auto &element : jsonValue) {
+        if (find_word_inJson(word, element)) {
+            return true;
+        }  
+    }
+    return false;
+}
+
+
+
+
+nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
+                                            std::vector<std::string> levels_vec) {
     nlohmann::json current_json = card;
 
     for (size_t i = 0; i < levels_vec.size(); ++i) {
@@ -290,31 +298,9 @@ interpreter::find_json_value(const nlohmann::json    &card,
             if (current_json.contains(key)) {
                 current_json = current_json[key];
             } else if (key == "$ANY") {
-                nlohmann::json any_values;
-                for (auto it = current_json.begin(); it != current_json.end();
-                     ++it) {
-                    const auto &result = find_json_value(
-                        it.value(),
-                        std::vector<std::string>(levels_vec.begin() + i + 1,
-                                                 levels_vec.end()));
-                    if (!result.is_null()) {
-                        any_values.push_back(result);
-                    }
-                }
-
-                if (any_values.size() == 1) {
-                    return any_values[0];
-                } else {
-                    return any_values;
-                }
-
+                return handleAnyKey(current_json, levels_vec, i);
             } else if (key == "$SELF") {
-                nlohmann::json self_keys;
-                for (auto it = current_json.begin(); it != current_json.end();
-                     ++it) {
-                    self_keys.push_back(it.key());
-                }
-                return self_keys;
+                return getSelfKeys(current_json);
             } else {
                 return nlohmann::json();
             }
@@ -322,8 +308,44 @@ interpreter::find_json_value(const nlohmann::json    &card,
             return nlohmann::json();
         }
     }
+
     return current_json;
 }
+
+nlohmann::json interpreter::handleAnyKey(const nlohmann::json& json_value,
+                                         const std::vector<std::string>& levels_vec,
+                                         size_t current_index) {
+    nlohmann::json any_values;
+
+    for (auto it = json_value.begin(); it != json_value.end(); ++it) {
+        const auto& result = find_json_value(
+            it.value(),
+            std::vector<std::string>(levels_vec.begin() + current_index + 1, levels_vec.end())
+        );
+
+        if (!result.is_null()) {
+            any_values.push_back(result);
+        }
+    }
+
+    if (any_values.size() == 1) { // возвращаем элемент, а не массив
+        return any_values[0];
+    } else {
+        return any_values;
+    }
+}
+
+nlohmann::json interpreter::getSelfKeys(const nlohmann::json& json_value) {
+    nlohmann::json self_keys;
+
+    for (auto it = json_value.begin(); it != json_value.end(); ++it) {
+        self_keys.push_back(it.key());
+    }
+
+    return self_keys;
+}
+
+
 
 void interpreter::visit(logical_expr *ex) {
     value left = evaluate(ex->left.get());
@@ -361,15 +383,15 @@ nlohmann::json interpreter::reduceJson(const nlohmann::json &jsonElem) {
     return result;
 }
 
-nlohmann::json interpreter::mergeJson(const nlohmann::json &json1,
-                                      const nlohmann::json &json2) {
+nlohmann::json interpreter::mergeJson(const nlohmann::json &jsonLeft,
+                                      const nlohmann::json &jsonRight) {
     nlohmann::json mergedJson = nlohmann::json::object();
 
-    for (nlohmann::json::const_iterator it = json1.begin(); it != json1.end();
+    for (nlohmann::json::const_iterator it = jsonLeft.begin(); it != jsonLeft.end();
          ++it) {
         mergedJson[it.key()] = it.value();
     }
-    for (nlohmann::json::const_iterator it = json2.begin(); it != json2.end();
+    for (nlohmann::json::const_iterator it = jsonRight.begin(); it != jsonRight.end();
          ++it) {
         mergedJson[it.key()] = it.value();
     }

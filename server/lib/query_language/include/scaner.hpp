@@ -1,12 +1,7 @@
 #pragma once
-#include <cctype>
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "include_libs.hpp"
+#include "exception.hpp"
 
-#include <nlohmann/json.hpp>
 
 enum token_type {
     LEFT_PAREN,
@@ -76,6 +71,12 @@ struct token {
 };
 
 class scanner {
+public:
+
+    scanner(const std::string &s);
+    std::vector<token> scan_tokens();
+
+private:
     std::string                       source;
     std::vector<token>                tokens;
     std::map<std::string, token_type> keywords;
@@ -96,8 +97,4 @@ class scanner {
     void        read_json_keyword();
     void        string();
     void        scan_token();
-
- public:
-    scanner(const std::string &s);
-    std::vector<token> scan_tokens();
 };
