@@ -18,7 +18,5 @@ target_include_directories(saved_deck_model PUBLIC ./)
 target_link_libraries(saved_deck_model PUBLIC
 Qt5::Core 
 Qt5::Widgets 
-word_cards 
-card 
-word_plugin_wrapper 
+card  
 )
