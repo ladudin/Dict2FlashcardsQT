@@ -1,5 +1,5 @@
 #pragma once
-#include "parcer.h"
+#include "parcer.hpp"
 
 class interpreter : expr_visitor {
  public:
@@ -19,7 +19,8 @@ class interpreter : expr_visitor {
     void           visit(func_in *expr) override;
     void           visit(logical_expr *ex) override;
     auto find_word_inJson(std::string word, nlohmann::json jsonValue) -> bool;
-    void check_number_operand(token oper, value operand);
+    void check_json_operand(value operand);
+    void check_number_operand(value operand);
     void check_number_operands(token oper, value left, value right);
     auto find_json_value(const nlohmann::json &card, std::vector<std::string>)
         -> nlohmann::json;
@@ -29,6 +30,10 @@ class interpreter : expr_visitor {
     auto upperJsonString(const nlohmann::json &data) -> nlohmann::json;
     auto lowerJsonString(const nlohmann::json &data) -> nlohmann::json;
     auto reduceJson(const nlohmann::json &jsonElem) -> nlohmann::json;
-    auto mergeJson(const nlohmann::json &json1, const nlohmann::json &json2)
+    auto getSelfKeys(const nlohmann::json& json_value) -> nlohmann::json;
+    auto handleAnyKey(const nlohmann::json& json_value,
+                    const std::vector<std::string>& levels_vec,
+                    size_t current_index) -> nlohmann::json;
+    auto mergeJson(const nlohmann::json &jsonLeft, const nlohmann::json &jsonRight)
         -> nlohmann::json;
 };

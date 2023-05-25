@@ -1,4 +1,4 @@
-#include "interpreter.h"
+#include "interpreter.hpp"
 
 using nlohmann::json;
 
@@ -36,7 +36,7 @@ int main() {
     card.audio_links = {"audio1.mp3", "audio2.mp3"};
     card.tags        = {
         {"tag1", {"value1", "moscow"}},
-        {"tag2", {"value2", "stp"}   }
+        {"level", {"A1"}}
     };
     card.other = {
         {"key1", "value1 слово pnfvinv 345"},
@@ -46,29 +46,34 @@ int main() {
 
     json               jsonCard = card_to_json(card);
 
-    scanner            scan("reduce(split(other[key1])+tags[tag1]))");
+    try {
+    scanner scan("\"A1\" in (tags[level])");
+    //scanner scan("tags");
     std::vector<token> tokens = scan.scan_tokens();
-    for (int i = 0; i < tokens.size(); ++i) {
-        std::cout << tokens[i].lexeme << " " << tokens[i].type << std::endl;
+    for (int i = 0; i < tokens.size(); ++i){
+        std::cout<< tokens[i].lexeme <<std::endl;
     }
-
-    parser                p(tokens);
+    parser p(tokens);
     std::unique_ptr<expr> exp = p.parse();
-    interpreter           inter;
-    value                 val = inter.interpret(exp.get(), jsonCard);
+    interpreter inter;
+    value val = inter.interpret(exp.get(), jsonCard);
+
     if (val.val_type == DOUBLE) {
-        std::cout << "значение: " << val.doub_val << std::endl;
+        std::cout << "Значение: " << val.doub_val << std::endl;
     } else if (val.val_type == JSON) {
-        std::cout << "это json " << std::endl;
-        std::cout << "значение: " << val.json_val.dump() << std::endl;
+        std::cout << "Это JSON" << std::endl;
+        std::cout << "Значение: " << val.json_val.dump() << std::endl;
     } else if (val.val_type == BOOL) {
-        std::cout << "это bool " << std::endl;
-        std::cout << "значение: " << val.bool_val << std::endl;
+        std::cout << "Это логическое значение" << std::endl;
+        std::cout << "Значение: " << val.bool_val << std::endl;
     } else if (val.val_type == STRING) {
-        std::cout << "это string " << std::endl;
-        std::cout << "значение: " << val.str_val << std::endl;
+        std::cout << "Это строка" << std::endl;
+        std::cout << "Значение: " << val.str_val << std::endl;
     } else if (val.val_type == EMPTY) {
-        std::cout << "пусто" << std::endl;
+        std::cout << "Пусто" << std::endl;
     }
+} catch (const ComponentException& e) {
+    std::cerr << "Ошибка: " << e.what() << std::endl;
+} 
     return 0;
 }

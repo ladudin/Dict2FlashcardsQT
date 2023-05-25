@@ -1,4 +1,4 @@
-#include "scaner.h"
+#include "scaner.hpp"
 
 void scanner::init_keywords() {
     keywords["in"]     = tt::IN;
@@ -73,7 +73,7 @@ void scanner::number() {
     add_token(tt::NUMBER, source.substr(start, current - start));
 }
 
-// избавиться от дублирования кода
+
 void scanner::read_json_keyword() {
     advance();  // считали $
     while (isalnum(peek()[0]) || peek()[0] == '_') {
@@ -83,10 +83,10 @@ void scanner::read_json_keyword() {
     if (text == "$ANY" || text == "$SELF") {
         add_token(tt::IDENTIFIER);
     }
-    // обработать ошибку, когда команды на $ нет
+    //
 }
 
-// избавиться от дублирования кода
+
 void scanner::read_json_level() {
     while (isalnum(peek()[0]) || peek()[0] == '_') {
         advance();
@@ -103,21 +103,21 @@ void scanner::string() {
         advance();
     }
 
-    // Unterminated string
+    // нет вторых кавычек
     if (!has_next()) {
-        // тут вставить логгер
-        return;
+        
+        throw ComponentException("Missing closing quotation mark for string.");
     }
 
-    advance();  // за "
-
+    advance();  // пропуск для кавычки
+    // добавляем слово без кавычек
     std::string value = source.substr(start + 1, current - start - 2);
     add_token(tt::STRING, value);
 }
 
 void scanner::scan_token() {
-    const char c = advance();
-    switch (c) {
+    const char token = advance();
+    switch (token) {
         case '(':
             add_token(tt::LEFT_PAREN);
             break;
@@ -169,9 +169,10 @@ void scanner::scan_token() {
         case '>':
             add_token(match(std::string("=")) ? tt::GREATER_EQUAL
                                               : tt::GREATER);
-            break;
+            break;       
         case ' ':
         case '\r':
+        case '\n':
         case '\t':
             break;
         case '"':
@@ -179,14 +180,14 @@ void scanner::scan_token() {
             break;
 
         default:
-            if (is_digit(std::string(1, c)))
+            if (is_digit(std::string(1, token)))
                 number();
-            else if (c == '$')
+            else if (token == '$')
                 read_json_keyword();
-            else if (isalpha(c))
+            else if (isalpha(token))
                 read_json_level();
             else
-                std::cout << "Unexpected character ";
+                throw ComponentException("Unexpected character encountered.");
             break;
     }
 }
