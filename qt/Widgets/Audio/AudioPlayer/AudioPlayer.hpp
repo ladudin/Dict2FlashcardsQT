@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QTextEdit>
-#include "Media.hpp"
+#include "Media.h"
 
 namespace Ui {
 class AudioPlayer;

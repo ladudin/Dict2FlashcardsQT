@@ -1,17 +1,17 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include <QPushButton>
-#include <QLabel>
-#include <QPixmap>
-#include <QTableWidget>
-#include <ImagesWidget.hpp>
-#include <memory>
-#include <qapplication.h>
-#include "AudioPlayer.hpp"
-#include "Media.hpp"
-#include "AudioWidget.hpp"
-#include "ExamplesWidget.hpp"
+// #include <QPushButton>
+// #include <QLabel>
+// #include <QPixmap>
+// #include <QTableWidget>
+// #include <ImagesWidget.hpp>
+// #include <memory>
+// #include <qapplication.h>
+// #include "AudioPlayer.hpp"
+// #include "Media.hpp"
+// #include "AudioWidget.hpp"
+// #include "ExamplesWidget.hpp"
 // #include "test.h"
 
 // int main(int argc, char *argv[])
