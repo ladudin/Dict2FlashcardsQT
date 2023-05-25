@@ -262,6 +262,8 @@ void interpreter::visit(literal *expr) {
         if (!json_val.empty()) {
             expr->val.val_type = JSON;
             expr->val.json_val = json_val;
+        } else {
+            expr->val.val_type = EMPTY;
         }
     }
     result = expr->val;

@@ -36,7 +36,7 @@ int main() {
     card.audio_links = {"audio1.mp3", "audio2.mp3"};
     card.tags        = {
         {"tag1", {"value1", "moscow"}},
-        {"tag2", {"value2", "stp"}   }
+        {"level", {"A1"}}
     };
     card.other = {
         {"key1", "value1 слово pnfvinv 345"},
@@ -47,9 +47,12 @@ int main() {
     json               jsonCard = card_to_json(card);
 
     try {
-    scanner scan("\"value2\" in other[key2] or \"value2\" in other[key3]");
-    //scanner scan("\"value2\" ");
+    scanner scan("\"A1\" in (tags[level])");
+    //scanner scan("tags");
     std::vector<token> tokens = scan.scan_tokens();
+    for (int i = 0; i < tokens.size(); ++i){
+        std::cout<< tokens[i].lexeme <<std::endl;
+    }
     parser p(tokens);
     std::unique_ptr<expr> exp = p.parse();
     interpreter inter;
