@@ -19,11 +19,11 @@ public:
     explicit ExamplesWidget(QWidget *parent = nullptr);
     ~ExamplesWidget();
 public slots:
-    void set(const std::vector<std::string>* new_examples);
+    void set(const std::vector<std::string>* new_examples, std::vector<bool> chosen=std::vector<bool>());
     void next();
     void prev();
-    void setButtonEnabled(QPushButton* button, bool enabled);
-    void setButtonChosen(QPushButton* button);
+    void setItemEnabled(size_t index, bool enabled);
+    void setItemChosen(size_t index);
     std::vector<std::string> extract();
 
 private slots:
@@ -33,7 +33,7 @@ private slots:
 private:
     Ui::ExamplesWidget *ui;
     const std::vector<std::string>* examples;
-    std::vector<bool> chosen;
+    std::vector<bool> chosen_;
     QFormLayout* form_layout;
     const size_t edits_in_page = 3;
     size_t page_number;

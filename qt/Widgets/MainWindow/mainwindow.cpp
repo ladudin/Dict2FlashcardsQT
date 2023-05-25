@@ -57,14 +57,17 @@ void MainWindow::onSearchReturned()
     if (int_idx == -1)
     {
         deckModel->load(ui->searchLine->text(), ui->filterEdit->toPlainText());
+        std::cout << "rows = " << deckModel->rowCount() << std::endl;
+        int rows = deckModel->rowCount() - 1;
         QModelIndex qm_idx = deckModel->index(deckModel->rowCount() - 1);
         ui->deckView->setCurrentIndex(qm_idx);
-        emit ui->deckView->clicked(qm_idx);
+        // emit ui->deckView->clicked(qm_idx);
+        ui->deckView->clicked(qm_idx);
         return;
     }
     QModelIndex qm_idx = deckModel->index(int_idx);
     ui->deckView->setCurrentIndex(qm_idx);
-    emit ui->deckView->clicked(qm_idx);
+    ui->deckView->clicked(qm_idx);
 }
 
 void MainWindow::updateCardFields()

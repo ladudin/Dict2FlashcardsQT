@@ -36,82 +36,87 @@ ExamplesWidget::~ExamplesWidget()
     delete ui;
 }
 
-void ExamplesWidget::setButtonEnabled(QPushButton* button, bool enabled) {
+void ExamplesWidget::setItemEnabled(size_t index, bool enabled) {
+    QLayoutItem* edit_item = form_layout->itemAt(index, QFormLayout::LabelRole);
+    QTextEdit* edit = qobject_cast<QTextEdit*>(edit_item->widget());
+    QLayoutItem* button_item = form_layout->itemAt(index, QFormLayout::FieldRole);
+    QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
     if (enabled) {
+        edit->setEnabled(true);
+        edit->setText(QString::fromStdString(examples->at(page_number * edits_in_page + index)));
         button->setEnabled(true);
         button->setChecked(false);
         button->setStyleSheet("background-color: white");
     }
     else {
-        button->setStyleSheet("background-color: gray");
+        edit->setEnabled(true);
+        edit->clear();
+        edit->setEnabled(false);
+        button->setEnabled(true);
         button->setChecked(false);
+        button->setStyleSheet("background-color: gray");
         button->setEnabled(false);
     }
 }
 
-void ExamplesWidget::setButtonChosen(QPushButton* button) {
+void ExamplesWidget::setItemChosen(size_t index) {
+    QLayoutItem* button_item = form_layout->itemAt(index, QFormLayout::FieldRole);
+    QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
+    button->setEnabled(true);
+    button->setChecked(true);
     button->setStyleSheet("background-color: green");
 }
 
-void ExamplesWidget::set(const std::vector<std::string> *new_examples)
+void ExamplesWidget::set(const std::vector<std::string> *new_examples, std::vector<bool> chosen)
 {
+    std::cout << "set при page_number " << page_number << std::endl;
     examples = new_examples;
     if (!examples) {
         return;
     }
+    std::cout << "examples не пустой " << page_number << std::endl;
     clear();
-    chosen.resize(examples->size());
+    if (!chosen.empty()) {
+        chosen_ = chosen;
+    } 
+    for (size_t i = chosen_.size(); i < examples->size(); ++i) {
+        chosen_.push_back(false);
+    }
+    size_t examples_index = page_number * edits_in_page;
     for (size_t i = 0; i < edits_in_page; ++i) {
-        QLayoutItem* edit_item = form_layout->itemAt(i, QFormLayout::LabelRole);
-        QTextEdit* edit = qobject_cast<QTextEdit*>(edit_item->widget());
-        QLayoutItem* button_item = form_layout->itemAt(i, QFormLayout::FieldRole);
-        QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
-        if (i < examples->size()) {
-            edit->setText(QString::fromStdString(examples->at(i)));
-            edit->setEnabled(true);
-            setButtonEnabled(button, true);
-        }
-        else {
+        if (examples_index + i < examples->size()) {
+            setItemEnabled(i, true);
+            if (chosen_.at(examples_index + i)) {
+                setItemChosen(i);
+            }
         }
     }
 }
 
 void ExamplesWidget::next()
 {
-    size_t start_index = (page_number + 1) * edits_in_page;
-    if (start_index >= examples->size()) {
+    if (!examples) {
         return;
     }
-    clear();
-    for (size_t i = 0; i < edits_in_page; ++i) {
-        QLayoutItem* edit_item = form_layout->itemAt(i, QFormLayout::LabelRole);
-        QTextEdit* edit = qobject_cast<QTextEdit*>(edit_item->widget());
-        QLayoutItem* button_item = form_layout->itemAt(i, QFormLayout::FieldRole);
-        QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
-        if (start_index + i < examples->size()) {
-            edit->setText(QString::fromStdString(examples->at(start_index + i)));
-            edit->setEnabled(true);
-            setButtonEnabled(button, true);
-        }
-        else {
-        }
+    if (page_number * edits_in_page >= examples->size()) {
+        return;
     }
     ++page_number;
+    std::cout << "Увеличили page_number до " << page_number << std::endl;
+    set(examples);
 }
 
 void ExamplesWidget::prev()
 {
+    if (!examples) {
+        return;
+    }
     if (page_number == 0) {
         return;
     }
-    clear();
-    if (page_number == 1) {
-        set(examples);
-        --page_number;
-        return;
-    }
-    page_number -= 2;
-    next();
+    --page_number;
+    std::cout << "Уменьшили page_number до " << page_number << std::endl;
+    set(examples);
 }
 
 std::vector<std::string> ExamplesWidget::extract()
@@ -120,8 +125,8 @@ std::vector<std::string> ExamplesWidget::extract()
     if (!examples) {
         return extracted;
     }
-    for (size_t i = 0; i < chosen.size(); ++i) {
-        if (chosen[i]) {
+    for (size_t i = 0; i < chosen_.size(); ++i) {
+        if (chosen_[i]) {
             extracted.push_back(examples->at(i));
         }
     }
@@ -131,27 +136,21 @@ std::vector<std::string> ExamplesWidget::extract()
 void ExamplesWidget::clear()
 {
     for (size_t i = 0; i < edits_in_page; ++i) {
-        QLayoutItem* item = form_layout->itemAt(i, QFormLayout::LabelRole);
-        if (QTextEdit* edit = qobject_cast<QTextEdit*>(item->widget())) {
-            edit->clear();
-        }
-        QLayoutItem* button_item = form_layout->itemAt(i, QFormLayout::FieldRole);
-        QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
-        setButtonEnabled(button, false);
+        setItemEnabled(i, false);
     }
 }
 
 void ExamplesWidget::updateChosen(size_t index, bool choice, QPushButton *button)
 {
-    if (chosen.size() <= index) {
+    if (chosen_.size() <= page_number * edits_in_page + index) {
         return;
     }
-    chosen.at(index) = choice;
+    chosen_.at(page_number * edits_in_page + index) = choice;
     if (choice) {
-        setButtonChosen(button);
+        setItemChosen(index);
     }
     else {
-        setButtonEnabled(button, true);
+        setItemEnabled(index, true);
     }
 }
 

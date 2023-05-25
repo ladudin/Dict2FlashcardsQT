@@ -1,2 +1,3 @@
 add_subdirectory(WordCards)
 add_subdirectory(DeckModel)
+add_subdirectory(SavedDeckModel)
