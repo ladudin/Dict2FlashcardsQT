@@ -1,8 +1,8 @@
 #include "querying.hpp"
 
-#include "interpreter.h"
-#include "parcer.h"
-#include "scaner.h"
+#include "interpreter.hpp"
+#include "parcer.hpp"
+#include "scaner.hpp"
 #include "spdlog/spdlog.h"
 #include <nlohmann/json_fwd.hpp>
 #include <optional>

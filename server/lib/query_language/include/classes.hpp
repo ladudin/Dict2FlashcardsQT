@@ -1,5 +1,6 @@
 #pragma once
-#include "scaner.h"
+
+#include "scaner.hpp"
 
 class binary;
 class grouping;
@@ -53,7 +54,7 @@ class expr {
     virtual void accept(expr_visitor *visitor) = 0;
 };
 
-//
+// класс для переменной, считанной из запроса
 class literal : public expr {
  public:
     std::vector<std::string> json_namevec;
@@ -74,7 +75,7 @@ class binary : public expr {
     token                 op;
     std::unique_ptr<expr> right;
 
-    binary(std::unique_ptr<expr> l, token tok, std::unique_ptr<expr> r);
+    binary(std::unique_ptr<expr> left_, token tok, std::unique_ptr<expr> right_);
     virtual ~binary(){};
     void accept(expr_visitor *visitor);
 };
@@ -84,21 +85,23 @@ class func_in : public expr {
     std::unique_ptr<expr> left;
     std::unique_ptr<expr> right;
 
-    func_in(std::unique_ptr<expr> l, std::unique_ptr<expr> r);
+    func_in(std::unique_ptr<expr> left_, std::unique_ptr<expr> right_);
     virtual ~func_in(){};
     void accept(expr_visitor *visitor);
 };
 
+
 // элементарный класс унарных операций
 class unary : public expr {
  public:
-    std::unique_ptr<expr> ex;
-    token                 op;
+    std::unique_ptr<expr> expression;
+    token                 oper;
 
-    unary(std::unique_ptr<expr> e, token t);
+    unary(std::unique_ptr<expr> expression_, token tok);
     virtual ~unary(){};
     void accept(expr_visitor *visitor);
 };
+
 
 class logical_expr : public expr {
  public:
@@ -113,12 +116,17 @@ class logical_expr : public expr {
     void accept(expr_visitor *visitor);
 };
 
+
 // класс для выражений в скобках
 class grouping : public expr {
  public:
     std::unique_ptr<expr> expression;
 
-    grouping(std::unique_ptr<expr> e);
+    grouping(std::unique_ptr<expr> expression_);
     virtual ~grouping(){};
     void accept(expr_visitor *visitor);
 };
+
+
+
+
