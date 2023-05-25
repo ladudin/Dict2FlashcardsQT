@@ -30,7 +30,8 @@ class SentencesProviderWrapper : public BasePluginWrapper,
     auto get(const std::string &word, uint64_t batch_size, bool restart)
         -> std::variant<ISentencesProviderWrapper::type,
                         std::string,
-                        PyExceptionInfo>override; 
+                        PyExceptionInfo> override; 
+
 
     [[nodiscard]] auto name() const -> const std::string & override;
 

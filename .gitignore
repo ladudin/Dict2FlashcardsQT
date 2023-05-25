@@ -1,3 +1,4 @@
+build/
 *
 !*/
 build/*
@@ -8,5 +9,6 @@ build/*
 !./README.md
 !/img/**
 !/server/**
+!/qt/**
 !/test_client/**
 !/plugins/**/*.py
