@@ -1,13 +1,14 @@
 #pragma once
 
+#include <variant>
 #include "scaner.hpp"
 
-class binary;
-class grouping;
-class unary;
-class logical_expr;
-class func_in;
-class literal;
+class Binary;
+class Grouping;
+class Unary;
+class LogicalExpr;
+class FuncIn;
+class Literal;
 
 // элемент этой структуры является результатом действия
 // функций аст дерева
@@ -36,37 +37,37 @@ struct value {
 
 // интерпретатор аст дерева обязан определить
 // все функции для посещения его вершин
-class expr_visitor {
+class ExprVisitor {
  public:
-    virtual ~expr_visitor()                = default;
-    virtual void visit(binary *expr)       = 0;
-    virtual void visit(unary *expr)        = 0;
-    virtual void visit(literal *expr)      = 0;
-    virtual void visit(logical_expr *expr) = 0;
-    virtual void visit(func_in *expr)      = 0;
-    virtual void visit(grouping *expr)     = 0;
+    virtual ~ExprVisitor()                = default;
+    virtual void visit(Binary *Expr)       = 0;
+    virtual void visit(Unary *Expr)        = 0;
+    virtual void visit(Literal *Expr)      = 0;
+    virtual void visit(LogicalExpr *Expr) = 0;
+    virtual void visit(FuncIn *Expr)      = 0;
+    virtual void visit(Grouping *Expr)     = 0;
 };
 
 // базовый класс аст дерева
-class expr {
+class Expr {
  public:
-    virtual ~expr()                            = default;
-    virtual void accept(expr_visitor *visitor) = 0;
+    virtual ~Expr()                            = default;
+    virtual void accept(ExprVisitor *visitor) = 0;
 };
 
 // класс для переменной, считанной из запроса
-class literal : public expr {
+class Literal : public Expr {
  public:
     
-    literal(std::string v);
-    literal(double d);
-    literal(bool b);
-    literal(std::vector<std::string> json_namevec);
-    literal();
+    Literal(std::string v);
+    Literal(double d);
+    Literal(bool b);
+    Literal(std::vector<std::string> json_namevec);
+    Literal();
 
     value& get_value();
     std::vector<std::string> get_json_namevec();
-    void accept(expr_visitor *visitor) override;
+    void accept(ExprVisitor *visitor) override;
 
  private:
     std::vector<std::string> json_namevec;
@@ -74,82 +75,82 @@ class literal : public expr {
 };
 
 // класс бинарных операций
-class binary : public expr {
+class Binary : public Expr {
  public:
 
-    binary(std::unique_ptr<expr> left_, token tok, std::unique_ptr<expr> right_);
+    Binary(std::unique_ptr<Expr> left_, token tok, std::unique_ptr<Expr> right_);
 
-    expr * get_leftptr();
-    expr * get_rightptr();
+    Expr * get_leftptr();
+    Expr * get_rightptr();
     token  get_opername();
-    void accept(expr_visitor *visitor) override;
+    void accept(ExprVisitor *visitor) override;
 
  private:
-    std::unique_ptr<expr> left;
-    std::unique_ptr<expr> right;
+    std::unique_ptr<Expr> left;
+    std::unique_ptr<Expr> right;
     token                 oper;
 };
 
-class func_in : public expr {
+class FuncIn : public Expr {
  public:
 
-    func_in(std::unique_ptr<expr> left_, std::unique_ptr<expr> right_);
+    FuncIn(std::unique_ptr<Expr> left_, std::unique_ptr<Expr> right_);
 
-    expr * get_leftptr();
-    expr * get_rightptr();
-    void accept(expr_visitor *visitor) override;
+    Expr * get_leftptr();
+    Expr * get_rightptr();
+    void accept(ExprVisitor *visitor) override;
 
  private:
-    std::unique_ptr<expr> left;
-    std::unique_ptr<expr> right;
+    std::unique_ptr<Expr> left;
+    std::unique_ptr<Expr> right;
 };
 
 
 // элементарный класс унарных операций
-class unary : public expr {
+class Unary : public Expr {
  public:
 
-    unary(std::unique_ptr<expr> expression_, token tok);
+    Unary(std::unique_ptr<Expr> Expression_, token tok);
 
-    expr * get_expr();
+    Expr * get_expr();
     token  get_opername();
-    void accept(expr_visitor *visitor) override;
+    void accept(ExprVisitor *visitor) override;
     
  private:
-    std::unique_ptr<expr> expression;
+    std::unique_ptr<Expr> expression;
     token                 oper;
 };
 
 
-class logical_expr : public expr {
+class LogicalExpr : public Expr {
  public:
     
-    logical_expr(std::unique_ptr<expr> left_,
-                 token                 t,
-                 std::unique_ptr<expr> right_);
+    LogicalExpr(std::unique_ptr<Expr> left_,
+                 token                 tok,
+                 std::unique_ptr<Expr> right_);
 
-    expr * get_leftptr();
-    expr * get_rightptr();
+    Expr * get_leftptr();
+    Expr * get_rightptr();
     token  get_opername();
-    void accept(expr_visitor *visitor) override;
+    void accept(ExprVisitor *visitor) override;
 
  private:
-    std::unique_ptr<expr> left;
-    std::unique_ptr<expr> right;
+    std::unique_ptr<Expr> left;
+    std::unique_ptr<Expr> right;
     token                 oper;
 };
 
 
 // класс для выражений в скобках
-class grouping : public expr {
+class Grouping : public Expr {
  public:
-    grouping(std::unique_ptr<expr> expression_);
+    Grouping(std::unique_ptr<Expr> Expression_);
 
-    expr * get_expr();
-    void accept(expr_visitor *visitor);
+    Expr * get_expr();
+    void accept(ExprVisitor *visitor);
 
  private:
-    std::unique_ptr<expr> expression;
+    std::unique_ptr<Expr> expression;
 };
 
 

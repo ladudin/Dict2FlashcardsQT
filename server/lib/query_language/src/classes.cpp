@@ -1,126 +1,126 @@
 #include "classes.hpp"
 
 
-literal::literal(std::string v) : val(v){};
-literal::literal(double d) : val(d){};
-literal::literal(bool b) : val(b){};
-literal::literal(std::vector<std::string> json_namevec_)
+Literal::Literal(std::string v) : val(v){};
+Literal::Literal(double d) : val(d){};
+Literal::Literal(bool b) : val(b){};
+Literal::Literal(std::vector<std::string> json_namevec_)
     : json_namevec(json_namevec_){};
-literal::literal() : val(){};
+Literal::Literal() : val(){};
 
 
-value& literal::get_value()
+value& Literal::get_value()
 {
     return val;
 }
 
-std::vector<std::string> literal::get_json_namevec()
+std::vector<std::string> Literal::get_json_namevec()
 {
     return json_namevec;
 }
 
-void literal::accept(expr_visitor *visitor)
+void Literal::accept(ExprVisitor *visitor)
 {
     visitor->visit(this);
 }
 
 
 
-binary::binary(std::unique_ptr<expr> left_, token tok, std::unique_ptr<expr> right_)
+Binary::Binary(std::unique_ptr<Expr> left_, token tok, std::unique_ptr<Expr> right_)
     : left(std::move(left_)), oper(tok), right(std::move(right_)){};
 
-void binary::accept(expr_visitor *visitor)
+void Binary::accept(ExprVisitor *visitor)
 {
     visitor->visit(this);
 }
 
-expr * binary::get_leftptr()
+Expr * Binary::get_leftptr()
 {
     return left.get();
 }
 
-expr * binary::get_rightptr()
+Expr * Binary::get_rightptr()
 {
     return right.get();
 }
 
-token  binary::get_opername()
+token  Binary::get_opername()
 {
     return oper;
 }
 
 
-unary::unary(std::unique_ptr<expr> expr_, token tok)
+Unary::Unary(std::unique_ptr<Expr> expr_, token tok)
     : expression(std::move(expr_)), oper(tok){};
 
-expr * unary::get_expr()
+Expr * Unary::get_expr()
 {
     return expression.get();
 }
 
-token  unary::get_opername()
+token  Unary::get_opername()
 {
     return oper;
 }
 
-void unary::accept(expr_visitor *visitor) {
+void Unary::accept(ExprVisitor *visitor) {
     visitor->visit(this);
 }
 
 
-logical_expr::logical_expr(std::unique_ptr<expr> left_,
+LogicalExpr::LogicalExpr(std::unique_ptr<Expr> left_,
                            token                 tok,
-                           std::unique_ptr<expr> right_)
+                           std::unique_ptr<Expr> right_)
     : left(std::move(left_)), oper(tok), right(std::move(right_)){};
 
-void logical_expr::accept(expr_visitor *visitor) {
+void LogicalExpr::accept(ExprVisitor *visitor) {
     visitor->visit(this);
 }
 
-expr * logical_expr::get_leftptr()
+Expr * LogicalExpr::get_leftptr()
 {
     return left.get();
 }
 
-expr * logical_expr::get_rightptr()
+Expr * LogicalExpr::get_rightptr()
 {
     return right.get();
 }
 
-token  logical_expr::get_opername()
+token  LogicalExpr::get_opername()
 {
     return oper;
 }
 
 
-func_in::func_in(std::unique_ptr<expr> left_, std::unique_ptr<expr> right_)
+FuncIn::FuncIn(std::unique_ptr<Expr> left_, std::unique_ptr<Expr> right_)
     : left(std::move(left_)), right(std::move(right_)){};
 
-void func_in::accept(expr_visitor *visitor)
+void FuncIn::accept(ExprVisitor *visitor)
 {
     visitor->visit(this);
 }
 
-expr * func_in::get_leftptr()
+Expr * FuncIn::get_leftptr()
 {
     return left.get();
 }
 
-expr * func_in::get_rightptr()
+Expr * FuncIn::get_rightptr()
 {
     return right.get();
 }
 
 
-grouping::grouping(std::unique_ptr<expr> expr_)
-    : expression(std::move(expr_)){};
+Grouping::Grouping(std::unique_ptr<Expr> Expr_)
+    : expression(std::move(Expr_)){};
 
-void grouping::accept(expr_visitor *visitor)
+void Grouping::accept(ExprVisitor *visitor)
 {
     visitor->visit(this);
 }
 
-expr * grouping::get_expr()
+Expr * Grouping::get_expr()
 {
     return expression.get();
 }

@@ -1,4 +1,4 @@
-#include "parcer.hpp"
+#include "parser.hpp"
 
 parser::parser(std::vector<token> &t) : tokens(t){};
 
@@ -35,23 +35,23 @@ bool parser::match(std::vector<token_type> types) {
 }
 
 
-std::unique_ptr<expr> parser::primary() {
+std::unique_ptr<Expr> parser::primary() {
    token_type type = peek().type;
     advance();
 
     switch (type) {
         case tt::FALSE:
-            return std::make_unique<literal>(false);
+            return std::make_unique<Literal>(false);
         case tt::TRUE:
-            return std::make_unique<literal>(true);
+            return std::make_unique<Literal>(true);
         case tt::NUMBER:
-            return std::make_unique<literal>(std::stod(previous().literal));
+            return std::make_unique<Literal>(std::stod(previous().literal));
         case tt::STRING:
-            return std::make_unique<literal>(previous().literal);
+            return std::make_unique<Literal>(previous().literal);
         case tt::LEFT_PAREN: {
-            std::unique_ptr<expr> expr = expression();
+            std::unique_ptr<Expr> Expr = expression();
             if (match({tt::RIGHT_PAREN})) {
-                return std::make_unique<grouping>(std::move(expr));
+                return std::make_unique<Grouping>(std::move(Expr));
             } else {
                 throw ComponentException("Missing closing parenthesis for grouping.");
             }
@@ -59,7 +59,7 @@ std::unique_ptr<expr> parser::primary() {
         case tt::IDENTIFIER: {
             std::vector<std::string> json_fields = read_json_elem();
             if (!json_fields.empty()) {
-                return std::make_unique<literal>(json_fields);
+                return std::make_unique<Literal>(json_fields);
             } else {
                  throw ComponentException("Invalid JSON element.");
             }
@@ -86,26 +86,26 @@ std::vector<std::string> parser::read_json_elem() {
     return json_fields;
 }
 
-std::unique_ptr<expr> parser::func_in_class() {
-    std::unique_ptr<expr> left = primary();
+std::unique_ptr<Expr> parser::func_in() {
+    std::unique_ptr<Expr> left = primary();
     if (match({tt::IN})){
         /*if(!match({tt::LEFT_PAREN})){
             throw ComponentException("Missing open parenthesis for function call.");
         }*/
 
-        std::unique_ptr<expr> right = primary();
+        std::unique_ptr<Expr> right = primary();
         
         /*if (!match({tt::RIGHT_PAREN})) {
             throw ComponentException("Missing closing parenthesis for function call.");
         }*/
 
-        return std::make_unique<func_in>(std::move(left),
+        return std::make_unique<FuncIn>(std::move(left),
                                         std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::unar() {
+std::unique_ptr<Expr> parser::unar() {
     if (match({tt::NOT,
                tt::MINUS,
                tt::LEN,
@@ -114,85 +114,85 @@ std::unique_ptr<expr> parser::unar() {
                tt::LOWER,
                tt::REDUCE})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = unar();
-        return std::make_unique<unary>(std::move(right), oper);
+        std::unique_ptr<Expr> right = unar();
+        return std::make_unique<Unary>(std::move(right), oper);
     }
-    return func_in_class();
+    return func_in();
 }
 
-std::unique_ptr<expr> parser::multiplication() {
-    std::unique_ptr<expr> left = unar();
+std::unique_ptr<Expr> parser::multiplication() {
+    std::unique_ptr<Expr> left = unar();
     while (match({tt::SLASH, tt::STAR})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = unar();
-        left                  = std::make_unique<binary>(
+        std::unique_ptr<Expr> right = unar();
+        left                  = std::make_unique<Binary>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::addition() {
-    std::unique_ptr<expr> left = multiplication();
+std::unique_ptr<Expr> parser::addition() {
+    std::unique_ptr<Expr> left = multiplication();
     while (match({tt::MINUS, tt::PLUS})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = multiplication();
-        left                  = std::make_unique<binary>(
+        std::unique_ptr<Expr> right = multiplication();
+        left                  = std::make_unique<Binary>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::comparison() {
-    std::unique_ptr<expr> left = addition();
+std::unique_ptr<Expr> parser::comparison() {
+    std::unique_ptr<Expr> left = addition();
     while (match({tt::LESS, tt::LESS_EQUAL, tt::GREATER, tt::GREATER_EQUAL})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = addition();
-        left                  = std::make_unique<binary>(
+        std::unique_ptr<Expr> right = addition();
+        left                  = std::make_unique<Binary>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::equality() {
-    std::unique_ptr<expr> left = comparison();
+std::unique_ptr<Expr> parser::equality() {
+    std::unique_ptr<Expr> left = comparison();
     while (match({tt::BANG_EQUAL, tt::EQUAL_EQUAL})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = comparison();
-        left                  = std::make_unique<binary>(
+        std::unique_ptr<Expr> right = comparison();
+        left                  = std::make_unique<Binary>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::and_expr() {
-    std::unique_ptr<expr> left = equality();
+std::unique_ptr<Expr> parser::and_expr() {
+    std::unique_ptr<Expr> left = equality();
 
     while (match({tt::AND})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = equality();
-        left                        = std::make_unique<logical_expr>(
+        std::unique_ptr<Expr> right = equality();
+        left                        = std::make_unique<LogicalExpr>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::or_expr() {
-    std::unique_ptr<expr> left = and_expr();
+std::unique_ptr<Expr> parser::or_expr() {
+    std::unique_ptr<Expr> left = and_expr();
     
     while (match({tt::OR})) {
         token                 oper  = previous();
-        std::unique_ptr<expr> right = and_expr();
-        left                        = std::make_unique<logical_expr>(
+        std::unique_ptr<Expr> right = and_expr();
+        left                        = std::make_unique<LogicalExpr>(
             std::move(left), oper, std::move(right));
     }
     return left;
 }
 
-std::unique_ptr<expr> parser::expression() {
+std::unique_ptr<Expr> parser::expression() {
     return or_expr();
 }
 
-std::unique_ptr<expr> parser::parse() {
+std::unique_ptr<Expr> parser::parse() {
 
     return expression();
 }

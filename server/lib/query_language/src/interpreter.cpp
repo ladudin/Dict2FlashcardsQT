@@ -2,13 +2,13 @@
 
 interpreter::interpreter(){};
 
-value interpreter::interpret(expr *expression, nlohmann::json card_) {
+value interpreter::interpret(Expr * expression, nlohmann::json card_) {
     card         = card_;
     value result = evaluate(expression);
     return result;
 }
 
-value interpreter::evaluate(expr *expression) {
+value interpreter::evaluate(Expr * expression) {
     expression->accept(this);
     return result;
 }
@@ -59,7 +59,7 @@ void interpreter::check_number_operands(token oper, value left, value right) {
 
 
 
-void interpreter::visit(binary *expr) {
+void interpreter::visit(Binary *expr) {
     value left  = evaluate(expr->get_leftptr());
     value right = evaluate(expr->get_rightptr());
     switch (expr->get_opername().type) {
@@ -114,11 +114,11 @@ void interpreter::visit(binary *expr) {
     }
 }
 
-void interpreter::visit(grouping *expr) {
+void interpreter::visit(Grouping *expr) {
     expr->get_expr()->accept(this);
 }
 
-void interpreter::visit(func_in *expr) {
+void interpreter::visit(FuncIn *expr) {
     value left  = evaluate(expr->get_leftptr());
     value right = evaluate(expr->get_rightptr());
     if (left.val_type == STRING && right.val_type == JSON) {
@@ -129,7 +129,7 @@ void interpreter::visit(func_in *expr) {
 }
 
 
-void interpreter::visit(unary *expr) {
+void interpreter::visit(Unary *expr) {
     value right = evaluate(expr->get_expr());
 
     switch (expr->get_opername().type) {
@@ -146,19 +146,19 @@ void interpreter::visit(unary *expr) {
             break;
         case tt::SPLIT:
             check_json_operand(right);
-            result = value(splitJson(right.json_val));
+            result = value(split_json(right.json_val));
             break;
         case tt::UPPER:
             check_json_operand(right);
-            result = value(upperJsonString(right.json_val));
+            result = value(upper_json_string(right.json_val));
             break;
         case tt::LOWER:
             check_json_operand(right);
-            result = value(lowerJsonString(right.json_val));
+            result = value(lower_json_string(right.json_val));
             break;
         case tt::REDUCE:
             check_json_operand(right);
-            result = value(reduceJson(right.json_val));
+            result = value(reduce_json(right.json_val));
             break;
         default:
             ComponentException("Invalid operand type");
@@ -167,7 +167,7 @@ void interpreter::visit(unary *expr) {
 }
 
 
-nlohmann::json interpreter::upperJsonString(const nlohmann::json &data) {
+nlohmann::json interpreter::upper_json_string(const nlohmann::json &data) {
     
     if (data.is_string()) {
         std::string str = data.get<std::string>();
@@ -178,7 +178,7 @@ nlohmann::json interpreter::upperJsonString(const nlohmann::json &data) {
     if (data.is_array()) {
         nlohmann::json result = nlohmann::json::array();
         for (const auto &item : data) {
-            result.push_back(upperJsonString(item));
+            result.push_back(upper_json_string(item));
         }
         return result;
     }
@@ -188,7 +188,7 @@ nlohmann::json interpreter::upperJsonString(const nlohmann::json &data) {
 }
 
 
-nlohmann::json interpreter::lowerJsonString(const nlohmann::json &data) {
+nlohmann::json interpreter::lower_json_string(const nlohmann::json &data) {
     
     if (data.is_string()) {
         std::string str = data.get<std::string>();
@@ -199,7 +199,7 @@ nlohmann::json interpreter::lowerJsonString(const nlohmann::json &data) {
     if (data.is_array()) {
         nlohmann::json result = nlohmann::json::array();
         for (const auto &item : data) {
-            result.push_back(lowerJsonString(item));
+            result.push_back(lower_json_string(item));
         }
         return result;
     }
@@ -208,7 +208,7 @@ nlohmann::json interpreter::lowerJsonString(const nlohmann::json &data) {
     
 }
 
-std::vector<std::string> interpreter::splitString(const std::string &str) {
+std::vector<std::string> interpreter::split_string(const std::string &str) {
     std::vector<std::string> words;
     std::string              word;
     std::istringstream       iss(str);
@@ -219,14 +219,14 @@ std::vector<std::string> interpreter::splitString(const std::string &str) {
 }
 
 // Рекурсивная функция для разделения JSON элемента
-nlohmann::json interpreter::splitJson(const nlohmann::json &jsonValue) {
+nlohmann::json interpreter::split_json(const nlohmann::json &jsonValue) {
     if (jsonValue.is_null()) {
         return nlohmann::json::array();
     }
 
     if (jsonValue.is_string()) {
         std::string str = jsonValue.get<std::string>();
-        return splitString(str);
+        return split_string(str);
     }
 
     if (jsonValue.is_array()) {
@@ -234,7 +234,7 @@ nlohmann::json interpreter::splitJson(const nlohmann::json &jsonValue) {
         for (const auto &item : jsonValue) {
             if (item.is_string()) {
                 std::string str = item.get<std::string>();
-                result.push_back(splitString(str));
+                result.push_back(split_string(str));
             }
         }
         return result;
@@ -255,7 +255,7 @@ double interpreter::json_length(const nlohmann::json &jsonValue) {
     return 1; // неитерируемый объект, например число или строка
 }
 
-void interpreter::visit(literal *expr) {
+void interpreter::visit(Literal *expr) {
     if (!expr->get_json_namevec().empty()) {
 
         nlohmann::json json_val = find_json_value(card, expr->get_json_namevec());
@@ -300,9 +300,9 @@ nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
             if (current_json.contains(key)) {
                 current_json = current_json[key];
             } else if (key == "$ANY") {
-                return handleAnyKey(current_json, levels_vec, i);
+                return handle_any_key(current_json, levels_vec, i);
             } else if (key == "$SELF") {
-                return getSelfKeys(current_json);
+                return get_self_keys(current_json);
             } else {
                 return nlohmann::json();
             }
@@ -314,7 +314,7 @@ nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
     return current_json;
 }
 
-nlohmann::json interpreter::handleAnyKey(const nlohmann::json& json_value,
+nlohmann::json interpreter::handle_any_key(const nlohmann::json& json_value,
                                          const std::vector<std::string>& levels_vec,
                                          size_t current_index) {
     nlohmann::json any_values;
@@ -337,7 +337,7 @@ nlohmann::json interpreter::handleAnyKey(const nlohmann::json& json_value,
     }
 }
 
-nlohmann::json interpreter::getSelfKeys(const nlohmann::json& json_value) {
+nlohmann::json interpreter::get_self_keys(const nlohmann::json& json_value) {
     nlohmann::json self_keys;
 
     for (auto it = json_value.begin(); it != json_value.end(); ++it) {
@@ -349,7 +349,7 @@ nlohmann::json interpreter::getSelfKeys(const nlohmann::json& json_value) {
 
 
 
-void interpreter::visit(logical_expr *ex) {
+void interpreter::visit(LogicalExpr *ex) {
     value left = evaluate(ex->get_leftptr());
     if (ex->get_opername().type == OR) {
         if (is_truthy(left)) {
@@ -365,7 +365,7 @@ void interpreter::visit(logical_expr *ex) {
     result = evaluate(ex->get_rightptr());
 }
 
-nlohmann::json interpreter::reduceJson(const nlohmann::json &jsonElem) {
+nlohmann::json interpreter::reduce_json(const nlohmann::json &jsonElem) {
     if (jsonElem.is_null()) {
         return nlohmann::json();
     }

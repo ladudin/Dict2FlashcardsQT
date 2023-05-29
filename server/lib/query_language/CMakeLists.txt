@@ -1,6 +1,6 @@
 set(LANG_HEADERS
     include/scaner.hpp
-    include/parcer.hpp
+    include/parser.hpp
     include/interpreter.hpp
     include/classes.hpp
     include/exception.hpp
@@ -8,7 +8,7 @@ set(LANG_HEADERS
 
 set(LANG_SOURCE
     src/scaner.cpp
-    src/parcer.cpp
+    src/parser.cpp
     src/interpreter.cpp
     src/classes.cpp
     src/exception.cpp

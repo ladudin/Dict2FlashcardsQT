@@ -1,7 +1,7 @@
 #include "querying.hpp"
 
 #include "interpreter.hpp"
-#include "parcer.hpp"
+#include "parser.hpp"
 #include "scaner.hpp"
 #include "spdlog/spdlog.h"
 #include <nlohmann/json_fwd.hpp>
@@ -23,7 +23,7 @@ auto prepare_filter(const std::string &query)
 
     SPDLOG_INFO("Parsing query: `{}`", query);
     auto                  p   = parser(tokens);
-    std::shared_ptr<expr> exp = p.parse();
+    std::shared_ptr<Expr> exp = p.parse();
     if (exp == nullptr) {
         SPDLOG_WARN("Parsing query `{}` resulted in empty expression, "
                     "returning a constant false function",

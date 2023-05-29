@@ -54,7 +54,7 @@ int main() {
         std::cout<< tokens[i].lexeme <<std::endl;
     }
     parser p(tokens);
-    std::unique_ptr<expr> exp = p.parse();
+    std::unique_ptr<Expr> exp = p.parse();
     interpreter inter;
     value val = inter.interpret(exp.get(), jsonCard);
 
