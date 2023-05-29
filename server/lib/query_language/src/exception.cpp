@@ -1,5 +1,5 @@
 #include "exception.hpp"
-
+#include <cctype>
 
 ComponentException::ComponentException(const char* message) : message_(message) {}
 

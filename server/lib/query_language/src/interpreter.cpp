@@ -60,9 +60,9 @@ void interpreter::check_number_operands(token oper, value left, value right) {
 
 
 void interpreter::visit(binary *expr) {
-    value left  = evaluate(expr->left.get());
-    value right = evaluate(expr->right.get());
-    switch (expr->op.type) {
+    value left  = evaluate(expr->get_leftptr());
+    value right = evaluate(expr->get_rightptr());
+    switch (expr->get_opername().type) {
         case PLUS:
             if (left.val_type == tt::DOUBLE && right.val_type == tt::DOUBLE) {
                 result = value(left.doub_val + right.doub_val);
@@ -73,39 +73,39 @@ void interpreter::visit(binary *expr) {
             }
             break;
         case MINUS:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val - right.doub_val);
             break;
         case STAR:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val * right.doub_val);
             break;
         case SLASH:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val / right.doub_val);
             break;
         case LESS:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val < right.doub_val);
             break;
         case LESS_EQUAL:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val <= right.doub_val);
             break;
         case GREATER:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val > right.doub_val);
             break;
         case GREATER_EQUAL:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(left.doub_val >= right.doub_val);
             break;
         case BANG_EQUAL:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(!is_equal(left, right));
             break;
         case EQUAL_EQUAL:
-            check_number_operands(expr->op, left, right);
+            check_number_operands(expr->get_opername(), left, right);
             result = value(is_equal(left, right));
             break;
         default:
@@ -115,12 +115,12 @@ void interpreter::visit(binary *expr) {
 }
 
 void interpreter::visit(grouping *expr) {
-    expr->expression->accept(this);
+    expr->get_expr()->accept(this);
 }
 
 void interpreter::visit(func_in *expr) {
-    value left  = evaluate(expr->left.get());
-    value right = evaluate(expr->right.get());
+    value left  = evaluate(expr->get_leftptr());
+    value right = evaluate(expr->get_rightptr());
     if (left.val_type == STRING && right.val_type == JSON) {
         result = value(find_word_inJson(left.str_val, right.json_val));
     } else {
@@ -130,9 +130,9 @@ void interpreter::visit(func_in *expr) {
 
 
 void interpreter::visit(unary *expr) {
-    value right = evaluate(expr->expression.get());
+    value right = evaluate(expr->get_expr());
 
-    switch (expr->oper.type) {
+    switch (expr->get_opername().type) {
         case tt::MINUS:
             check_number_operand(right);
             result = value(-right.doub_val);
@@ -256,17 +256,17 @@ double interpreter::json_length(const nlohmann::json &jsonValue) {
 }
 
 void interpreter::visit(literal *expr) {
-    if (!expr->json_namevec.empty()) {
+    if (!expr->get_json_namevec().empty()) {
 
-        nlohmann::json json_val = find_json_value(card, expr->json_namevec);
+        nlohmann::json json_val = find_json_value(card, expr->get_json_namevec());
         if (!json_val.empty()) {
-            expr->val.val_type = JSON;
-            expr->val.json_val = json_val;
+            expr->get_value().val_type = JSON;
+            expr->get_value().json_val = json_val;
         } else {
-            expr->val.val_type = EMPTY;
+            expr->get_value().val_type = EMPTY;
         }
     }
-    result = expr->val;
+    result = expr->get_value();
 }
 
 
@@ -350,8 +350,8 @@ nlohmann::json interpreter::getSelfKeys(const nlohmann::json& json_value) {
 
 
 void interpreter::visit(logical_expr *ex) {
-    value left = evaluate(ex->left.get());
-    if (ex->oper.type == OR) {
+    value left = evaluate(ex->get_leftptr());
+    if (ex->get_opername().type == OR) {
         if (is_truthy(left)) {
             result = left;
             return;
@@ -362,7 +362,7 @@ void interpreter::visit(logical_expr *ex) {
             return;
         }
     }
-    result = evaluate(ex->right.get());
+    result = evaluate(ex->get_rightptr());
 }
 
 nlohmann::json interpreter::reduceJson(const nlohmann::json &jsonElem) {

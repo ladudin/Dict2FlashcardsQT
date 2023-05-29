@@ -57,74 +57,99 @@ class expr {
 // класс для переменной, считанной из запроса
 class literal : public expr {
  public:
-    std::vector<std::string> json_namevec;
-    value                    val;
+    
     literal(std::string v);
     literal(double d);
     literal(bool b);
     literal(std::vector<std::string> json_namevec);
     literal();
-    virtual ~literal(){};
-    void accept(expr_visitor *visitor);
+
+    value& get_value();
+    std::vector<std::string> get_json_namevec();
+    void accept(expr_visitor *visitor) override;
+
+ private:
+    std::vector<std::string> json_namevec;
+    value                    val;
 };
 
 // класс бинарных операций
 class binary : public expr {
  public:
-    std::unique_ptr<expr> left;
-    token                 op;
-    std::unique_ptr<expr> right;
 
     binary(std::unique_ptr<expr> left_, token tok, std::unique_ptr<expr> right_);
-    virtual ~binary(){};
-    void accept(expr_visitor *visitor);
+
+    expr * get_leftptr();
+    expr * get_rightptr();
+    token  get_opername();
+    void accept(expr_visitor *visitor) override;
+
+ private:
+    std::unique_ptr<expr> left;
+    std::unique_ptr<expr> right;
+    token                 oper;
 };
 
 class func_in : public expr {
  public:
-    std::unique_ptr<expr> left;
-    std::unique_ptr<expr> right;
 
     func_in(std::unique_ptr<expr> left_, std::unique_ptr<expr> right_);
-    virtual ~func_in(){};
-    void accept(expr_visitor *visitor);
+
+    expr * get_leftptr();
+    expr * get_rightptr();
+    void accept(expr_visitor *visitor) override;
+
+ private:
+    std::unique_ptr<expr> left;
+    std::unique_ptr<expr> right;
 };
 
 
 // элементарный класс унарных операций
 class unary : public expr {
  public:
-    std::unique_ptr<expr> expression;
-    token                 oper;
 
     unary(std::unique_ptr<expr> expression_, token tok);
-    virtual ~unary(){};
-    void accept(expr_visitor *visitor);
+
+    expr * get_expr();
+    token  get_opername();
+    void accept(expr_visitor *visitor) override;
+    
+ private:
+    std::unique_ptr<expr> expression;
+    token                 oper;
 };
 
 
 class logical_expr : public expr {
  public:
-    std::unique_ptr<expr> left;
-    token                 oper;
-    std::unique_ptr<expr> right;
-
+    
     logical_expr(std::unique_ptr<expr> left_,
                  token                 t,
                  std::unique_ptr<expr> right_);
-    virtual ~logical_expr(){};
-    void accept(expr_visitor *visitor);
+
+    expr * get_leftptr();
+    expr * get_rightptr();
+    token  get_opername();
+    void accept(expr_visitor *visitor) override;
+
+ private:
+    std::unique_ptr<expr> left;
+    std::unique_ptr<expr> right;
+    token                 oper;
 };
 
 
 // класс для выражений в скобках
 class grouping : public expr {
  public:
-    std::unique_ptr<expr> expression;
-
     grouping(std::unique_ptr<expr> expression_);
-    virtual ~grouping(){};
+
+    expr * get_expr();
     void accept(expr_visitor *visitor);
+
+ private:
+    std::unique_ptr<expr> expression;
 };
 
 

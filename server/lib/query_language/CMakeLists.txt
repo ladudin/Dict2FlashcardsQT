@@ -3,7 +3,6 @@ set(LANG_HEADERS
     include/parcer.hpp
     include/interpreter.hpp
     include/classes.hpp
-    include/include_libs.hpp
     include/exception.hpp
 )
 
