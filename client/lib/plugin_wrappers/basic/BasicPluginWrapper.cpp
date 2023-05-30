@@ -30,7 +30,7 @@ std::string BasicPluginWrapper::init(const std::string &plugin_name) {
             return response_message.at("message").get<std::string>();
         return {};
     } catch (...) {
-        return "Wrong response format";
+        return "Wrong response format: " + response.second;
     }
 }
 
@@ -47,10 +47,10 @@ std::pair<std::string, std::string> BasicPluginWrapper::get_default_config() {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
             return {"", response_message.at("message").get<std::string>()};
-        return {response_message.at("result").dump(2),
-                response_message.at("message").get<std::string>()};
+        return {response_message.at("result")[0].dump(2),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {"", "Wrong response format"};
+        return {"", "Wrong response format: " + response.second};
     }
 }
 
@@ -67,10 +67,10 @@ std::pair<std::string, std::string> BasicPluginWrapper::get_default_scheme() {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
             return {"", response_message.at("message").get<std::string>()};
-        return {response_message.at("result").dump(2),
-                response_message.at("message").get<std::string>()};
+        return {response_message.at("result")[0].dump(2),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {"", "Wrong response format"};
+        return {"", "Wrong response format: " + response.second};
     }
 }
 
@@ -99,7 +99,7 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
                     ""};
         return {{}, ""};
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
 
@@ -123,10 +123,10 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::list_plugins() {
                        response_message.at("result")
                            .at("failed")
                            .get<std::vector<std::string>>()},
-            response_message.at("message").get<std::string>()
+            ""
         };
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
 
@@ -150,9 +150,9 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::load_new_plugins() {
                        response_message.at("result")
                            .at("failed")
                            .get<std::vector<std::string>>()},
-            response_message.at("message").get<std::string>()
+            ""
         };
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
