@@ -22,7 +22,7 @@ bool ServerConnection::is_connected() {
 
 std::pair<bool, std::string>
 ServerConnection::request(const std::string &message) {
-    std::string request_message = message + "\r\n";
+    std::string               request_message = message + "\r\n";
     boost::system::error_code error;
 
     boost::asio::write(socket_, boost::asio::buffer(request_message), error);
