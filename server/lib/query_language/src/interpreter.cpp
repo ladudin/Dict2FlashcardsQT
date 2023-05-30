@@ -2,170 +2,205 @@
 
 interpreter::interpreter(){};
 
-value interpreter::interpret(Expr * expression, nlohmann::json card_) {
+Value interpreter::interpret(Expr * expression, nlohmann::json card_) {
     card         = card_;
-    value result = evaluate(expression);
-    return result;
+    return evaluate(expression);
 }
 
-value interpreter::evaluate(Expr * expression) {
-    expression->accept(this);
-    return result;
+Value interpreter::evaluate(Expr * expression) {
+    return expression->accept(this);
 }
 
-bool interpreter::is_truthy(value val) {
-    if (val.val_type == EMPTY)
+bool interpreter::is_truthy(const Value& val) {
+    if (std::holds_alternative<std::monostate>(val)){
         return false;
-    if (val.val_type == DOUBLE)
-        return val.doub_val != 0;
-    if (val.val_type == BOOL)
-        return val.bool_val;
+    }
+    if (std::holds_alternative<double>(val)){
+        return std::get<double>(val) != 0;
+    }
+    if (std::holds_alternative<bool>(val)){
+    return  std::get<bool>(val);
+    }
+       
     return true;
 }
 
-bool interpreter::is_equal(value left, value right) {
-    if (left.val_type == BOOL && right.val_type == BOOL)
-        return left.bool_val == right.bool_val;
-    if (left.val_type == DOUBLE && right.val_type == DOUBLE)
-        return left.doub_val == right.doub_val;
-    if (left.val_type == JSON && right.val_type == JSON)
-        return left.json_val == right.json_val;
-    if (left.val_type == EMPTY && right.val_type == EMPTY)
-        return true;
-    return false;
+bool interpreter::is_equal(const Value& left, const Value& right) {
+    if (std::holds_alternative<bool>(left) && std::holds_alternative<bool>(right)) {
+
+        return std::get<bool>(left) == std::get<bool>(right);
+
+    } else if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
+
+        return std::get<double>(left) == std::get<double>(right);
+
+    } else if (std::holds_alternative<nlohmann::json>(left) && std::holds_alternative<nlohmann::json>(right)) {
+
+        return std::get<nlohmann::json>(left) == std::get<nlohmann::json>(right);
+
+    } else if (std::holds_alternative<std::monostate>(left) && std::holds_alternative<std::monostate>(right)) {
+
+        return true;  // Если оба значения имеют тип std::monostate, считаем их равными
+    }
+
+    return false;  // Если типы не совпадают, считаем значения неравными
 }
 
-
-void interpreter::check_number_operand(value operand) {
-    if (operand.val_type != tt::DOUBLE) {
+void interpreter::check_number_operand(const Value& operand) {
+    if (!std::holds_alternative<double>(operand)) {
         throw ComponentException("Invalid operand type");
     }
 }
 
-void interpreter::check_json_operand( value operand) {
-    if (operand.val_type != tt::JSON) {
+void interpreter::check_json_operand( const Value& operand) {
+    if (!std::holds_alternative<nlohmann::json>(operand)) {
         throw ComponentException("Expected JSON");
     }
 }
 
-void interpreter::check_number_operands(token oper, value left, value right) {
-    if (left.val_type != tt::DOUBLE || right.val_type != tt::DOUBLE) {
+/*
+void interpreter::check_number_operands(token oper, const Value& left, const Value& right) {
+    std::visit([&](auto&& left_, auto&& right_) {
+        using LeftType = std::decay_t<decltype(left_)>;
+        using RightType = std::decay_t<decltype(right_)>;
+
+        if constexpr (std::is_same_v<LeftType, double> && std::is_same_v<RightType, double>) {
+            if (right_ == 0 && oper.type == tt::SLASH) {
+                throw ComponentException("Division by zero");
+            }
+        } else {
+            throw ComponentException("Invalid operand type");
+        }
+    }, left, right);
+}
+*/
+
+
+Value interpreter::visit(Binary* expr) {
+    Value left = evaluate(expr->get_leftptr());
+    Value right = evaluate(expr->get_rightptr());
+
+    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
+        double left_ = std::get<double>(left);
+        double right_ = std::get<double>(right);
+        switch (expr->get_opername().type) {
+            case PLUS:
+                return  Value(left_ + right_);
+            case MINUS:
+                return  Value(left_ - right_);
+
+            case STAR:
+                return  Value(left_ * right_);
+
+            case SLASH:
+                return  Value(left_ / right_);
+
+            case LESS:
+                return  Value(left_ < right_);
+
+            case LESS_EQUAL:
+                return  Value(left_ <= right_);
+
+            case GREATER:
+                return  Value(left_ > right_);
+
+            case GREATER_EQUAL:
+                return  Value(left >= right);
+
+            case BANG_EQUAL:
+                return  Value(!is_equal(left_, right_));
+
+            case EQUAL_EQUAL:
+                return  Value(is_equal(left_, right_));
+
+            default:
+                throw ComponentException("Invalid operand type");
+        }
+    } else if (std::holds_alternative<nlohmann::json>(left) && std::holds_alternative<nlohmann::json>(right)) {
+        nlohmann::json left_ = std::get<nlohmann::json>(left);
+        nlohmann::json right_ = std::get<nlohmann::json>(right);
+        if (expr->get_opername().type == PLUS) {
+            return Value(mergeJson(left_, right_));
+        } else {
+            throw ComponentException("Invalid operand type");
+        }
+    } else {
         throw ComponentException("Invalid operand type");
     }
-    if (right.doub_val == 0 && oper.type == tt::SLASH) {
-        throw ComponentException("Division by zero");
-    }
 }
 
-
-
-void interpreter::visit(Binary *expr) {
-    value left  = evaluate(expr->get_leftptr());
-    value right = evaluate(expr->get_rightptr());
-    switch (expr->get_opername().type) {
-        case PLUS:
-            if (left.val_type == tt::DOUBLE && right.val_type == tt::DOUBLE) {
-                result = value(left.doub_val + right.doub_val);
-            } else if (left.val_type == tt::JSON && right.val_type == tt::JSON) {
-                result = value(mergeJson(left.json_val, right.json_val));
-            } else {
-                throw ComponentException("Invalid operand type");
-            }
-            break;
-        case MINUS:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val - right.doub_val);
-            break;
-        case STAR:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val * right.doub_val);
-            break;
-        case SLASH:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val / right.doub_val);
-            break;
-        case LESS:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val < right.doub_val);
-            break;
-        case LESS_EQUAL:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val <= right.doub_val);
-            break;
-        case GREATER:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val > right.doub_val);
-            break;
-        case GREATER_EQUAL:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(left.doub_val >= right.doub_val);
-            break;
-        case BANG_EQUAL:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(!is_equal(left, right));
-            break;
-        case EQUAL_EQUAL:
-            check_number_operands(expr->get_opername(), left, right);
-            result = value(is_equal(left, right));
-            break;
-        default:
-            throw ComponentException("Invalid operand type");
-            break;
-    }
+Value interpreter::visit(Grouping* expr) {
+    return expr->get_expr()->accept(this);
 }
 
-void interpreter::visit(Grouping *expr) {
-    expr->get_expr()->accept(this);
-}
+Value interpreter::visit(FuncIn* expr) {
+    Value left = evaluate(expr->get_leftptr());
+    Value right = evaluate(expr->get_rightptr());
 
-void interpreter::visit(FuncIn *expr) {
-    value left  = evaluate(expr->get_leftptr());
-    value right = evaluate(expr->get_rightptr());
-    if (left.val_type == STRING && right.val_type == JSON) {
-        result = value(find_word_inJson(left.str_val, right.json_val));
+    if (std::holds_alternative<std::string>(left) && std::holds_alternative<nlohmann::json>(right)) {
+
+        std::string left_ = std::get<std::string>(left);
+        nlohmann::json right_ = std::get<nlohmann::json>(right);
+        return Value(find_word_inJson(left_, right_));
     } else {
-        result = value(false);
+        return Value(false);
     }
 }
 
-
-void interpreter::visit(Unary *expr) {
-    value right = evaluate(expr->get_expr());
+Value interpreter::visit(Unary *expr) {
+    Value right = evaluate(expr->get_expr());
 
     switch (expr->get_opername().type) {
         case tt::MINUS:
             check_number_operand(right);
-            result = value(-right.doub_val);
-            break;
+            return Value(-std::get<double>(right));
         case tt::NOT:
-            result = value(!is_truthy(right));
-            break;
+            return Value(!is_truthy(right));
         case tt::LEN:
             check_json_operand(right);
-            result = value(json_length(right.json_val));
-            break;
+            return Value(json_length(std::get<nlohmann::json>(right)));
         case tt::SPLIT:
             check_json_operand(right);
-            result = value(split_json(right.json_val));
-            break;
+            return Value(split_json(std::get<nlohmann::json>(right)));
         case tt::UPPER:
             check_json_operand(right);
-            result = value(upper_json_string(right.json_val));
-            break;
+            return Value(upper_json_string(std::get<nlohmann::json>(right)));
         case tt::LOWER:
             check_json_operand(right);
-            result = value(lower_json_string(right.json_val));
-            break;
+            return Value(lower_json_string(std::get<nlohmann::json>(right)));
         case tt::REDUCE:
             check_json_operand(right);
-            result = value(reduce_json(right.json_val));
-            break;
+            return Value(reduce_json(std::get<nlohmann::json>(right)));
         default:
-            ComponentException("Invalid operand type");
-            break;
+            throw ComponentException("Invalid operand type");
     }
 }
 
+Value interpreter::visit(LogicalExpr *ex) {
+    Value left = evaluate(ex->get_leftptr());
+    if (ex->get_opername().type == OR) {
+        if (is_truthy(left)) {
+            return left;
+        }
+    } else {
+        if (!is_truthy(left)) {
+            return left;
+        }
+    }
+    return evaluate(ex->get_rightptr());
+}
+
+Value interpreter::visit(Literal* expr) {
+    if (!expr->get_json_namevec().empty()) {
+        nlohmann::json json_val = find_json_value(card, expr->get_json_namevec());
+        if (!json_val.empty()) {
+            expr->get_value() = Value(json_val);
+        } else {
+            expr->get_value() = Value();
+        }
+    }
+    return expr->get_value();
+}
 
 nlohmann::json interpreter::upper_json_string(const nlohmann::json &data) {
     
@@ -183,8 +218,7 @@ nlohmann::json interpreter::upper_json_string(const nlohmann::json &data) {
         return result;
     }
 
-    return nlohmann::json();
-    // exeption?
+    return data;
 }
 
 
@@ -204,7 +238,7 @@ nlohmann::json interpreter::lower_json_string(const nlohmann::json &data) {
         return result;
     }
 
-    return nlohmann::json();
+    return data;
     
 }
 
@@ -255,20 +289,6 @@ double interpreter::json_length(const nlohmann::json &jsonValue) {
     return 1; // неитерируемый объект, например число или строка
 }
 
-void interpreter::visit(Literal *expr) {
-    if (!expr->get_json_namevec().empty()) {
-
-        nlohmann::json json_val = find_json_value(card, expr->get_json_namevec());
-        if (!json_val.empty()) {
-            expr->get_value().val_type = JSON;
-            expr->get_value().json_val = json_val;
-        } else {
-            expr->get_value().val_type = EMPTY;
-        }
-    }
-    result = expr->get_value();
-}
-
 
 bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
     if (jsonValue.is_string()) {
@@ -285,8 +305,6 @@ bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
     }
     return false;
 }
-
-
 
 
 nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
@@ -314,12 +332,12 @@ nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
     return current_json;
 }
 
-nlohmann::json interpreter::handle_any_key(const nlohmann::json& json_value,
+nlohmann::json interpreter::handle_any_key(const nlohmann::json& json_Value,
                                          const std::vector<std::string>& levels_vec,
                                          size_t current_index) {
     nlohmann::json any_values;
 
-    for (auto it = json_value.begin(); it != json_value.end(); ++it) {
+    for (auto it = json_Value.begin(); it != json_Value.end(); ++it) {
         const auto& result = find_json_value(
             it.value(),
             std::vector<std::string>(levels_vec.begin() + current_index + 1, levels_vec.end())
@@ -337,10 +355,10 @@ nlohmann::json interpreter::handle_any_key(const nlohmann::json& json_value,
     }
 }
 
-nlohmann::json interpreter::get_self_keys(const nlohmann::json& json_value) {
+nlohmann::json interpreter::get_self_keys(const nlohmann::json& json_Value) {
     nlohmann::json self_keys;
 
-    for (auto it = json_value.begin(); it != json_value.end(); ++it) {
+    for (auto it = json_Value.begin(); it != json_Value.end(); ++it) {
         self_keys.push_back(it.key());
     }
 
@@ -349,21 +367,7 @@ nlohmann::json interpreter::get_self_keys(const nlohmann::json& json_value) {
 
 
 
-void interpreter::visit(LogicalExpr *ex) {
-    value left = evaluate(ex->get_leftptr());
-    if (ex->get_opername().type == OR) {
-        if (is_truthy(left)) {
-            result = left;
-            return;
-        }
-    } else {
-        if (!is_truthy(left)) {
-            result = left;
-            return;
-        }
-    }
-    result = evaluate(ex->get_rightptr());
-}
+
 
 nlohmann::json interpreter::reduce_json(const nlohmann::json &jsonElem) {
     if (jsonElem.is_null()) {

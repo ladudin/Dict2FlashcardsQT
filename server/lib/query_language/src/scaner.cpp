@@ -1,5 +1,17 @@
 #include "scaner.hpp"
 
+
+token::token() : type(token_type::NUL), lexeme(""), literal("") {}
+
+token::token(token_type type) : type(type), lexeme(""), literal("") {}
+
+token::token(token_type type, const std::string& lexeme)
+    : type(type), lexeme(lexeme), literal("") {}
+
+token::token(token_type type, const std::string& lexeme, const std::string& literal)
+    : type(type), lexeme(lexeme), literal(literal) {}
+
+
 void scanner::init_keywords() {
     keywords["in"]     = tt::IN;
     keywords["len"]    = tt::LEN;
@@ -18,8 +30,8 @@ bool scanner::has_next(size_t i) {
     return current + i < source.size();
 }
 
-bool scanner::is_digit(const std::string &c) {
-    return std::isdigit(c[0]);
+bool scanner::is_digit(char ch) {
+    return std::isdigit(ch);
 }
 
 void scanner::add_token(token_type type) {
@@ -45,16 +57,18 @@ bool scanner::match(const std::string &expected) {
     return true;
 }
 
-std::string scanner::peek() {
-    if (!has_next())
-        return "";
-    return source.substr(current, 1);
+char scanner::peek(){
+    if (!has_next()) {
+        return '\0';
+    }
+    return source[current];
 }
 
-std::string scanner::peek_next() {
-    if (current + 1 >= source.size())
-        return std::string("\0");
-    return source.substr(current + 1, 1);
+char scanner::peek_next(){
+    if (current + 1 >= source.size()){
+        return '\0';
+    }
+    return source[current + 1];
 }
 
 void scanner::number() {
@@ -63,7 +77,7 @@ void scanner::number() {
         advance();
     }
 
-    if (peek()[0] == '.' && is_digit(peek_next())) {
+    if (peek() == '.' && is_digit(peek_next())) {
         advance();
         while (is_digit(peek())) {
             advance();
@@ -76,7 +90,7 @@ void scanner::number() {
 
 void scanner::read_json_keyword() {
     advance();  // считали $
-    while (isalnum(peek()[0]) || peek()[0] == '_') {
+    while (isalnum(peek()) || peek() == '_') {
         advance();
     }
     std::string text = source.substr(start, current - start);
@@ -88,7 +102,7 @@ void scanner::read_json_keyword() {
 
 
 void scanner::read_json_level() {
-    while (isalnum(peek()[0]) || peek()[0] == '_') {
+    while (isalnum(peek()) || peek() == '_') {
         advance();
     }
     std::string text = source.substr(start, current - start);
@@ -99,7 +113,7 @@ void scanner::read_json_level() {
 
 void scanner::string() {
 
-    while (peek()[0] != '"' && has_next()) {
+    while (peek() != '"' && has_next()) {
         advance();
     }
 
@@ -180,7 +194,7 @@ void scanner::scan_token() {
             break;
 
         default:
-            if (is_digit(std::string(1, token)))
+            if (is_digit(token))
                 number();
             else if (token == '$')
                 read_json_keyword();

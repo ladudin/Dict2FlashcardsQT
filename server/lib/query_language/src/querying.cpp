@@ -35,9 +35,9 @@ auto prepare_filter(const std::string &query)
     interpreter inter;
     return [i = std::move(inter), e = std::move(exp)](
                const nlohmann::json &json_card) mutable -> std::optional<bool> {
-        value val = i.interpret(e.get(), json_card);
-        if (val.val_type == BOOL) {
-            return val.bool_val;
+        Value val = i.interpret(e.get(), json_card);
+        if (std::holds_alternative<bool>(val)) {
+            return std::get<bool>(val);
         }
         return std::nullopt;
     };

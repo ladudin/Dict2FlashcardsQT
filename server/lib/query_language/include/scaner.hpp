@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
@@ -64,15 +63,13 @@ enum token_type {
 using tt = token_type;
 
 struct token {
-    token_type  type;
+    token();
+    explicit token(token_type type);
+    explicit token(token_type type, const std::string& lexeme);
+    explicit token(token_type type, const std::string& lexeme, const std::string& literal);
+    token_type type;
     std::string lexeme;
     std::string literal;
-
-    token() : type(tt::NUL), lexeme(""){};
-    token(const token_type   type_,
-          const std::string &lexeme_  = "",
-          const std::string &literal_ = "")
-        : type(type_), lexeme(lexeme_), literal(literal_){};
 };
 
 class scanner {
@@ -90,13 +87,13 @@ private:
 
     void                              init_keywords();
     bool                              has_next(size_t i = 0);
-    bool                              is_digit(const std::string &c);
+    bool                              is_digit(char ch);
     void                              add_token(token_type type);
     void        add_token(token_type type, const std::string &literal);
     char        advance();
     bool        match(const std::string &expected);
-    std::string peek();
-    std::string peek_next();
+    char peek();
+    char peek_next();
     void        number();
     void        read_json_level();
     void        read_json_keyword();

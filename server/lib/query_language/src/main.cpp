@@ -47,8 +47,8 @@ int main() {
     json               jsonCard = card_to_json(card);
 
     try {
-    scanner scan("\"A1\" in (tags[level])");
-    //scanner scan("tags");
+    scanner scan("\"A1\" in tags[level]");
+    //scanner scan("\"A1ee\"");
     std::vector<token> tokens = scan.scan_tokens();
     for (int i = 0; i < tokens.size(); ++i){
         std::cout<< tokens[i].lexeme <<std::endl;
@@ -56,21 +56,23 @@ int main() {
     parser p(tokens);
     std::unique_ptr<Expr> exp = p.parse();
     interpreter inter;
-    value val = inter.interpret(exp.get(), jsonCard);
+    Value val = inter.interpret(exp.get(), jsonCard);
 
-    if (val.val_type == DOUBLE) {
-        std::cout << "Значение: " << val.doub_val << std::endl;
-    } else if (val.val_type == JSON) {
+    if (std::holds_alternative<double>(val)) {
+        std::cout << "Значение: " << std::get<double>(val) << std::endl;
+    } else if (std::holds_alternative<nlohmann::json>(val)) {
         std::cout << "Это JSON" << std::endl;
-        std::cout << "Значение: " << val.json_val.dump() << std::endl;
-    } else if (val.val_type == BOOL) {
+        std::cout << "Значение: " << std::get<nlohmann::json>(val).dump() << std::endl;
+    } else if (std::holds_alternative<bool>(val)) {
         std::cout << "Это логическое значение" << std::endl;
-        std::cout << "Значение: " << val.bool_val << std::endl;
-    } else if (val.val_type == STRING) {
+        std::cout << "Значение: " << std::get<bool>(val) << std::endl;
+    } else if (std::holds_alternative<std::string>(val)) {
         std::cout << "Это строка" << std::endl;
-        std::cout << "Значение: " << val.str_val << std::endl;
-    } else if (val.val_type == EMPTY) {
+        std::cout << "Значение: " << std::get<std::string>(val) << std::endl;
+    } else if (std::holds_alternative<std::monostate>(val)){
         std::cout << "Пусто" << std::endl;
+    } else {
+         std::cout << ":(" << std::endl;
     }
 } catch (const ComponentException& e) {
     std::cerr << "Ошибка: " << e.what() << std::endl;

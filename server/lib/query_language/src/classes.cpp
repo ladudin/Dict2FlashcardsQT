@@ -1,15 +1,18 @@
 #include "classes.hpp"
 
 
-Literal::Literal(std::string v) : val(v){};
-Literal::Literal(double d) : val(d){};
-Literal::Literal(bool b) : val(b){};
+Literal::Literal(std::string v) : val(std::move(v)) {}
+
+Literal::Literal(double d) : val(d) {}
+
+Literal::Literal(bool b) : val(b) {}
+
 Literal::Literal(std::vector<std::string> json_namevec_)
-    : json_namevec(json_namevec_){};
-Literal::Literal() : val(){};
+    : json_namevec(std::move(json_namevec_)) {}
 
+Literal::Literal() : val(std::monostate{}) {}
 
-value& Literal::get_value()
+Value& Literal::get_value()
 {
     return val;
 }
@@ -19,9 +22,9 @@ std::vector<std::string> Literal::get_json_namevec()
     return json_namevec;
 }
 
-void Literal::accept(ExprVisitor *visitor)
+Value Literal::accept(ExprVisitor* visitor)
 {
-    visitor->visit(this);
+    return visitor->visit(this);
 }
 
 
@@ -29,9 +32,9 @@ void Literal::accept(ExprVisitor *visitor)
 Binary::Binary(std::unique_ptr<Expr> left_, token tok, std::unique_ptr<Expr> right_)
     : left(std::move(left_)), oper(tok), right(std::move(right_)){};
 
-void Binary::accept(ExprVisitor *visitor)
+Value Binary::accept(ExprVisitor *visitor)
 {
-    visitor->visit(this);
+    return visitor->visit(this);
 }
 
 Expr * Binary::get_leftptr()
@@ -63,8 +66,8 @@ token  Unary::get_opername()
     return oper;
 }
 
-void Unary::accept(ExprVisitor *visitor) {
-    visitor->visit(this);
+Value Unary::accept(ExprVisitor *visitor) {
+    return visitor->visit(this);
 }
 
 
@@ -73,7 +76,7 @@ LogicalExpr::LogicalExpr(std::unique_ptr<Expr> left_,
                            std::unique_ptr<Expr> right_)
     : left(std::move(left_)), oper(tok), right(std::move(right_)){};
 
-void LogicalExpr::accept(ExprVisitor *visitor) {
+Value LogicalExpr::accept(ExprVisitor *visitor) {
     visitor->visit(this);
 }
 
@@ -96,9 +99,9 @@ token  LogicalExpr::get_opername()
 FuncIn::FuncIn(std::unique_ptr<Expr> left_, std::unique_ptr<Expr> right_)
     : left(std::move(left_)), right(std::move(right_)){};
 
-void FuncIn::accept(ExprVisitor *visitor)
+Value FuncIn::accept(ExprVisitor *visitor)
 {
-    visitor->visit(this);
+    return visitor->visit(this);
 }
 
 Expr * FuncIn::get_leftptr()
@@ -115,9 +118,9 @@ Expr * FuncIn::get_rightptr()
 Grouping::Grouping(std::unique_ptr<Expr> Expr_)
     : expression(std::move(Expr_)){};
 
-void Grouping::accept(ExprVisitor *visitor)
+Value Grouping::accept(ExprVisitor *visitor)
 {
-    visitor->visit(this);
+    return visitor->visit(this);
 }
 
 Expr * Grouping::get_expr()

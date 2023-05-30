@@ -25,13 +25,13 @@ bool parser::check(token_type type) {
 }
 
 bool parser::match(std::vector<token_type> types) {
-    for (auto &type : types) {
+    return std::ranges::any_of(types, [this](const token_type& type) {
         if (check(type)) {
             advance();
             return true;
         }
-    }
-    return false;
+        return false;
+    });
 }
 
 
@@ -72,7 +72,7 @@ std::unique_ptr<Expr> parser::primary() {
 std::vector<std::string> parser::read_json_elem() {
     std::vector<std::string> json_fields;
     json_fields.push_back(previous().lexeme);
-    while (match({{tt::LEFT_BRACKET}})) {
+    while (match({tt::LEFT_BRACKET})) {
         if (match({tt::IDENTIFIER})) {
             json_fields.push_back(previous().lexeme);
         } else {
