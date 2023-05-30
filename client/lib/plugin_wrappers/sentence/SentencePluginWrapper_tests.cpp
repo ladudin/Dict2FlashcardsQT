@@ -29,9 +29,10 @@ TEST(SentensePWGet, Output) {
 
 TEST(SentensePWGet, PartialSuccess) {
     json answer = {
-        {"status",  0                                                      },
-        {"result",  json::array({"sentence_1", "sentence_2", "sentence_3"})},
-        {"message", "something"                                            }
+        {"status", 0               },
+        {"result",
+         json::array({json::array({"sentence_1", "sentence_2", "sentence_3"}),
+                      "something"})}
     };
     auto fixed_answer = std::make_shared<FixedAnswer>(answer.dump());
     SentencePluginWrapper                            wrapper(fixed_answer);

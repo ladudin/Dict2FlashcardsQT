@@ -48,7 +48,7 @@ TEST(BasicPWInit, WrongResponseFormat) {
     BasicPluginWrapper wrapper(fixed_answer, "tests");
 
     std::string        actual   = wrapper.init("nonexiten_plugin");
-    std::string        expected = "Wrong response format";
+    std::string        expected = "Wrong response format: " + answer;
 
     EXPECT_EQ(actual, expected);
 }

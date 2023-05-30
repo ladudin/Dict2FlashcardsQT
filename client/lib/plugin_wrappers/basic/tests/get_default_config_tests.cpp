@@ -24,9 +24,10 @@ TEST(BasicPWGetDefaultConfig, Output) {
 
 TEST(BasicPWGetDefaultConfig, PartialSuccess) {
     json answer = {
-        {"status", 0                                         },
-        {"result", {{"language", "english"}, {"level", "C2"}}},
-        {"message",  "something"                               }
+        {"status", 0               },
+        {"result",
+         json::array({json::object({{"language", "english"}, {"level", "C2"}}),
+                      "something"})}
     };
     auto fixed_answer = std::make_shared<FixedAnswer>(answer.dump());
     BasicPluginWrapper           wrapper(fixed_answer, "tests");
@@ -46,7 +47,7 @@ TEST(BasicPWGetDefaultConfig, Error) {
     json answer = {
         {"status",   1          },
         {"response", "null"     },
-        {"message",    "something"}
+        {"message",  "something"}
     };
     auto fixed_answer = std::make_shared<FixedAnswer>(answer.dump());
     BasicPluginWrapper                  wrapper(fixed_answer, "tests");

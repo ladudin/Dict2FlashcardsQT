@@ -25,10 +25,11 @@ std::string FormatProcessorPluginWrapper::save(const std::string &cards_path) {
         return "Server disconnected";
     try {
         json response_message = json::parse(response.second);
-        if (response_message.at("status").get<int>() != 0)
+        if (response_message.at("status").get<int>() != 0) {
             return response_message.at("message").get<std::string>();
+        }
         return {};
     } catch (...) {
-        return "Wrong response format";
+        return "Wrong response format: " + response.second;
     }
 }

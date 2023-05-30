@@ -30,7 +30,7 @@ std::string BasicPluginWrapper::init(const std::string &plugin_name) {
             return response_message.at("message").get<std::string>();
         return {};
     } catch (...) {
-        return "Wrong response format";
+        return "Wrong response format: " + response.second;
     }
 }
 
@@ -47,10 +47,10 @@ std::pair<std::string, std::string> BasicPluginWrapper::get_default_config() {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
             return {"", response_message.at("message").get<std::string>()};
-        return {response_message.at("result").dump(2),
-                response_message.at("message").get<std::string>()};
+        return {response_message.at("result")[0].dump(2),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {"", "Wrong response format"};
+        return {"", "Wrong response format: " + response.second};
     }
 }
 
@@ -59,17 +59,18 @@ std::pair<std::string, std::string> BasicPluginWrapper::get_default_scheme() {
         {"query_type",  "get_default_scheme"},
         {"plugin_type", plugin_type_        }
     };
-    std::pair<bool, std::string> response(connection_->request(request_message.dump()));
+    std::pair<bool, std::string> response(
+        connection_->request(request_message.dump()));
     if (!response.first)
         return {"", "Server disconnected"};
     try {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0)
             return {"", response_message.at("message").get<std::string>()};
-        return {response_message.at("result").dump(2),
-                response_message.at("message").get<std::string>()};
+        return {response_message.at("result")[0].dump(2),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {"", "Wrong response format"};
+        return {"", "Wrong response format: " + response.second};
     }
 }
 
@@ -86,7 +87,8 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
         {"plugin_type", plugin_type_},
         {"query",       config      }
     };
-    std::pair<bool, std::string> response(connection_->request(request_message.dump()));
+    std::pair<bool, std::string> response(
+        connection_->request(request_message.dump()));
     if (!response.first)
         return {{}, "Server disconnected"};
     try {
@@ -97,7 +99,7 @@ BasicPluginWrapper::set_config(const std::string &new_config) {
                     ""};
         return {{}, ""};
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
 
@@ -106,7 +108,8 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::list_plugins() {
         {"query_type",  "list_plugins"},
         {"plugin_type", plugin_type_  }
     };
-    std::pair<bool, std::string> response(connection_->request(request_message.dump()));
+    std::pair<bool, std::string> response(
+        connection_->request(request_message.dump()));
     if (!response.first)
         return {{}, "Server disconnected"};
     try {
@@ -120,10 +123,10 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::list_plugins() {
                        response_message.at("result")
                            .at("failed")
                            .get<std::vector<std::string>>()},
-            response_message.at("message").get<std::string>()
+            ""
         };
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
 
@@ -132,7 +135,8 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::load_new_plugins() {
         {"query_type",  "load_new_plugins"},
         {"plugin_type", plugin_type_      }
     };
-    std::pair<bool, std::string> response(connection_->request(request_message.dump()));
+    std::pair<bool, std::string> response(
+        connection_->request(request_message.dump()));
     if (!response.first)
         return {{}, "Server disconnected"};
     try {
@@ -146,9 +150,9 @@ std::pair<LoadResult, std::string> BasicPluginWrapper::load_new_plugins() {
                        response_message.at("result")
                            .at("failed")
                            .get<std::vector<std::string>>()},
-            response_message.at("message").get<std::string>()
+            ""
         };
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
