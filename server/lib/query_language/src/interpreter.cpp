@@ -255,7 +255,7 @@ std::vector<std::string> interpreter::split_string(const std::string &str) {
 // Рекурсивная функция для разделения JSON элемента
 nlohmann::json interpreter::split_json(const nlohmann::json &jsonValue) {
     if (jsonValue.is_null()) {
-        return nlohmann::json::array();
+         throw ComponentException("Element is null");
     }
 
     if (jsonValue.is_string()) {
@@ -274,12 +274,12 @@ nlohmann::json interpreter::split_json(const nlohmann::json &jsonValue) {
         return result;
     }
 
-    return nlohmann::json::array();
+     throw ComponentException("Invalid operation");
 }
 
 double interpreter::json_length(const nlohmann::json &jsonValue) {
     if (jsonValue.is_null()) {
-        return 0;
+        throw ComponentException("Element is null");
     }
 
     if (jsonValue.is_array() || jsonValue.is_object()) {
@@ -298,11 +298,15 @@ bool interpreter::find_word_inJson(std::string word, nlohmann::json jsonValue) {
     if (!jsonValue.is_array()) {
         return false;
     }
-    for (const auto &element : jsonValue) {
-        if (find_word_inJson(word, element)) {
-            return true;
-        }  
+
+    bool found = std::ranges::any_of(jsonValue, [&](const auto& element) {
+        return find_word_inJson(word, element);
+    });
+
+    if (found) {
+        return true;
     }
+    
     return false;
 }
 
@@ -322,10 +326,10 @@ nlohmann::json interpreter::find_json_value(const nlohmann::json& card,
             } else if (key == "$SELF") {
                 return get_self_keys(current_json);
             } else {
-                return nlohmann::json();
+                 throw ComponentException("Invalid operand type");
             }
         } else {
-            return nlohmann::json();
+             throw ComponentException("Invalid operand type");
         }
     }
 
@@ -371,7 +375,7 @@ nlohmann::json interpreter::get_self_keys(const nlohmann::json& json_Value) {
 
 nlohmann::json interpreter::reduce_json(const nlohmann::json &jsonElem) {
     if (jsonElem.is_null()) {
-        return nlohmann::json();
+        throw ComponentException("Element is null");
     }
 
     nlohmann::json result;
