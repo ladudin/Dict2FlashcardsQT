@@ -30,19 +30,19 @@ WordPluginWrapper::get(const std::string &word,
     std::pair<bool, std::string> response(
         connection_->request(request_message.dump()));
     if (!response.first)
-        return {std::vector<Card>(), "Server disconnected"};
+        return {{}, "Server disconnected"};
     try {
         json response_message = json::parse(response.second);
         if (response_message.at("status").get<int>() != 0) {
             return {std::vector<Card>(),
                     response_message.at("message").get<std::string>()};
         }
-        json cards_with_error = response_message["result"];
-        std::vector<Card> cards = cards_with_error[0];
+        json              cards_with_error = response_message["result"];
+        std::vector<Card> cards            = cards_with_error[0];
 
         return {cards, cards_with_error[1]};
     } catch (...) {
-        return {std::vector<Card>(), "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }
 
@@ -53,15 +53,17 @@ std::pair<std::string, std::string> WordPluginWrapper::get_dict_scheme() {
     };
     std::pair<bool, std::string> response(
         connection_->request(request_message.dump()));
-    if (!response.first)
+    if (!response.first) {
         return {"", "Server disconnected"};
+    }
     try {
         json response_message = json::parse(response.second);
-        if (response_message.at("status").get<int>() != 0)
+        if (response_message.at("status").get<int>() != 0) {
             return {"", response_message.at("message").get<std::string>()};
-        return {response_message.at("result").dump(2),
-                response_message.at("message").get<std::string>()};
+        }
+        return {response_message.at("result")[0].dump(2),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {"", "Wrong response format"};
+        return {"", "Wrong response format: " + response.second};
     }
 }

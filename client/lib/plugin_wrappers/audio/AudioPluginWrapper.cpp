@@ -32,9 +32,9 @@ std::pair<Media, std::string> AudioPluginWrapper::get(const std::string &word,
         if (response_message.at("status").get<int>() != 0) {
             return {{}, response_message.at("message").get<std::string>()};
         }
-        return {response_message.at("result").get<Media>(),
-                response_message.at("message").get<std::string>()};
+        return {response_message.at("result")[0].get<Media>(),
+                response_message.at("result")[1].get<std::string>()};
     } catch (...) {
-        return {{}, "Wrong response format"};
+        return {{}, "Wrong response format: " + response.second};
     }
 }

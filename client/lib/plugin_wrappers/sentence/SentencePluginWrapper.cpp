@@ -28,16 +28,19 @@ SentencePluginWrapper::get(const std::string &word,
     };
     std::pair<bool, std::string> response(
         connection_->request(request_message.dump()));
-    if (!response.first)
+    if (!response.first) {
         return {std::vector<std::string>(), "Server disconnected"};
+    }
     try {
         json response_message = json::parse(response.second);
-        if (response_message.at("status").get<int>() != 0)
+        if (response_message.at("status").get<int>() != 0) {
             return {std::vector<std::string>(),
                     response_message.at("message").get<std::string>()};
-        return {response_message.at("result").get<std::vector<std::string>>(),
-                response_message.at("message").get<std::string>()};
+        }
+        json              sentences_with_error = response_message["result"];
+        std::vector<std::string> sentences            = sentences_with_error[0];
+        return {sentences, sentences_with_error[1]};
     } catch (...) {
-        return {std::vector<std::string>(), "Wrong response format"};
+        return {std::vector<std::string>(), "Wrong response format: " + response.second};
     }
 }
