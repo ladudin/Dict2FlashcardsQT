@@ -23,4 +23,8 @@ target_link_libraries(app
 Qt5::Core
 Qt5::Widgets
 main_window
+sentences_widget
+connection
+sentence_plugin_wrapper
+card
 )

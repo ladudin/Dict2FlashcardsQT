@@ -1,4 +1,5 @@
 add_subdirectory(Audio)
 add_subdirectory(ExamplesViewer)
 add_subdirectory(ImagesViewer)
+add_subdirectory(SentencesWidget)
 add_subdirectory(MainWindow)

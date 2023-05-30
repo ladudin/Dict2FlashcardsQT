@@ -6,11 +6,14 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-add_library(examples_viewer 
-ExamplesWidget.cpp 
-# ExamplesWidget.hpp 
-ExamplesWidget.ui
+
+set(PROJECT_SOURCES
+    ExamplesWidget.cpp 
+    ExamplesWidget.hpp 
+    ExamplesWidget.ui
 )
+
+add_library(examples_viewer ${PROJECT_SOURCES})
 
 target_include_directories(examples_viewer PUBLIC ./)
 
