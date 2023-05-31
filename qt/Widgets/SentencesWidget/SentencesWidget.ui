@@ -82,8 +82,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>LoadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SentencesWidget</receiver>
+   <slot>load()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>141</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>addSentence()</slot>
+  <slot>load()</slot>
  </slots>
 </ui>

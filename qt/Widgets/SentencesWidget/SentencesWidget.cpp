@@ -8,12 +8,14 @@
 #include <qdebug.h>
 #include <qlayoutitem.h>
 #include <qnamespace.h>
+#include <qobject.h>
 #include <qpushbutton.h>
 #include <qsizepolicy.h>
 #include <qtextedit.h>
 #include <qwidget.h>
 #include <qwindowdefs.h>
 #include <QDebug>
+#include <string>
 
 SentencesWidget::SentencesWidget(std::unique_ptr<ISentencePluginWrapper> sentencePlugin,
                             QWidget *parent) :
@@ -29,7 +31,12 @@ SentencesWidget::SentencesWidget(std::unique_ptr<ISentencePluginWrapper> sentenc
     sentencesListWidget->setObjectName("ListWidget");
     sentencesListWidget->setLayout(gridLayout);
     ui->scrollArea->setWidget(sentencesListWidget);
-    load("go");
+    // std::vector<std::string> sentences = {"hello", "world", "bye", "school", ""};
+    // std::vector<bool> mask = {true, false, true, false, true};
+    // set(sentences, mask);
+    // SPDLOG_INFO("Sentences size: {}", getSentences().size());
+    // SPDLOG_INFO("Mask size: {}", getMask().size());
+    // SPDLOG_INFO("Chosen sentences size: {}", getChosenSentences().size());
 }
 
 SentencesWidget::~SentencesWidget()
@@ -46,7 +53,12 @@ void SentencesWidget::addSentence(QString sentence, bool is_chosen)
     textEdit->setText(sentence);
 
     QPushButton *pushButton = new QPushButton;
+    pushButton->setCheckable(true);
+    pushButton->setStyleSheet("QPushButton:checked { background-color: green; }");
     pushButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    if (is_chosen) {
+        pushButton->setChecked(true);
+    }
     
     textEdit->setMaximumHeight(100);
     pushButton->setMaximumHeight(100);
@@ -81,4 +93,97 @@ void SentencesWidget::clear() {
         delete item;
     }
     SPDLOG_INFO("Clear end. Row count = {}", gridLayout->count() / gridLayout->columnCount());
+}
+
+void SentencesWidget::set(std::vector<std::string> sentences, std::vector<bool> chosen_mask) {
+    clear();
+    for (int i = 0; i < sentences.size(); ++i) {
+        bool chosen = i < chosen_mask.size() ? chosen_mask.at(i) : false;
+        addSentence(QString::fromStdString(sentences.at(i)), chosen);
+    }
+}
+
+std::vector<std::string> SentencesWidget::getSentences() {
+    std::vector<std::string> sentences;
+    for (int row = 0; row < gridLayout->count() / gridLayout->columnCount(); ++row) {
+        QLayoutItem* textEditItem = gridLayout->itemAtPosition(row, 0);
+        if (!textEditItem) {
+            continue;
+        }
+        QTextEdit* textEdit = qobject_cast<QTextEdit*>(textEditItem->widget());
+        if (!textEdit) {
+            continue;
+        }
+        QString text = textEdit->toPlainText();
+        if (!text.isEmpty()) {
+            sentences.push_back(text.toStdString());
+        }
+    }
+    return sentences;
+}
+
+std::vector<bool> SentencesWidget::getMask() {
+    std::vector<bool> sentencesMask;
+    for (int row = 0; row < gridLayout->count() / gridLayout->columnCount(); ++row) {
+
+        QLayoutItem* textEditItem = gridLayout->itemAtPosition(row, 0);
+        if (!textEditItem) {
+            continue;
+        }
+        QTextEdit* textEdit = qobject_cast<QTextEdit*>(textEditItem->widget());
+        if (!textEdit) {
+            continue;
+        }
+
+        QString text = textEdit->toPlainText();
+        if (text.isEmpty()) {
+            continue;
+        }
+
+        QLayoutItem* pushButtonItem = gridLayout->itemAtPosition(row, 1);
+        if (!pushButtonItem) {
+            continue;
+        }
+
+        QPushButton* pushButton = qobject_cast<QPushButton*>(pushButtonItem->widget());
+        if (!pushButton) {
+            continue;
+        }
+        sentencesMask.push_back(pushButton->isChecked());
+    }
+    return sentencesMask;
+}
+
+std::vector<std::string> SentencesWidget::getChosenSentences() {
+    std::vector<std::string> chosenSentences;
+    for (int row = 0; row < gridLayout->count() / gridLayout->columnCount(); ++row) {
+
+        QLayoutItem* textEditItem = gridLayout->itemAtPosition(row, 0);
+        if (!textEditItem) {
+            continue;
+        }
+        QTextEdit* textEdit = qobject_cast<QTextEdit*>(textEditItem->widget());
+        if (!textEdit) {
+            continue;
+        }
+
+        QString text = textEdit->toPlainText();
+        if (text.isEmpty()) {
+            continue;
+        }
+
+        QLayoutItem* pushButtonItem = gridLayout->itemAtPosition(row, 1);
+        if (!pushButtonItem) {
+            continue;
+        }
+
+        QPushButton* pushButton = qobject_cast<QPushButton*>(pushButtonItem->widget());
+        if (!pushButton) {
+            continue;
+        }
+        if (pushButton->isChecked()) {
+            chosenSentences.push_back(text.toStdString());
+        }
+    }
+    return chosenSentences;
 }

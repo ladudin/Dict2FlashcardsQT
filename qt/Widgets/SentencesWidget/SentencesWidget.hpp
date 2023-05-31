@@ -21,8 +21,14 @@ public:
 
 public slots:
     void addSentence(QString sentence = QString(), bool is_chosen = false);
-    void load(QString word, int batch_size = 5);
+    void load(QString word = "go", int batch_size = 5);
     void clear();
+    void set(std::vector<std::string> sentences, 
+            std::vector<bool> chosen_mask = std::vector<bool>()
+            );
+    std::vector<std::string> getSentences();
+    std::vector<bool> getMask();
+    std::vector<std::string> getChosenSentences();
 
 private:
     Ui::SentencesWidget *ui;
