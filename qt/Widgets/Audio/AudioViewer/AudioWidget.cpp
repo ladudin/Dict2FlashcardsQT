@@ -19,7 +19,7 @@ AudioWidget::AudioWidget(QWidget *parent) :
         connect(button, &QPushButton::clicked, [=](bool toggled) {
                 updateChosen(i, toggled, button);
             });
-        AudioPlayer* audioPlayer = new AudioPlayer;
+        MyAudioPlayer* audioPlayer = new MyAudioPlayer;
         formLayout->addRow(button, audioPlayer);
     }
     ui->groupBox->setLayout(formLayout);
@@ -56,7 +56,7 @@ void AudioWidget::set(Media audio)
         QLayoutItem* button_item = formLayout->itemAt(i, QFormLayout::LabelRole);
         QPushButton* button = qobject_cast<QPushButton*>(button_item->widget());
         QLayoutItem* player_item = formLayout->itemAt(i, QFormLayout::FieldRole);
-        AudioPlayer* player = qobject_cast<AudioPlayer*>(player_item->widget());
+        MyAudioPlayer* player = qobject_cast<MyAudioPlayer*>(player_item->widget());
         if (i >= audio.web.size()) {
             return;
         }

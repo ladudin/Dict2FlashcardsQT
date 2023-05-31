@@ -12,22 +12,22 @@
 #include "Media.h"
 
 namespace Ui {
-class AudioPlayer;
+class MyAudioPlayer;
 }
 
-class AudioPlayer : public QWidget
+class MyAudioPlayer : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit AudioPlayer(QWidget *parent = nullptr);
-    ~AudioPlayer();
+    explicit MyAudioPlayer(QWidget *parent = nullptr);
+    ~MyAudioPlayer();
 
 public slots:
     void set(SourceWithAdditionalInfo audio, bool isLocal);
 
 private:
-    Ui::AudioPlayer *ui;
+    Ui::MyAudioPlayer *ui;
     SourceWithAdditionalInfo m_audio;
     bool m_isLocal;
     QPushButton* m_pcmdPlay;

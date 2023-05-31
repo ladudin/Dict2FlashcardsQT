@@ -26,5 +26,6 @@ main_window
 sentences_widget
 connection
 sentence_plugin_wrapper
+player
 card
 )

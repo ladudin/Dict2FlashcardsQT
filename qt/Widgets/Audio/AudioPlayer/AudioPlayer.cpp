@@ -7,9 +7,9 @@
 #include <QTime>
 #include <QTextEdit>
 
-AudioPlayer::AudioPlayer(QWidget *parent):
+MyAudioPlayer::MyAudioPlayer(QWidget *parent):
     QWidget(parent),
-    ui(new Ui::AudioPlayer)
+    ui(new Ui::MyAudioPlayer)
 {
     m_infoEdit = new QTextEdit;
     m_infoEdit->setPlaceholderText("Audio additional info");
@@ -54,12 +54,12 @@ AudioPlayer::AudioPlayer(QWidget *parent):
     setLayout(m_pvbxMainLayout);
 }
 
-AudioPlayer::~AudioPlayer()
+MyAudioPlayer::~MyAudioPlayer()
 {
     delete ui;
 }
 
-void AudioPlayer::set(SourceWithAdditionalInfo audio, bool isLocal)
+void MyAudioPlayer::set(SourceWithAdditionalInfo audio, bool isLocal)
 {
     m_audio = audio;
     m_isLocal = isLocal;
@@ -67,7 +67,7 @@ void AudioPlayer::set(SourceWithAdditionalInfo audio, bool isLocal)
     slotOpen();
 }
 
-void AudioPlayer::slotOpen()
+void MyAudioPlayer::slotOpen()
 {
     QUrl url;
     if (m_isLocal) {
@@ -83,7 +83,7 @@ void AudioPlayer::slotOpen()
     }
 }
 
-void AudioPlayer::slotPlay()
+void MyAudioPlayer::slotPlay()
 {
     switch (m_pmp->state()) {
     case QMediaPlayer::PlayingState:
@@ -95,7 +95,7 @@ void AudioPlayer::slotPlay()
     }
 }
 
-void AudioPlayer::slotStatusChanged(QMediaPlayer::State state)
+void MyAudioPlayer::slotStatusChanged(QMediaPlayer::State state)
 {
     switch (state) {
     case QMediaPlayer::PlayingState:
@@ -107,12 +107,12 @@ void AudioPlayer::slotStatusChanged(QMediaPlayer::State state)
     }
 }
 
-void AudioPlayer::slotSetMediaPosition(int n)
+void MyAudioPlayer::slotSetMediaPosition(int n)
 {
     m_pmp->setPosition(n);
 }
 
-QString AudioPlayer::msecsToString(qint64 n)
+QString MyAudioPlayer::msecsToString(qint64 n)
 {
     int nHours = (n / (60 * 60 * 1000));
     int nMinutes = ((n % (60 * 60 * 1000)) / (60 * 1000));
@@ -121,14 +121,14 @@ QString AudioPlayer::msecsToString(qint64 n)
     return QTime(nHours, nMinutes, nSeconds).toString("hh:mm::ss");
 }
 
-void AudioPlayer::slotSetDuration(qint64 n)
+void MyAudioPlayer::slotSetDuration(qint64 n)
 {
     m_psldPosition->setRange(0, n);
     m_plblCurrent->setText(msecsToString(0));
     m_plblRemain->setText(msecsToString(n));
 }
 
-void AudioPlayer::slotSetSliderPosition(qint64 n)
+void MyAudioPlayer::slotSetSliderPosition(qint64 n)
 {
     m_psldPosition->setValue(n);
 

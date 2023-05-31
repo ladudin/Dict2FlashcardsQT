@@ -1,4 +1,5 @@
 #include "ISentencePluginWrapper.h"
+#include "Media.h"
 #include "SentencePluginWrapper.h"
 #include "mainwindow.h"
 
@@ -8,6 +9,7 @@
 #include "ServerConnection.h"
 #include "Card.h"
 #include "spdlog/spdlog.h"
+#include "Player.hpp"
 // #include <QPushButton>
 // #include <QLabel>
 // #include <QPixmap>
@@ -66,11 +68,19 @@ int main(int argc, char *argv[]) {
 //    // window.resize(800, 400);
     // auto [cards, error] = load_cards("/home/vlad/park/cpp/Dict2FlashcardsQT/build/qt/savedDeck.json");
     // qDebug() << "Cards loaded: " << cards.size() << "with message" << QString::fromStdString(error);
-    SPDLOG_DEBUG("hello");
-    auto connection = std::make_shared<ServerConnection>(8888);
-    std::unique_ptr<ISentencePluginWrapper> sentencePlugin = std::make_unique<SentencePluginWrapper>(connection);
-    SentencesWidget wgt(std::move(sentencePlugin));
-    wgt.show();
+    // SPDLOG_DEBUG("hello");
+    // auto connection = std::make_shared<ServerConnection>(8888);
+    // std::unique_ptr<ISentencePluginWrapper> sentencePlugin = std::make_unique<SentencePluginWrapper>(connection);
+    // SentencesWidget wgt(std::move(sentencePlugin));
+    // wgt.show();
+    Player player;
+    
+    SourceWithAdditionalInfo source;
+    source.info = "Test audio";
+    source.src = "http://music.arizona-rp.com/rodina/1682373650.mp3";
+
+    player.set(source, false);
+    player.show();
     app.exec();
     return 0;
 }
