@@ -20,5 +20,6 @@ target_include_directories(audios_widget PUBLIC ./)
 target_link_libraries(audios_widget 
 Qt5::Widgets
 player
+card
 audio_plugin_wrapper
 )

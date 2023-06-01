@@ -4,12 +4,24 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <iostream>
 #include <memory>
 #include "SentencesWidget.hpp"
+#include "AudiosWidget.hpp"
 #include "ServerConnection.h"
 #include "Card.h"
 #include "spdlog/spdlog.h"
 #include "Player.hpp"
+#include <QMediaPlayer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <qmediacontent.h>
+#include <qmediaplayer.h>
+#include <thread>
+#include <chrono>
+#include <thread>
+#include <QBuffer>
 // #include <QPushButton>
 // #include <QLabel>
 // #include <QPixmap>
@@ -73,14 +85,35 @@ int main(int argc, char *argv[]) {
     // std::unique_ptr<ISentencePluginWrapper> sentencePlugin = std::make_unique<SentencePluginWrapper>(connection);
     // SentencesWidget wgt(std::move(sentencePlugin));
     // wgt.show();
-    Player player;
-    
-    SourceWithAdditionalInfo source;
-    source.info = "Test audio";
-    source.src = "http://music.arizona-rp.com/rodina/1682373650.mp3";
 
-    player.set(source, false);
-    player.show();
+    SourceWithAdditionalInfo source1;
+    source1.info = "Test audio";
+    source1.src = "http://music.arizona-rp.com/rodina/1682374558.mp3";
+
+    SourceWithAdditionalInfo source2;
+    source2.info = "Test audio";
+    source2.src = "http://music.arizona-rp.com/rodina/1682288834.mp3";
+
+    SourceWithAdditionalInfo source3;
+    source3.info = "Test audio";
+    source3.src = "http://music.arizona-rp.com/rodina/1682374575.mp3";
+
+    AudiosWidget wgt;
+    wgt.addAudio(source1, false, false);
+    wgt.addAudio(source2, false, false);
+    wgt.addAudio(source3, false, false);
+    wgt.show();
+    // QNetworkAccessManager manager;
+    // QNetworkReply* reply = manager.get(QNetworkRequest(QUrl("https://www.1zoom.ru/big2/541/255095-Sepik.jpg")));
+
+    // std::this_thread::sleep_for(std::chrono::seconds(10));
+    // QByteArray bytes = reply->readAll();
+    // std::cout << bytes.length() << " " << bytes.size() << std::endl;
+    // QBuffer buffer(&bytes);
+    // delete reply;
+    // Player player;
+    // player.download(QUrl("https://www.1zoom.ru/big2/541/255095-Sepik.jpg"));
+    // std::this_thread::sleep_for(std::chrono::seconds(10));
     app.exec();
     return 0;
 }

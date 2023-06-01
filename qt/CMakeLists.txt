@@ -24,6 +24,7 @@ Qt5::Core
 Qt5::Widgets
 main_window
 sentences_widget
+audios_widget
 connection
 sentence_plugin_wrapper
 player

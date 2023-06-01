@@ -2,9 +2,15 @@
 #include "ui_Player.h"
 #include <qdatetime.h>
 #include <qmediaplayer.h>
+#include <qnetworkreply.h>
 #include <qurl.h>
 #include <QStyle>
 #include <QTimer>
+#include <string>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <sys/socket.h>
 
 Player::Player(QWidget *parent) :
     QWidget(parent),
@@ -25,7 +31,17 @@ Player::~Player()
     delete ui;
 }
 
+void Player::download(QUrl url) {
+}
+
+void Player::onFinished() {
+    qDebug() << "here";
+    QByteArray bytes = reply->readAll();
+    qDebug() << bytes.size();
+}
+
 void Player::set(SourceWithAdditionalInfo audio, bool isLocal) {
+    qDebug() << "here";
     if (isLocal) {
         audioPlayer->setMedia(QUrl::fromLocalFile(QString::fromStdString(audio.src)));
         return;
@@ -35,9 +51,9 @@ void Player::set(SourceWithAdditionalInfo audio, bool isLocal) {
 }
 
 void Player::onStateChanged(QMediaPlayer::State state) {
-    if (state == QMediaPlayer::StoppedState) {
-        ui->playButton->setEnabled(true);
-    }
+    // if (state == QMediaPlayer::StoppedState) {
+    //     ui->playButton->setEnabled(true);
+    // }
 }
 
 void Player::onStatusChanged(QMediaPlayer::MediaStatus status) {
@@ -49,5 +65,5 @@ void Player::onStatusChanged(QMediaPlayer::MediaStatus status) {
 void Player::onPlayClicked() {
     audioPlayer->play();
     ui->playButton->setEnabled(false);
-    QTimer::singleShot(maxPlayDuration, audioPlayer, SLOT(stop()));
+    // QTimer::singleShot(maxPlayDuration, audioPlayer, SLOT(stop()));
 }
