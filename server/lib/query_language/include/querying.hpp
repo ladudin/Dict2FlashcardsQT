@@ -8,4 +8,4 @@
 auto prepare_filter(const std::string &query)
     -> std::function<std::optional<bool>(const nlohmann::json &json_card)>;
 
-#endif // !QUERYING_H
+#endif  // !QUERYING_H
