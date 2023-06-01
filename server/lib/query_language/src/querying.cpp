@@ -1,14 +1,17 @@
 #include "querying.hpp"
 
+#include "exception.hpp"
 #include "interpreter.hpp"
 #include "parcer.hpp"
 #include "scaner.hpp"
+#include "spdlog/fmt/bundled/core.h"
 #include "spdlog/spdlog.h"
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
+#include <variant>
 
-auto prepare_filter(const std::string &query)
-    -> std::function<std::optional<bool>(const nlohmann::json &json_card)> {
+auto prepare_filter(const std::string &query) -> std::function<
+    std::variant<bool, std::string>(const nlohmann::json &json_card)> {
     SPDLOG_INFO("Preparing query: `{}`", query);
     if (query.empty()) {
         SPDLOG_INFO("Query `{}` is considered empty, returning a constant true "
@@ -33,12 +36,19 @@ auto prepare_filter(const std::string &query)
 
     SPDLOG_INFO("Setting up an interpreter for ther query: `{}`", query);
     interpreter inter;
-    return [i = std::move(inter), e = std::move(exp)](
-               const nlohmann::json &json_card) mutable -> std::optional<bool> {
-        value val = i.interpret(e.get(), json_card);
+    return [i = std::move(inter),
+            e = std::move(exp)](const nlohmann::json &json_card) mutable
+           -> std::variant<bool, std::string> {
+        value val;
+        try {
+            val = i.interpret(e.get(), json_card);
+        } catch (const ComponentException &error) {
+            return error.what();
+        }
         if (val.val_type == BOOL) {
             return val.bool_val;
         }
-        return std::nullopt;
+        return fmt::format("Resulting type has to be `bool`. Got: `{}`",
+                           val.val_type);
     };
 }

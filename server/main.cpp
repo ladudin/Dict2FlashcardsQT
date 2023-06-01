@@ -87,7 +87,6 @@ auto main(int argc, char *argv[]) -> int {
         }
         Py_SetProgramName(absolute_path_to_python_interpreter.wstring().data());
     }
-
     Py_Initialize();
     auto plugins_dirs = PluginTypesLocationsConfig{
         .definitions_providers_dir =
