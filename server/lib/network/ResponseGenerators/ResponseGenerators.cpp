@@ -10,6 +10,7 @@
 #include "ImagesProviderWrapper.hpp"
 #include "PyExceptionInfo.hpp"
 #include "SentencesProviderWrapper.hpp"
+#include "exception.hpp"
 #include "querying.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
@@ -467,9 +468,15 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
         return return_error("\""s + RESTART_FIELD +
                             "\" field is expected to be a boolean");
     }
-    auto restart         = request[RESTART_FIELD].get<bool>();
+    auto restart = request[RESTART_FIELD].get<bool>();
 
-    auto filter_function = prepare_filter(filter_query);
+    std::function<std::variant<bool, std::string>(const nlohmann::json &)>
+        filter_function;
+    try {
+        filter_function = prepare_filter(filter_query);
+    } catch (const ComponentException &error) {
+        return return_error("Could'n parse query. Reason: "s + error.what());
+    }
     DefinitionsProviderWrapper::type batch;
     while (batch_size && batch.second.empty()) {
         auto result_or_error = provider->get(word, batch_size, restart);
@@ -494,9 +501,14 @@ auto ResponseGenerator::handle_get_definitions(const nlohmann::json &request)
                 std::ranges::views::filter(
                     [&filter_function](const Card &item) -> bool {
                         auto filtration_res = filter_function(item);
-                        if (filtration_res.has_value()) {
-                            return filtration_res.value();
+                        if (std::holds_alternative<bool>(filtration_res)) {
+                            auto res = std::get<bool>(filtration_res);
+                            return res;
                         }
+                        auto res = std::get<std::string>(filtration_res);
+                        SPDLOG_WARN("Couldn't filter card, thus evaluating "
+                                    "filter as `false`. Reason: {}",
+                                    res);
                         return false;
                     });
 
