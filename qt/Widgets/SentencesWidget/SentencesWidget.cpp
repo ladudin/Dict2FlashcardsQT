@@ -71,9 +71,9 @@ void SentencesWidget::addSentence(QString sentence, bool is_chosen)
     SPDLOG_INFO("Sentence added. Row count =  {}", gridLayout->count() / gridLayout->columnCount());
 }
 
-void SentencesWidget::load(QString word, int batch_size) {
+void SentencesWidget::load(int batch_size) {
     SPDLOG_INFO("Start loading sentences");
-    auto [sentences, error] = sentencePlugin_->get(word.toStdString(), batch_size, false);
+    auto [sentences, error] = sentencePlugin_->get(currentWord, batch_size, false);
 
     for (const std::string& sentence: sentences) {
         addSentence(QString::fromStdString(sentence));
@@ -95,8 +95,10 @@ void SentencesWidget::clear() {
     SPDLOG_INFO("Clear end. Row count = {}", gridLayout->count() / gridLayout->columnCount());
 }
 
-void SentencesWidget::set(std::vector<std::string> sentences, std::vector<bool> chosen_mask) {
+void SentencesWidget::set(std::string word, std::vector<std::string> sentences, 
+                            std::vector<bool> chosen_mask) {
     clear();
+    currentWord = word;
     for (int i = 0; i < sentences.size(); ++i) {
         bool chosen = i < chosen_mask.size() ? chosen_mask.at(i) : false;
         addSentence(QString::fromStdString(sentences.at(i)), chosen);

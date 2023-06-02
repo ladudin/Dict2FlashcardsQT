@@ -124,7 +124,7 @@ void MainWindow::updateExamples(const Card *card)
     if (!card) {
         return;
     }
-    sentencesWidget->set(card->examples);
+    sentencesWidget->set(card->word, card->examples);
 }
 
 void MainWindow::updateAudio(const Card *card)
@@ -132,7 +132,7 @@ void MainWindow::updateAudio(const Card *card)
     if (!card) {
         return;
     }
-    audiosWidget->set(card->audios);
+    audiosWidget->set(card->word, card->audios);
 }
 
 void MainWindow::updateImages(const Card *card)
@@ -140,7 +140,7 @@ void MainWindow::updateImages(const Card *card)
     if (!card) {
         return;
     }
-    imagesWidget->set(card->images);
+    imagesWidget->set(card->word, card->images);
 }
 
 void MainWindow::setCurrentIndex(QModelIndex index)

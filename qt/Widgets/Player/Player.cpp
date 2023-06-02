@@ -29,6 +29,8 @@ Player::Player(QMediaPlayer *audioPlayer, QWidget *parent) :
             this, &Player::onStateChanged);
     connect(audioPlayer, &QMediaPlayer::mediaStatusChanged, 
             this, &Player::onStatusChanged);
+    ui->infoEdit->setEnabled(false);
+    ui->infoEdit->setStyleSheet("color: black; background-color: #F0F0F0; border: 1px solid gray;");
 }
 
 Player::~Player()

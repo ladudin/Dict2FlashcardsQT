@@ -50,8 +50,8 @@ void AudiosWidget::addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool i
     gridLayout->addWidget(audioPlayer, new_row, 1);
 }
 
-void AudiosWidget::load(QString word, int batch_size) {
-    auto [audios, error] = audioPlugin_->get(word.toStdString(), batch_size, false);
+void AudiosWidget::load(int batch_size) {
+    auto [audios, error] = audioPlugin_->get(currentWord, batch_size, false);
 
     for (SourceWithAdditionalInfo localAudio: audios.local) {
         addAudio(localAudio, true);
@@ -71,15 +71,17 @@ void AudiosWidget::clear() {
     }
 }
 
-void AudiosWidget::set(Media audios, std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
+void AudiosWidget::set(std::string word, Media audios, 
+                        std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
     clear();
+    currentWord = word;
     for (int i = 0; i < audios.local.size(); ++i) {
         bool chosen = i < chosen_mask.first.size() ? chosen_mask.first.at(i) : false;
         addAudio(audios.local.at(i), true, chosen);
     }
     for (int i = 0; i < audios.web.size(); ++i) {
         bool chosen = i < chosen_mask.second.size() ? chosen_mask.second.at(i) : false;
-        addAudio(audios.web.at(i), true, chosen);
+        addAudio(audios.web.at(i), false, chosen);
     }
 }
 

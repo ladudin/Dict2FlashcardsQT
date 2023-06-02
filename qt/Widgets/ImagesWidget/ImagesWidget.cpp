@@ -71,8 +71,8 @@ void ImagesWidget::addImage(SourceWithAdditionalInfo image, bool isLocal, bool i
     }
 }
 
-void ImagesWidget::load(QString word, int batch_size) {
-    auto [images, error] = imagePlugin_->get(word.toStdString(), batch_size, false);
+void ImagesWidget::load(int batch_size) {
+    auto [images, error] = imagePlugin_->get(currentWord, batch_size, false);
 
     for (SourceWithAdditionalInfo localImage: images.local) {
         addImage(localImage, true);
@@ -92,15 +92,17 @@ void ImagesWidget::clear() {
     }
 }
 
-void ImagesWidget::set(Media images, std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
+void ImagesWidget::set(std::string word, Media images, 
+                    std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
     clear();
+    currentWord = word;
     for (int i = 0; i < images.local.size(); ++i) {
         bool chosen = i < chosen_mask.first.size() ? chosen_mask.first.at(i) : false;
         addImage(images.local.at(i), true, chosen);
     }
     for (int i = 0; i < images.web.size(); ++i) {
         bool chosen = i < chosen_mask.second.size() ? chosen_mask.second.at(i) : false;
-        addImage(images.web.at(i), true, chosen);
+        addImage(images.web.at(i), false, chosen);
     }
 }
 

@@ -24,9 +24,9 @@ public:
 
 public slots:
     void addImage(SourceWithAdditionalInfo audio, bool isLocal, bool isChosen = false);
-    void load(QString word = "go", int batch_size = 5);
+    void load(int batch_size = 10);
     void clear();
-    void set(Media audios, 
+    void set(std::string word, Media audios, 
             std::pair<std::vector<bool>, std::vector<bool>> chosen_mask = 
             std::pair<std::vector<bool>, std::vector<bool>>());
     Media getImages();
@@ -38,6 +38,7 @@ private:
     QGridLayout *gridLayout;
     Downloader *downloader;
     const int picsInRow = 3;
+    std::string currentWord;
     std::unique_ptr<IImagePluginWrapper> imagePlugin_;
 };
 

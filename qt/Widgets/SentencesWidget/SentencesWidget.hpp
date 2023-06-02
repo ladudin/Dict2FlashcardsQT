@@ -21,9 +21,9 @@ public:
 
 public slots:
     void addSentence(QString sentence = QString(), bool is_chosen = false);
-    void load(QString word = "go", int batch_size = 5);
+    void load(int batch_size = 5);
     void clear();
-    void set(std::vector<std::string> sentences, 
+    void set(std::string word, std::vector<std::string> sentences, 
             std::vector<bool> chosen_mask = std::vector<bool>()
             );
     std::vector<std::string> getSentences();
@@ -33,6 +33,7 @@ public slots:
 private:
     Ui::SentencesWidget *ui;
     QGridLayout *gridLayout;
+    std::string currentWord;
     std::unique_ptr<ISentencePluginWrapper> sentencePlugin_;
 };
 

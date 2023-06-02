@@ -26,9 +26,9 @@ public:
 
 public slots:
     void addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool isChosen = false);
-    void load(QString word = "go", int batch_size = 5);
+    void load(int batch_size = 5);
     void clear();
-    void set(Media audios, 
+    void set(std::string word, Media audios, 
             std::pair<std::vector<bool>, std::vector<bool>> chosen_mask = 
             std::pair<std::vector<bool>, std::vector<bool>>());
     Media getAudios();
@@ -39,6 +39,7 @@ private:
     Ui::AudiosWidget *ui;
     QGridLayout *gridLayout;
     QMediaPlayer *mediaPlayer;
+    std::string currentWord;
     std::unique_ptr<IAudioPluginWrapper> audioPlugin_;
 };
 
