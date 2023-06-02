@@ -10,7 +10,7 @@ find_package(Qt5Concurrent REQUIRED)
 
 
 set(PROJECT_SOURCES
-    ImagesWWidget.hpp
+    ImagesWidget.hpp
     ImagesWidget.cpp
     ImagesWidget.ui
 )

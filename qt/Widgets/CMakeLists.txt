@@ -1,7 +1,4 @@
-add_subdirectory(Audio)
 add_subdirectory(Player)
-add_subdirectory(ExamplesViewer)
-add_subdirectory(ImagesViewer)
 add_subdirectory(AudiosWidget)
 add_subdirectory(SentencesWidget)
 add_subdirectory(ImagesWidget)

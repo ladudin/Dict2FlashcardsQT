@@ -1,4 +1,4 @@
-#include "ImagesWWidget.hpp"
+#include "ImagesWidget.hpp"
 #include "Downloader.hpp"
 #include "ui_ImagesWidget.h"
 #include <QPushButton>

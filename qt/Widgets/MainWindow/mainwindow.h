@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include "deck_model.h"
 #include "Card.h"
-#include "AudioWidget.hpp"
+#include "AudiosWidget.hpp"
 #include "ImagesWidget.hpp"
-#include "ExamplesWidget.hpp"
+#include "SentencesWidget.hpp"
 #include "IRequestable.h"
 
 
@@ -42,9 +42,9 @@ private:
     DeckModel* deckModel;
     std::vector<Card> savedDeck;
     std::shared_ptr<IRequestable> connection;
-    ExamplesWidget* examplesWidget;
-    AudioWidget* audioWidget;
-    IMagesWidget* imagesWidget;
+    SentencesWidget* sentencesWidget;
+    AudiosWidget* audiosWidget;
+    ImagesWidget* imagesWidget;
     QModelIndex current_index;
 };
 #endif // MAINWINDOW_H

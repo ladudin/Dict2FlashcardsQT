@@ -10,7 +10,7 @@
 #include <memory>
 #include "SentencesWidget.hpp"
 #include "AudiosWidget.hpp"
-#include "ImagesWWidget.hpp"
+#include "ImagesWidget.hpp"
 #include "ServerConnection.h"
 #include "Card.h"
 #include "spdlog/spdlog.h"
@@ -49,24 +49,26 @@ int main(int argc, char *argv[]) {
     // wgt.addAudio(source3, false, false);
     // wgt.show();
 
-    SourceWithAdditionalInfo source1;
-    source1.info = "Test audio";
-    source1.src = "https://mobimg.b-cdn.net/v3/fetch/ae/ae3617367cfef8ee5cba5db54cde1360.jpeg?w=1470&r=0.5625";
+    // SourceWithAdditionalInfo source1;
+    // source1.info = "Test audio";
+    // source1.src = "https://mobimg.b-cdn.net/v3/fetch/ae/ae3617367cfef8ee5cba5db54cde1360.jpeg?w=1470&r=0.5625";
 
-    SourceWithAdditionalInfo source2;
-    source2.info = "Test audio";
-    source2.src = "https://i.pinimg.com/originals/d3/0f/c8/d30fc877ade673509416fa5fe9917f71.jpg";
+    // SourceWithAdditionalInfo source2;
+    // source2.info = "Test audio";
+    // source2.src = "https://i.pinimg.com/originals/d3/0f/c8/d30fc877ade673509416fa5fe9917f71.jpg";
 
-    SourceWithAdditionalInfo source3;
-    source3.info = "Test audio";
-    source3.src = "https://w-dog.ru/wallpapers/11/0/500831153565704/priroda-pejzazh-prosmotret-nebo-zakat-pole-derevya-oblaka-vid-krasivyj-doroga.jpg";
+    // SourceWithAdditionalInfo source3;
+    // source3.info = "Test audio";
+    // source3.src = "https://w-dog.ru/wallpapers/11/0/500831153565704/priroda-pejzazh-prosmotret-nebo-zakat-pole-derevya-oblaka-vid-krasivyj-doroga.jpg";
 
-    auto connection = std::make_shared<ServerConnection>(8888);
-    std::unique_ptr<IImagePluginWrapper> imagePlugin = std::make_unique<ImagePluginWrapper>(connection);
-    ImagesWidget wgt(std::move(imagePlugin));
-    wgt.addImage(source1, false);
-    wgt.addImage(source2, false);
-    wgt.addImage(source3, false);
+    // auto connection = std::make_shared<ServerConnection>(8888);
+    // std::unique_ptr<IImagePluginWrapper> imagePlugin = std::make_unique<ImagePluginWrapper>(connection);
+    // ImagesWidget wgt(std::move(imagePlugin));
+    // wgt.addImage(source1, false);
+    // wgt.addImage(source2, false);
+    // wgt.addImage(source3, false);
+    // wgt.show();
+    MainWindow wgt;
     wgt.show();
     app.exec();
     return 0;

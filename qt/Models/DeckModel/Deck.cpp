@@ -4,6 +4,7 @@
 
 Deck::Deck(std::unique_ptr<IWordPluginWrapper> wordPlugin) {
     wordPlugin_ = std::move(wordPlugin);
+    wordPlugin_->init("definitions");
 }
 
 size_t Deck::size() const {
