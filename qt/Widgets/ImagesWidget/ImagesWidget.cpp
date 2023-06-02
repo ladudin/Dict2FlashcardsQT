@@ -164,6 +164,9 @@ Media ImagesWidget::getChosenImages() {
         if (!pushButton) {
             continue;
         }
+        if (!pushButton->isChecked()) {
+            continue;
+        }
         SourceWithAdditionalInfo image;
         bool isLocal = pushButton->property("isLocal").toBool();
         image.src = pushButton->property("src").toString().toStdString();

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <nlohmann/json_fwd.hpp>
 #include "deck_model.h"
 #include "Card.h"
 #include "AudiosWidget.hpp"
@@ -46,5 +47,6 @@ private:
     AudiosWidget* audiosWidget;
     ImagesWidget* imagesWidget;
     QModelIndex current_index;
+    nlohmann::json currentTags;
 };
 #endif // MAINWINDOW_H

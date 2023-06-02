@@ -18,11 +18,13 @@
 #include "WordPluginWrapper.h"
 #include "FormatProcessorPluginWrapper.h"
 #include "ServerConnection.h"
+#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <QBoxLayout>
 #include <iostream>
 #include <iostream>
+#include <qcoreevent.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -116,6 +118,7 @@ void MainWindow::updateTags(const Card *card)
     if (!card) {
         return;
     }
+    currentTags = card->tags;
     ui->tagsLine->setText(QString::fromStdString(parse_tags(card->tags)));
 }
 
@@ -170,11 +173,11 @@ void MainWindow::onPrevClicked()
 void MainWindow::onAddClicked() {
     Card card;
     card.word = ui->wordLine->text().toStdString();
-    // card.tags = ui->tagsLine->text().toStdString();
+    card.tags = currentTags;
     card.definition = ui->definitionEdit->toPlainText().toStdString();
-    card.examples = sentencesWidget->getSentences();
-    card.audios = audiosWidget->getAudios();
-    card.images = imagesWidget->getImages();
+    card.examples = sentencesWidget->getChosenSentences();
+    card.audios = audiosWidget->getChosenAudio();
+    card.images = imagesWidget->getChosenImages();
     savedDeck.push_back(card);
     onNextClicked();
 }
@@ -186,4 +189,5 @@ void MainWindow::save() {
     FormatProcessorPluginWrapper savingPlugin(connection);
     savingPlugin.init("processor");
     savingPlugin.save(absolute_path);
+    exit(0);
 }
