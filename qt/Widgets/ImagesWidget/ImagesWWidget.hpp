@@ -32,7 +32,6 @@ public slots:
     Media getImages();
     std::pair<std::vector<bool>, std::vector<bool>> getMask();
     Media getChosenImages();
-    void slotDone(const QUrl&, const QByteArray&);
 
 private:
     Ui::ImagesWidget *ui;

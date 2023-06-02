@@ -59,7 +59,7 @@ void ImagesWidget::addImage(SourceWithAdditionalInfo image, bool isLocal, bool i
     pushButton->setIcon(pixmap);
     }
     else if (QUrl(QString::fromStdString(image.src)).isValid()) {
-        downloader = new Downloader();
+        downloader = new Downloader(this);
         connect(downloader, &Downloader::done, [=](const QUrl &url, const QByteArray &bytes) {
             QPixmap pixmap;
             pixmap.loadFromData(bytes);
@@ -175,8 +175,4 @@ Media ImagesWidget::getChosenImages() {
         }
     }
     return chosenImages;
-}
-
-void ImagesWidget::slotDone(const QUrl&, const QByteArray&) {
-
 }
