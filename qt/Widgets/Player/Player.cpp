@@ -46,6 +46,7 @@ void Player::set(SourceWithAdditionalInfo audio, bool isLocal) {
     ui->infoEdit->setText(QString::fromStdString(audio.info));
     ui->playButton->setEnabled(true);
     ui->infoEdit->setEnabled(false);
+    ui->infoEdit->setStyleSheet("color: black; background-color: #F0F0F0; border: 1px solid gray;");
 }
 
 void Player::onStateChanged(QMediaPlayer::State state) {

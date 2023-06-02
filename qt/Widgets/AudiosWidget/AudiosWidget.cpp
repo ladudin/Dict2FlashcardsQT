@@ -1,15 +1,19 @@
 #include "AudiosWidget.hpp"
+#include "Media.h"
 #include "ui_AudiosWidget.h"
 #include <QPushButton>
 #include <qmediaplayer.h>
 #include "Player.hpp"
 
 
-AudiosWidget::AudiosWidget(QWidget *parent) :
+AudiosWidget::AudiosWidget(std::unique_ptr<IAudioPluginWrapper> audioPlugin,
+                        QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AudiosWidget)
 {
     ui->setupUi(this);
+    audioPlugin_ = std::move(audioPlugin);
+    audioPlugin_->init("audios");
     gridLayout = new QGridLayout;
     gridLayout->setAlignment(Qt::AlignTop);
     QWidget *audiosListWidget = new QWidget;
@@ -48,4 +52,15 @@ void AudiosWidget::addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool i
     gridLayout->addWidget(audioPlayer, new_row, 1);
 
     // SPDLOG_INFO("Sentence added. Row count =  {}", gridLayout->count() / gridLayout->columnCount());
+}
+
+void AudiosWidget::load(QString word, int batch_size) {
+    auto [audios, error] = audioPlugin_->get(word.toStdString(), batch_size, false);
+
+    for (SourceWithAdditionalInfo localAudio: audios.local) {
+        addAudio(localAudio, true);
+    }
+    for (SourceWithAdditionalInfo webAudio: audios.web) {
+    addAudio(webAudio, false);
+    }
 }

@@ -1,6 +1,7 @@
 #include "ISentencePluginWrapper.h"
 #include "Media.h"
 #include "SentencePluginWrapper.h"
+#include "AudioPluginWrapper.h"
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -98,7 +99,9 @@ int main(int argc, char *argv[]) {
     source3.info = "Test audio";
     source3.src = "http://music.arizona-rp.com/rodina/1682374575.mp3";
 
-    AudiosWidget wgt;
+    auto connection = std::make_shared<ServerConnection>(8888);
+    std::unique_ptr<IAudioPluginWrapper> audioPlugin = std::make_unique<AudioPluginWrapper>(connection);
+    AudiosWidget wgt(std::move(audioPlugin));
     wgt.addAudio(source1, false, false);
     wgt.addAudio(source2, false, false);
     wgt.addAudio(source3, false, false);

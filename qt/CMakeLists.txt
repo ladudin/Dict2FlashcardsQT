@@ -27,6 +27,7 @@ sentences_widget
 audios_widget
 connection
 sentence_plugin_wrapper
+audio_plugin_wrapper
 player
 card
 )
