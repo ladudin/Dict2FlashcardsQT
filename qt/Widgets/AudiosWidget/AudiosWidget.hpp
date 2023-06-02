@@ -27,6 +27,13 @@ public:
 public slots:
     void addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool isChosen = false);
     void load(QString word = "go", int batch_size = 5);
+    void clear();
+    void set(Media audios, 
+            std::pair<std::vector<bool>, std::vector<bool>> chosen_mask = 
+            std::pair<std::vector<bool>, std::vector<bool>>());
+    Media getAudios();
+    std::pair<std::vector<bool>, std::vector<bool>> getMask();
+    Media getChosenAudio();
 
 private:
     Ui::AudiosWidget *ui;

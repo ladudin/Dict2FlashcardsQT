@@ -36,9 +36,10 @@ Player::~Player()
     delete ui;
 }
 
-void Player::set(SourceWithAdditionalInfo audio, bool isLocal) {
-    qDebug() << "here";
-    if (isLocal) {
+void Player::set(SourceWithAdditionalInfo audio, bool local) {
+    QString info = QString::fromStdString(audio.info);
+    local_ = local;
+    if (local_) {
         url = QUrl::fromLocalFile(QString::fromStdString(audio.src));
         return;
     }
@@ -65,4 +66,16 @@ void Player::onPlayClicked() {
     audioPlayer->setMedia(url);
     audioPlayer->play();
     ui->playButton->setEnabled(false);
+}
+
+bool Player::isLocal() const {
+    return local_;
+}
+
+QString Player::getSrc() const {
+    return url.toString();
+}
+
+QString Player::getInfo() const {
+    return info;
 }
