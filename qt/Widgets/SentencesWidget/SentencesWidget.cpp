@@ -31,12 +31,6 @@ SentencesWidget::SentencesWidget(std::unique_ptr<ISentencePluginWrapper> sentenc
     sentencesListWidget->setObjectName("ListWidget");
     sentencesListWidget->setLayout(gridLayout);
     ui->scrollArea->setWidget(sentencesListWidget);
-    // std::vector<std::string> sentences = {"hello", "world", "bye", "school", ""};
-    // std::vector<bool> mask = {true, false, true, false, true};
-    // set(sentences, mask);
-    // SPDLOG_INFO("Sentences size: {}", getSentences().size());
-    // SPDLOG_INFO("Mask size: {}", getMask().size());
-    // SPDLOG_INFO("Chosen sentences size: {}", getChosenSentences().size());
 }
 
 SentencesWidget::~SentencesWidget()
@@ -73,6 +67,10 @@ void SentencesWidget::addSentence(QString sentence, bool is_chosen)
 
 void SentencesWidget::load(int batch_size) {
     SPDLOG_INFO("Start loading sentences");
+    currentWord = ui->loadSentenceLine->text().toStdString();
+    if (currentWord.empty()) {
+        return;
+    }
     auto [sentences, error] = sentencePlugin_->get(currentWord, batch_size, false);
 
     for (const std::string& sentence: sentences) {
@@ -99,6 +97,7 @@ void SentencesWidget::set(std::string word, std::vector<std::string> sentences,
                             std::vector<bool> chosen_mask) {
     clear();
     currentWord = word;
+    ui->loadSentenceLine->setText(QString::fromStdString(currentWord));
     for (int i = 0; i < sentences.size(); ++i) {
         bool chosen = i < chosen_mask.size() ? chosen_mask.at(i) : false;
         addSentence(QString::fromStdString(sentences.at(i)), chosen);

@@ -51,6 +51,10 @@ void AudiosWidget::addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool i
 }
 
 void AudiosWidget::load(int batch_size) {
+    currentWord = ui->loadAudioLine->text().toStdString();
+    if (currentWord.empty()) {
+        return;
+    }
     auto [audios, error] = audioPlugin_->get(currentWord, batch_size, false);
 
     for (SourceWithAdditionalInfo localAudio: audios.local) {
@@ -75,6 +79,7 @@ void AudiosWidget::set(std::string word, Media audios,
                         std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
     clear();
     currentWord = word;
+    ui->loadAudioLine->setText(QString::fromStdString(currentWord));
     for (int i = 0; i < audios.local.size(); ++i) {
         bool chosen = i < chosen_mask.first.size() ? chosen_mask.first.at(i) : false;
         addAudio(audios.local.at(i), true, chosen);

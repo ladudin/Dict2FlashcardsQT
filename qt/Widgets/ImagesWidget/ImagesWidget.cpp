@@ -72,6 +72,10 @@ void ImagesWidget::addImage(SourceWithAdditionalInfo image, bool isLocal, bool i
 }
 
 void ImagesWidget::load(int batch_size) {
+    currentWord = ui->loadImageLine->text().toStdString();
+    if (currentWord.empty()) {
+        return;
+    }
     auto [images, error] = imagePlugin_->get(currentWord, batch_size, false);
 
     for (SourceWithAdditionalInfo localImage: images.local) {
@@ -96,6 +100,7 @@ void ImagesWidget::set(std::string word, Media images,
                     std::pair<std::vector<bool>, std::vector<bool>> chosen_mask) {
     clear();
     currentWord = word;
+    ui->loadImageLine->setText(QString::fromStdString(currentWord));
     for (int i = 0; i < images.local.size(); ++i) {
         bool chosen = i < chosen_mask.first.size() ? chosen_mask.first.at(i) : false;
         addImage(images.local.at(i), true, chosen);
