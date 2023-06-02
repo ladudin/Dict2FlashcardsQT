@@ -14,6 +14,7 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_subdirectory(Models)
 add_subdirectory(Widgets)
+add_subdirectory(Downloader)
 
 add_executable(app
 main.cpp
@@ -25,8 +26,10 @@ Qt5::Widgets
 main_window
 sentences_widget
 audios_widget
+images_widget
 connection
 sentence_plugin_wrapper
+image_plugin_wrapper
 audio_plugin_wrapper
 player
 card
