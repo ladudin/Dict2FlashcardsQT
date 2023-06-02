@@ -72,7 +72,6 @@ void MainWindow::onSearchReturned()
         int rows = deckModel->rowCount() - 1;
         QModelIndex qm_idx = deckModel->index(deckModel->rowCount() - 1);
         ui->deckView->setCurrentIndex(qm_idx);
-        // emit ui->deckView->clicked(qm_idx);
         ui->deckView->clicked(qm_idx);
         return;
     }
