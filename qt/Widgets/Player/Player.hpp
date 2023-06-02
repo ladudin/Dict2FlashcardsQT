@@ -18,7 +18,7 @@ class Player : public QWidget
     Q_OBJECT
 
 public:
-    explicit Player(QWidget *parent = nullptr);
+    explicit Player(QMediaPlayer *audioPlayer, QWidget *parent = nullptr);
     ~Player();
     void download(QUrl url);
 
@@ -27,13 +27,11 @@ public slots:
     void onStateChanged(QMediaPlayer::State state);
     void onStatusChanged(QMediaPlayer::MediaStatus status);
     void onPlayClicked();
-    void onFinished();
 
 private:
     Ui::Player *ui;
     QMediaPlayer *audioPlayer;
-    QNetworkReply *reply;
-    const int maxPlayDuration = 5000;
+    QUrl url;
 };
 
 #endif // PLAYER_HPP

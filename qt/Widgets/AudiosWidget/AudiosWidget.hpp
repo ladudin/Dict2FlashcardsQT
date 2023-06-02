@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <qgridlayout.h>
+#include <QMediaPlayer>
+#include <qmediaplayer.h>
 #include "Card.h"
 #include "Media.h"
 
@@ -25,6 +27,7 @@ public slots:
 private:
     Ui::AudiosWidget *ui;
     QGridLayout *gridLayout;
+    QMediaPlayer *mediaPlayer;
 };
 
 #endif // AUDIOSWIDGET_HPP

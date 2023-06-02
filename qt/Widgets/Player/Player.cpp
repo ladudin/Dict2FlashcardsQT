@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "ui_Player.h"
 #include <qdatetime.h>
+#include <qglobal.h>
 #include <qmediaplayer.h>
 #include <qnetworkreply.h>
 #include <qurl.h>
@@ -12,12 +13,16 @@
 #include <QNetworkRequest>
 #include <sys/socket.h>
 
-Player::Player(QWidget *parent) :
+Player::Player(QMediaPlayer *audioPlayer, QWidget *parent) :
     QWidget(parent),
+    audioPlayer(audioPlayer),
     ui(new Ui::Player)
 {
     ui->setupUi(this);
-    audioPlayer = new QMediaPlayer(this);
+    if (!audioPlayer) {
+        qDebug() << "Svoi";
+        audioPlayer = new QMediaPlayer(this);
+    }
     ui->playButton->setEnabled(false);
     ui->playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     connect(audioPlayer, &QMediaPlayer::stateChanged, 
@@ -31,29 +36,22 @@ Player::~Player()
     delete ui;
 }
 
-void Player::download(QUrl url) {
-}
-
-void Player::onFinished() {
-    qDebug() << "here";
-    QByteArray bytes = reply->readAll();
-    qDebug() << bytes.size();
-}
-
 void Player::set(SourceWithAdditionalInfo audio, bool isLocal) {
     qDebug() << "here";
     if (isLocal) {
-        audioPlayer->setMedia(QUrl::fromLocalFile(QString::fromStdString(audio.src)));
+        url = QUrl::fromLocalFile(QString::fromStdString(audio.src));
         return;
     }
-    audioPlayer->setMedia(QUrl(QString::fromStdString(audio.src)));
+    url = QUrl(QString::fromStdString(audio.src));
     ui->infoEdit->setText(QString::fromStdString(audio.info));
+    ui->playButton->setEnabled(true);
+    ui->infoEdit->setEnabled(false);
 }
 
 void Player::onStateChanged(QMediaPlayer::State state) {
-    // if (state == QMediaPlayer::StoppedState) {
-    //     ui->playButton->setEnabled(true);
-    // }
+    if (state == QMediaPlayer::StoppedState) {
+        ui->playButton->setEnabled(true);
+    }
 }
 
 void Player::onStatusChanged(QMediaPlayer::MediaStatus status) {
@@ -63,7 +61,7 @@ void Player::onStatusChanged(QMediaPlayer::MediaStatus status) {
 }
 
 void Player::onPlayClicked() {
+    audioPlayer->setMedia(url);
     audioPlayer->play();
     ui->playButton->setEnabled(false);
-    // QTimer::singleShot(maxPlayDuration, audioPlayer, SLOT(stop()));
 }

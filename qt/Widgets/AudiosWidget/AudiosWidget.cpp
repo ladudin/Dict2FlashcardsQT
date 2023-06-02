@@ -1,6 +1,7 @@
 #include "AudiosWidget.hpp"
 #include "ui_AudiosWidget.h"
 #include <QPushButton>
+#include <qmediaplayer.h>
 #include "Player.hpp"
 
 
@@ -14,6 +15,7 @@ AudiosWidget::AudiosWidget(QWidget *parent) :
     QWidget *audiosListWidget = new QWidget;
     audiosListWidget->setLayout(gridLayout);
     ui->scrollArea->setWidget(audiosListWidget);
+    mediaPlayer = new QMediaPlayer(this);
 }
 
 AudiosWidget::~AudiosWidget()
@@ -29,7 +31,7 @@ void AudiosWidget::addAudio(SourceWithAdditionalInfo audio, bool isLocal, bool i
     pushButton->setStyleSheet("QPushButton:checked { background-color: green; }");
     pushButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    Player *audioPlayer = new Player;
+    Player *audioPlayer = new Player(mediaPlayer);
     audioPlayer->set(audio, isLocal);
 
     if (isChosen) {
