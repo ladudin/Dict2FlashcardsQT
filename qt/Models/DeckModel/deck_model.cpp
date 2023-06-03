@@ -5,9 +5,7 @@
 DeckModel::DeckModel(std::unique_ptr<IDeck> deck, QObject *parent)
     : QAbstractListModel(parent)
 {
-    std::cout << "do: " << (deck != nullptr) << std::endl;
     deck_ = std::move(deck);
-    std::cout << "posle: " << (deck_ != nullptr) << std::endl;
 }
 
 int DeckModel::rowCount(const QModelIndex &parent) const
