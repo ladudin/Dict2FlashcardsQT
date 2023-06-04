@@ -1,10 +1,11 @@
 #pragma once
+
 #include "classes.hpp"
 
 class parser {
  public:
     parser(std::vector<token> &t);
-    std::unique_ptr<expr> parse();
+    std::unique_ptr<Expr> parse();
 
  private:
     std::vector<token>       tokens;
@@ -16,14 +17,14 @@ class parser {
     token                    peek();
     token                    previous();
     token                    advance();
-    std::unique_ptr<expr>    primary();
-    std::unique_ptr<expr>    func_in_class();
-    std::unique_ptr<expr>    unar();
-    std::unique_ptr<expr>    multiplication();
-    std::unique_ptr<expr>    addition();
-    std::unique_ptr<expr>    comparison();
-    std::unique_ptr<expr>    equality();
-    std::unique_ptr<expr>    and_expr();
-    std::unique_ptr<expr>    or_expr();
-    std::unique_ptr<expr>    expression();
+    std::unique_ptr<Expr>    primary();
+    std::unique_ptr<Expr>    func_in();
+    std::unique_ptr<Expr>    unar();
+    std::unique_ptr<Expr>    multiplication();
+    std::unique_ptr<Expr>    addition();
+    std::unique_ptr<Expr>    comparison();
+    std::unique_ptr<Expr>    equality();
+    std::unique_ptr<Expr>    and_expr();
+    std::unique_ptr<Expr>    or_expr();
+    std::unique_ptr<Expr>    expression();
 };
